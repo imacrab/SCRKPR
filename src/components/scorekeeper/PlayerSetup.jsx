@@ -203,14 +203,6 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
                   backgroundColor: active ? "hsl(var(--card))" : "transparent",
                 }}
               >
-                <div
-                  className="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all"
-                  style={{
-                    borderColor: active ? "white" : "hsl(var(--muted-foreground))",
-                  }}
-                >
-                  {active && <div className="w-2 h-2 rounded-full bg-white" />}
-                </div>
                 <opt.Icon
                   size={20}
                   strokeWidth={1.5}

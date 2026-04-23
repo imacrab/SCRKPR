@@ -201,7 +201,6 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
 
       {/* Win mode */}
       <div className="px-5 pt-2 pb-0">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Win Condition</p>
         <div className="flex gap-2">
           {[
             { value: "low",  label: "Low Score",  Icon: Target },

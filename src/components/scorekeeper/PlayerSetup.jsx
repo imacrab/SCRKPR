@@ -189,8 +189,8 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Win Condition</p>
         <div className="flex gap-2">
           {[
-            { value: "high", label: "High Score", Icon: Trophy },
             { value: "low",  label: "Low Score",  Icon: Target },
+            { value: "high", label: "High Score", Icon: Trophy },
           ].map((opt) => {
             const active = winMode === opt.value;
             return (

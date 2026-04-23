@@ -36,7 +36,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
   const [expandedColor, setExpandedColor] = useState(null);
   const [groups, setGroups] = useState([]);
   const [showSaveGroup, setShowSaveGroup] = useState(false);
-  const [winMode, setWinMode] = useState("high"); // "high" | "low"
+  const [winMode, setWinMode] = useState("low"); // "high" | "low"
 
   useEffect(() => {
     base44.entities.PlayerGroup.list("-created_date", 20).then(setGroups);

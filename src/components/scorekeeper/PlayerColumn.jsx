@@ -44,7 +44,7 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditPl
                 onClick={() => onEditScore(idx)}
               >
                 <span
-                  className={`font-semibold block leading-none text-xs ${!isCurrent ? "text-muted-foreground" : ""}`}
+                  className={`font-semibold block leading-none text-s ${!isCurrent ? "text-muted-foreground" : ""}`}
                   style={isCurrent ? { color: player.color } : undefined}
                 >
                   {score > 0 ? `+${score}` : score}

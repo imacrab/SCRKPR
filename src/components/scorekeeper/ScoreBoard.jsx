@@ -4,7 +4,7 @@ import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
 import { Button } from "@/components/ui/button";
 
-export default function ScoreBoard({ players, onAddScore, onEditScore, onEditName, onReset, onAddPlayer }) {
+export default function ScoreBoard({ players, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [editingScore, setEditingScore] = useState(null);
 
@@ -40,8 +40,8 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
     <div className="h-screen w-screen bg-background flex flex-col overflow-hidden">
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-10 pb-3 flex-shrink-0 bg-card border-b border-border">
-        <h1 className="font-display text-lg font-bold text-foreground">
-          Scor<span className="text-accent-blue">Keep</span>
+        <h1 className="font-sans font-medium text-lg text-foreground">
+          Scorkeepr
         </h1>
         <div className="flex items-center gap-2">
           {players.length < 20 && (
@@ -84,6 +84,7 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
                 onAddScore={() => handleOpenScore(player)}
                 onEditScore={(idx) => handleEditScore(player, idx)}
                 onEditName={(name) => onEditName(player.id, name)}
+                onEditColor={(color) => onEditColor(player.id, color)}
               />
             </div>
           ))}

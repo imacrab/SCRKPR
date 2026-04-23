@@ -89,8 +89,8 @@ export default function PlayerSetup({ onStart }) {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="pt-14 pb-8 px-6 text-center">
-        <h1 className="font-display text-4xl font-bold text-foreground mb-1">
-          Scor<span className="text-accent-blue">Keep</span>
+        <h1 className="font-sans font-medium text-4xl text-foreground mb-1">
+          Scorkeepr
         </h1>
         <p className="text-muted-foreground text-sm">Add players to get started</p>
       </div>
@@ -166,8 +166,8 @@ export default function PlayerSetup({ onStart }) {
         <Button
           onClick={handleStart}
           disabled={!canStart}
-          className="w-full h-13 text-base font-semibold bg-accent-blue hover:bg-accent-blue/90 text-background"
-          style={{ height: "52px" }}
+          className="w-full h-13 text-base font-semibold bg-white hover:bg-white/90 text-background"
+          style={{ height: "52px", color: "#111" }}
         >
           <Play size={16} className="mr-2" />
           Start Game

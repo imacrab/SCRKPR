@@ -49,6 +49,12 @@ export default function ScoreKeeper() {
     );
   }, []);
 
+  const handleEditColor = useCallback((playerId, color) => {
+    setPlayers((prev) =>
+      prev.map((p) => (p.id === playerId ? { ...p, color } : p))
+    );
+  }, []);
+
   const handleAddPlayer = useCallback((name) => {
     setPlayers((prev) => {
       if (prev.length >= 20) return prev;
@@ -69,6 +75,7 @@ export default function ScoreKeeper() {
         onAddScore={handleAddScore}
         onEditScore={handleEditScore}
         onEditName={handleEditName}
+        onEditColor={handleEditColor}
         onReset={handleReset}
         onAddPlayer={() => setShowAddPlayer(true)}
       />

@@ -106,7 +106,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       {/* Header */}
       <div className="pt-14 pb-5 px-6 flex items-center justify-between">
         <h1 className="font-sans font-bold text-4xl text-foreground">Scorkeepr</h1>

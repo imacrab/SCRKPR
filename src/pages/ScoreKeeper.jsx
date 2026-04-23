@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { motion, AnimatePresence } from "framer-motion";
 import PlayerSetup from "@/components/scorekeeper/PlayerSetup";
 import ScoreBoard from "@/components/scorekeeper/ScoreBoard";
 import AddPlayerModal from "@/components/scorekeeper/AddPlayerModal";
@@ -86,36 +87,46 @@ export default function ScoreKeeper() {
     setShowAddPlayer(false);
   }, []);
 
-  if (view === "history") {
-    return <History onBack={() => setView("setup")} />;
-  }
-
-  if (view === "setup") {
-    return (
-      <PlayerSetup
-        onStart={handleStartGame}
-        onShowHistory={() => setView("history")}
-      />
-    );
-  }
+  const pageVariants = {
+    initial: { opacity: 0, filter: "blur(12px)", scale: 0.97 },
+    animate: { opacity: 1, filter: "blur(0px)", scale: 1 },
+    exit:    { opacity: 0, filter: "blur(12px)", scale: 1.02 },
+  };
+  const pageTransition = { duration: 0.4, ease: [0.4, 0, 0.2, 1] };
 
   return (
-    <>
-      <ScoreBoard
-        players={players}
-        onAddScore={handleAddScore}
-        onEditScore={handleEditScore}
-        onEditName={handleEditName}
-        onEditColor={handleEditColor}
-        onReset={handleReset}
-        onEndGame={handleEndGame}
-        onAddPlayer={() => setShowAddPlayer(true)}
-      />
-      <AddPlayerModal
-        isOpen={showAddPlayer}
-        onAdd={handleAddPlayer}
-        onClose={() => setShowAddPlayer(false)}
-      />
-    </>
+    <AnimatePresence mode="wait">
+      {view === "history" && (
+        <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden">
+          <History onBack={() => setView("setup")} />
+        </motion.div>
+      )}
+
+      {view === "setup" && (
+        <motion.div key="setup" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden">
+          <PlayerSetup onStart={handleStartGame} onShowHistory={() => setView("history")} />
+        </motion.div>
+      )}
+
+      {view === "game" && (
+        <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden">
+          <ScoreBoard
+            players={players}
+            onAddScore={handleAddScore}
+            onEditScore={handleEditScore}
+            onEditName={handleEditName}
+            onEditColor={handleEditColor}
+            onReset={handleReset}
+            onEndGame={handleEndGame}
+            onAddPlayer={() => setShowAddPlayer(true)}
+          />
+          <AddPlayerModal
+            isOpen={showAddPlayer}
+            onAdd={handleAddPlayer}
+            onClose={() => setShowAddPlayer(false)}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

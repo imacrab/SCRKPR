@@ -1,5 +1,35 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { Pencil, Plus } from "lucide-react";
+
+function AnimatedTotal({ value, color }) {
+  const [displayValue, setDisplayValue] = useState(value);
+  const [animKey, setAnimKey] = useState(0);
+  const prevValue = useRef(value);
+
+  useEffect(() => {
+    if (value !== prevValue.current) {
+      prevValue.current = value;
+      setDisplayValue(value);
+      setAnimKey((k) => k + 1);
+    }
+  }, [value]);
+
+  return (
+    <AnimatePresence mode="popLayout">
+      <motion.span
+        key={animKey}
+        initial={{ scale: 0.6, opacity: 0, y: -10 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 500, damping: 22 }}
+        className="text-4xl font-bold leading-none block"
+        style={{ color }}
+      >
+        {displayValue}
+      </motion.span>
+    </AnimatePresence>
+  );
+}
 
 export default function PlayerColumn({ player, onAddScore, onEditScore, onEditPlayer }) {
   const total = player.scores.reduce((s, n) => s + n, 0);
@@ -24,7 +54,7 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditPl
         </button>
 
         {/* Total */}
-        <span className="text-4xl font-bold leading-none" style={{ color: player.color }}>{total}</span>
+        <AnimatedTotal value={total} color={player.color} />
       </div>
 
       {/* Score history */}

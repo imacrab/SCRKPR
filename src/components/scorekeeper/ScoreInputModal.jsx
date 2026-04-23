@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X } from "lucide-react";
 import NumberPad from "./NumberPad";
@@ -6,9 +6,23 @@ import { Button } from "@/components/ui/button";
 
 export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit, onClose }) {
   const [value, setValue] = useState("");
+  const prevValue = useRef("");
+  const [digitKey, setDigitKey] = useState(0);
+
+  const handleChange = (newVal) => {
+    if (newVal !== prevValue.current) {
+      prevValue.current = newVal;
+      setDigitKey((k) => k + 1);
+    }
+    setValue(newVal);
+  };
 
   useEffect(() => {
-    if (isOpen) setValue("");
+    if (isOpen) {
+      setValue("");
+      prevValue.current = "";
+      setDigitKey(0);
+    }
   }, [isOpen, player?.id, editingIndex]);
 
   const handleSubmit = () => {
@@ -36,8 +50,8 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
           <motion.div
             initial={{ y: "100%", opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: "100%", opacity: 0 }}
-            transition={{ type: "spring", stiffness: 400, damping: 35 }}
+            exit={{ y: "110%", opacity: 0 }}
+            transition={{ type: "spring", stiffness: 380, damping: 28 }}
             className="fixed inset-x-0 bottom-0 z-50 bg-card border-t border-border rounded-t-2xl shadow-2xl"
           >
             <div className="px-5 pt-5 pb-8">
@@ -54,17 +68,24 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
 
               {/* Display */}
               <div className="text-center mb-4">
-                <span
-                  className="text-5xl font-bold transition-colors"
-                  style={{ color: value === "" ? "hsl(var(--muted-foreground) / 0.3)" : player.color }}
-                >
-                  {value === "" ? "0" : value}
-                </span>
+                <AnimatePresence mode="popLayout">
+                  <motion.span
+                    key={digitKey}
+                    initial={{ opacity: 0, y: -14, scale: 0.8 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 14, scale: 0.8 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 24 }}
+                    className="text-5xl font-bold inline-block"
+                    style={{ color: value === "" ? "rgba(150,150,150,0.3)" : player.color }}
+                  >
+                    {value === "" ? "0" : value}
+                  </motion.span>
+                </AnimatePresence>
                 <div className="mt-3 h-px bg-border mx-6" />
               </div>
 
               {/* Number pad */}
-              <NumberPad value={value} onChange={setValue} />
+              <NumberPad value={value} onChange={handleChange} />
 
               {/* Actions */}
               <div className="flex gap-3 mt-4">

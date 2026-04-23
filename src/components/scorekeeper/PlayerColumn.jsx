@@ -24,7 +24,7 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditPl
         </button>
 
         {/* Total */}
-        <span className="font-display text-2xl font-bold leading-none" style={{ color: player.color }}>{total}</span>
+        <span className="text-2xl font-bold leading-none" style={{ color: player.color }}>{total}</span>
       </div>
 
       {/* Score history */}

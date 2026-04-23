@@ -100,7 +100,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
       <div className="pt-14 pb-5 px-6 flex items-center justify-between">
         <h1 className="font-sans font-bold text-4xl text-foreground">Scorkeepr</h1>
         <button onClick={onShowHistory} className="text-muted-foreground hover:text-foreground transition-colors p-1">
-          <History size={18} />
+          <History size={24} />
         </button>
       </div>
 
@@ -112,12 +112,12 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
             {groups.map((g) => (
               <div key={g.id} className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-card border border-border">
                 <button onClick={() => loadGroup(g)} className="flex items-center gap-1.5">
-                  <Users size={16} className="text-muted-foreground" />
+                  <Users size={24} className="text-muted-foreground" />
                   <span className="text-sm font-medium text-foreground whitespace-nowrap">{g.name}</span>
                   <span className="text-xs text-muted-foreground">({g.players.length})</span>
                 </button>
                 <button onClick={() => deleteGroup(g.id)} className="text-muted-foreground hover:text-accent-red transition-colors ml-1">
-                  <Trash2 size={16} />
+                  <Trash2 size={24} />
                 </button>
               </div>
             ))}
@@ -152,7 +152,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
                 />
                 {players.length > 2 && (
                   <button onClick={() => removePlayer(i)} className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-accent-red transition-colors">
-                    <Trash2 size={14} />
+                    <Trash2 size={24} />
                   </button>
                 )}
               </div>
@@ -178,7 +178,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
             onClick={addPlayer}
             className="w-full mt-1 h-11 rounded-lg flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50"
           >
-            <Plus size={15} />
+            <Plus size={24} />
             Add Player
           </button>
         )}
@@ -204,7 +204,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
                 }}
               >
                 <opt.Icon
-                  size={20}
+                  size={24}
                   strokeWidth={1.5}
                   style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
                 />
@@ -225,7 +225,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
             variant="outline"
             className="w-full h-10 text-sm text-muted-foreground"
           >
-            <Save size={13} className="mr-1.5" />
+            <Save size={24} className="mr-1.5" />
             Save as Group
           </Button>
         )}
@@ -235,7 +235,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
           className="w-full text-base font-semibold bg-white hover:bg-white/90"
           style={{ height: "52px", color: "#111" }}
         >
-          <Play size={16} className="mr-2" />
+          <Play size={24} className="mr-2" />
           Start Game
         </Button>
       </div>

@@ -46,7 +46,7 @@ export default function SaveGroupModal({ isOpen, onSave, onClose }) {
               />
               <div className="flex gap-3">
                 <Button onClick={onClose} variant="outline" className="flex-1 h-11">
-                  <X size={15} className="mr-1.5" /> Cancel
+                  <X size={24} className="mr-1.5" /> Cancel
                 </Button>
                 <Button
                   onClick={handleSave}
@@ -54,7 +54,7 @@ export default function SaveGroupModal({ isOpen, onSave, onClose }) {
                   className="flex-[2] h-11 bg-white hover:bg-white/90 font-semibold"
                   style={{ color: "#111" }}
                 >
-                  <Check size={15} className="mr-1.5" /> Save Group
+                  <Check size={24} className="mr-1.5" /> Save Group
                 </Button>
               </div>
             </div>

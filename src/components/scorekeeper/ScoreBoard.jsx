@@ -56,7 +56,7 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
         <Popover>
           <PopoverTrigger asChild>
             <button className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-              <MoreHorizontal size={18} />
+              <MoreHorizontal size={24} />
             </button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-48 p-1.5 bg-card border-border">
@@ -65,7 +65,7 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
                 onClick={onAddPlayer}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-foreground hover:bg-accent transition-colors"
               >
-                <UserPlus size={14} className="text-muted-foreground" />
+                <UserPlus size={24} className="text-muted-foreground" />
                 Add Player
               </button>
             )}
@@ -73,7 +73,7 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
               onClick={onReset}
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-foreground hover:bg-accent transition-colors"
             >
-              <RotateCcw size={14} className="text-muted-foreground" />
+              <RotateCcw size={24} className="text-muted-foreground" />
               Reset Scores
             </button>
             <div className="my-1 h-px bg-border" />
@@ -82,7 +82,7 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               style={{ color: "#FF3A3A", backgroundColor: "rgba(255,58,58,0.08)" }}
             >
-              <FlagOff size={14} />
+              <FlagOff size={24} />
               End Game
             </button>
           </PopoverContent>

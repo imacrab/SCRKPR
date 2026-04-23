@@ -50,7 +50,7 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditPl
           <span className="text-xs font-bold text-foreground truncate max-w-[70px] text-center leading-tight">
             {player.name}
           </span>
-          <Pencil size={9} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+          <Pencil size={24} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
         </button>
 
         {/* Total */}
@@ -93,7 +93,7 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditPl
           style={{ backgroundColor: `${player.color}18`, color: player.color }}
           aria-label={`Add score for ${player.name}`}
         >
-          <Plus size={16} />
+          <Plus size={24} />
         </button>
       </div>
     </div>

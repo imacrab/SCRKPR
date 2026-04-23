@@ -52,7 +52,7 @@ module.exports = {
   			}
   		},
   		fontFamily: {
-  			display: ['Playfair Display', 'serif'],
+  			display: ['Syne', 'sans-serif'],
   			sans: ['Inter', 'sans-serif'],
   		},
   		keyframes: {

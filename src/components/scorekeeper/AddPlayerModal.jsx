@@ -2,22 +2,22 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X } from "lucide-react";
 
-export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit, onClose }) {
-  const [value, setValue] = useState("");
+export default function AddPlayerModal({ isOpen, onAdd, onClose }) {
+  const [name, setName] = useState("");
   const inputRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
-      setValue("");
+      setName("");
       setTimeout(() => inputRef.current?.focus(), 120);
     }
-  }, [isOpen, player?.id, editingIndex]);
+  }, [isOpen]);
 
   const handleSubmit = () => {
-    const num = parseFloat(value);
-    if (isNaN(num)) return;
-    onSubmit(num);
-    setValue("");
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    onAdd(trimmed);
+    setName("");
   };
 
   const handleKeyDown = (e) => {
@@ -25,13 +25,10 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
     if (e.key === "Escape") onClose();
   };
 
-  const isEditing = editingIndex !== null && editingIndex !== undefined;
-
   return (
     <AnimatePresence>
-      {isOpen && player && (
+      {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -40,8 +37,6 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
             onClick={onClose}
           />
-
-          {/* Modal */}
           <motion.div
             initial={{ scale: 0.4, opacity: 0, y: 40 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -51,31 +46,26 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
             style={{ background: "#212125", border: "1px solid rgba(255,255,255,0.07)" }}
           >
             <div className="px-6 pt-7 pb-6">
-              {/* Player name */}
               <div className="text-center mb-5">
-                <p className="text-xs font-semibold text-[#a8a8a8] uppercase tracking-widest mb-1">
-                  {isEditing ? "Edit Score" : "Add Score"}
-                </p>
-                <h2 className="font-display text-3xl font-bold text-gradient">{player.name}</h2>
+                <p className="text-xs font-semibold text-[#a8a8a8] uppercase tracking-widest mb-1">New Player</p>
+                <h2 className="font-display text-2xl font-bold text-gradient">Add to Game</h2>
               </div>
 
-              {/* Input */}
               <div className="relative mb-6">
                 <input
                   ref={inputRef}
-                  type="number"
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value.slice(0, 20))}
                   onKeyDown={handleKeyDown}
-                  placeholder="0"
-                  className="w-full text-center text-5xl font-bold font-display bg-transparent outline-none text-white placeholder:text-[#3a3a3e] py-2"
-                  inputMode="decimal"
-                  aria-label="Score value"
+                  placeholder="Player name"
+                  maxLength={20}
+                  className="w-full text-center text-2xl font-bold font-display bg-transparent outline-none text-white placeholder:text-[#3a3a3e] py-2"
+                  aria-label="New player name"
                 />
                 <div className="absolute bottom-0 left-4 right-4 h-px" style={{ background: "rgba(255,255,255,0.1)" }} />
               </div>
 
-              {/* Buttons */}
               <div className="flex gap-3">
                 <button
                   onClick={onClose}
@@ -87,11 +77,11 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
                 </button>
                 <button
                   onClick={handleSubmit}
-                  disabled={value === "" || isNaN(parseFloat(value))}
+                  disabled={!name.trim()}
                   className="flex-[2] h-12 rounded-2xl gradient-warm text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md disabled:opacity-30 active:scale-95 transition-transform"
                 >
                   <Check size={16} />
-                  {isEditing ? "Update" : "Add Score"}
+                  Add Player
                 </button>
               </div>
             </div>

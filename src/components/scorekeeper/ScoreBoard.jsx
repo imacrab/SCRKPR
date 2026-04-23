@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, UserPlus } from "lucide-react";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
 
-export default function ScoreBoard({ players, onAddScore, onEditScore, onEditName, onReset }) {
+export default function ScoreBoard({ players, onAddScore, onEditScore, onEditName, onReset, onAddPlayer }) {
   const [activePlayer, setActivePlayer] = useState(null);
-  const [editingScore, setEditingScore] = useState(null); // { playerId, scoreIndex }
+  const [editingScore, setEditingScore] = useState(null);
 
   const handleOpenScore = (player) => {
     setActivePlayer(player);
@@ -34,22 +33,34 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
     setEditingScore(null);
   };
 
-  // Min 4 columns visible, scroll if more
-  const colMinWidth = 25; // percent — 4 cols = 100%
-  const colWidth = players.length <= 4 ? `${100 / players.length}%` : `${colMinWidth}%`;
+  const colWidth = players.length <= 4 ? `${100 / players.length}%` : "25%";
 
   return (
-    <div className="h-screen gradient-surface flex flex-col overflow-hidden">
+    <div className="h-screen app-bg flex flex-col overflow-hidden">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 pt-10 pb-3 flex-shrink-0">
-        <h1 className="font-display text-xl text-gradient font-bold">ScoreKeeper</h1>
-        <button
-          onClick={onReset}
-          className="flex items-center gap-1.5 text-muted-foreground text-xs font-medium py-1.5 px-3 rounded-full bg-white/60 border border-border/50 hover:bg-white transition-all"
-        >
-          <RotateCcw size={12} />
-          New Game
-        </button>
+      <div className="flex items-center justify-between px-4 pt-10 pb-3 flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+        <h1 className="font-display text-xl text-gradient font-bold">ScorKeep</h1>
+        <div className="flex items-center gap-2">
+          {players.length < 20 && (
+            <button
+              onClick={onAddPlayer}
+              className="flex items-center gap-1.5 text-[#c8c8c8] text-xs font-medium py-1.5 px-3 rounded-full transition-all active:scale-95"
+              style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.07)" }}
+              aria-label="Add player"
+            >
+              <UserPlus size={12} />
+              Add Player
+            </button>
+          )}
+          <button
+            onClick={onReset}
+            className="flex items-center gap-1.5 text-[#c8c8c8] text-xs font-medium py-1.5 px-3 rounded-full transition-all active:scale-95"
+            style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.07)" }}
+          >
+            <RotateCcw size={12} />
+            New Game
+          </button>
+        </div>
       </div>
 
       {/* Columns container */}
@@ -75,7 +86,6 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
         </div>
       </div>
 
-      {/* Score input modal */}
       <ScoreInputModal
         player={activePlayer}
         editingIndex={editingScore?.scoreIndex ?? null}

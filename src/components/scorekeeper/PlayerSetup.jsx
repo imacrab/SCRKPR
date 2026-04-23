@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Trash2, Play } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export default function PlayerSetup({ onStart }) {
   const [names, setNames] = useState(["", ""]);
@@ -29,11 +27,11 @@ export default function PlayerSetup({ onStart }) {
   };
 
   return (
-    <div className="min-h-screen gradient-surface flex flex-col">
+    <div className="min-h-screen app-bg flex flex-col">
       {/* Header */}
       <div className="pt-14 pb-8 px-6 text-center">
-        <h1 className="font-display text-4xl text-gradient font-bold mb-2">ScoreKeeper</h1>
-        <p className="text-muted-foreground text-sm font-medium tracking-wide">Add your players to get started</p>
+        <h1 className="font-display text-4xl text-gradient font-bold mb-2">ScorKeep</h1>
+        <p className="text-[#a8a8a8] text-sm font-medium tracking-wide">Add your players to get started</p>
       </div>
 
       {/* Player list */}
@@ -51,17 +49,19 @@ export default function PlayerSetup({ onStart }) {
               <div className="w-8 h-8 rounded-full gradient-warm flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                 {i + 1}
               </div>
-              <Input
+              <input
                 value={name}
                 onChange={(e) => updateName(i, e.target.value)}
                 placeholder={`Player ${i + 1}`}
                 maxLength={20}
-                className="flex-1 bg-white/70 border-border/50 rounded-xl h-11 text-sm font-medium focus:bg-white transition-colors"
+                className="flex-1 rounded-xl h-11 px-3 text-sm font-medium outline-none transition-colors text-white placeholder:text-[#6b6b6f]"
+                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.07)" }}
               />
               {names.length > 2 && (
                 <button
                   onClick={() => removePlayer(i)}
-                  className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
+                  className="w-8 h-8 flex items-center justify-center text-[#a8a8a8] hover:text-red-400 transition-colors"
+                  aria-label="Remove player"
                 >
                   <Trash2 size={15} />
                 </button>
@@ -73,7 +73,8 @@ export default function PlayerSetup({ onStart }) {
         {names.length < 20 && (
           <button
             onClick={addPlayer}
-            className="w-full mt-1 h-11 rounded-xl border-2 border-dashed border-border hover:border-primary/50 flex items-center justify-center gap-2 text-muted-foreground hover:text-primary text-sm font-medium transition-all"
+            className="w-full mt-1 h-11 rounded-xl flex items-center justify-center gap-2 text-[#a8a8a8] hover:text-white text-sm font-medium transition-all"
+            style={{ border: "2px dashed rgba(255,255,255,0.12)" }}
           >
             <Plus size={16} />
             Add Player
@@ -82,15 +83,15 @@ export default function PlayerSetup({ onStart }) {
       </div>
 
       {/* Start button */}
-      <div className="px-5 pb-10 pt-4">
-        <Button
+      <div className="px-5 pb-12 pt-4">
+        <button
           onClick={handleStart}
           disabled={!canStart}
-          className="w-full h-14 rounded-2xl text-base font-semibold gradient-warm border-0 text-white shadow-lg shadow-primary/20 disabled:opacity-40 disabled:shadow-none transition-all"
+          className="w-full h-14 rounded-2xl text-base font-semibold gradient-warm text-white shadow-lg disabled:opacity-30 disabled:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2"
         >
-          <Play size={18} className="mr-2" />
+          <Play size={18} />
           Start Game
-        </Button>
+        </button>
       </div>
     </div>
   );

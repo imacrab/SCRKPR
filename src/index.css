@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,31 +6,26 @@
 
 @layer base {
   :root {
-    --background: 30 20% 96%;
-    --foreground: 20 15% 12%;
-    --card: 30 25% 98%;
-    --card-foreground: 20 15% 12%;
-    --popover: 30 25% 98%;
-    --popover-foreground: 20 15% 12%;
-    --primary: 22 60% 45%;
-    --primary-foreground: 30 25% 98%;
-    --secondary: 35 30% 88%;
-    --secondary-foreground: 20 15% 25%;
-    --muted: 30 15% 91%;
-    --muted-foreground: 20 10% 52%;
-    --accent: 28 50% 82%;
-    --accent-foreground: 20 15% 12%;
+    --background: 240 4% 14%;
+    --foreground: 0 0% 95%;
+    --card: 240 4% 14%;
+    --card-foreground: 0 0% 95%;
+    --popover: 240 4% 14%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 28 80% 62%;
+    --primary-foreground: 240 4% 10%;
+    --secondary: 240 4% 20%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 240 4% 20%;
+    --muted-foreground: 0 0% 68%;
+    --accent: 240 4% 22%;
+    --accent-foreground: 0 0% 90%;
     --destructive: 0 72% 58%;
     --destructive-foreground: 0 0% 98%;
-    --border: 30 20% 85%;
-    --input: 30 20% 85%;
-    --ring: 22 60% 45%;
+    --border: 0 0% 100%;
+    --input: 0 0% 100%;
+    --ring: 28 80% 62%;
     --radius: 1rem;
-
-    --warm-1: 22 70% 55%;
-    --warm-2: 35 65% 58%;
-    --warm-3: 15 55% 48%;
-    --surface: 30 30% 95%;
   }
 }
 
@@ -40,7 +35,7 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[#212125] text-foreground;
     font-family: 'Inter', sans-serif;
     overscroll-behavior: none;
   }
@@ -48,25 +43,33 @@
 
 @layer utilities {
   .font-display {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Syne', sans-serif;
   }
 
   .gradient-warm {
-    background: linear-gradient(135deg, hsl(22, 70%, 55%), hsl(35, 65%, 58%));
+    background: linear-gradient(135deg, hsl(22, 80%, 58%), hsl(35, 75%, 62%));
   }
 
-  .gradient-surface {
-    background: linear-gradient(160deg, hsl(30, 30%, 98%), hsl(28, 25%, 92%));
+  .app-bg {
+    background-color: #212125;
   }
 
-  .gradient-card {
-    background: linear-gradient(145deg, hsl(30, 35%, 99%), hsl(28, 25%, 94%));
+  .modal-bg {
+    background-color: #212125;
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, hsl(22, 70%, 45%), hsl(35, 65%, 48%));
+    background: linear-gradient(135deg, hsl(28, 90%, 68%), hsl(40, 85%, 68%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  .border-subtle {
+    border-color: rgba(255, 255, 255, 0.07);
+  }
+
+  .col-header-bg {
+    background-color: rgba(255, 255, 255, 0.04);
   }
 }

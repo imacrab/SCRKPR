@@ -1,10 +1,12 @@
 import { useState, useCallback } from "react";
 import PlayerSetup from "@/components/scorekeeper/PlayerSetup";
 import ScoreBoard from "@/components/scorekeeper/ScoreBoard";
+import AddPlayerModal from "@/components/scorekeeper/AddPlayerModal";
 
 export default function ScoreKeeper() {
   const [players, setPlayers] = useState([]);
   const [gameStarted, setGameStarted] = useState(false);
+  const [showAddPlayer, setShowAddPlayer] = useState(false);
 
   const handleStartGame = useCallback((playerNames) => {
     const initialPlayers = playerNames.map((name, i) => ({
@@ -46,17 +48,34 @@ export default function ScoreKeeper() {
     );
   }, []);
 
+  const handleAddPlayer = useCallback((name) => {
+    setPlayers((prev) => {
+      if (prev.length >= 20) return prev;
+      const maxId = prev.reduce((m, p) => Math.max(m, p.id), 0);
+      return [...prev, { id: maxId + 1, name, scores: [] }];
+    });
+    setShowAddPlayer(false);
+  }, []);
+
   if (!gameStarted) {
     return <PlayerSetup onStart={handleStartGame} />;
   }
 
   return (
-    <ScoreBoard
-      players={players}
-      onAddScore={handleAddScore}
-      onEditScore={handleEditScore}
-      onEditName={handleEditName}
-      onReset={handleReset}
-    />
+    <>
+      <ScoreBoard
+        players={players}
+        onAddScore={handleAddScore}
+        onEditScore={handleEditScore}
+        onEditName={handleEditName}
+        onReset={handleReset}
+        onAddPlayer={() => setShowAddPlayer(true)}
+      />
+      <AddPlayerModal
+        isOpen={showAddPlayer}
+        onAdd={handleAddPlayer}
+        onClose={() => setShowAddPlayer(false)}
+      />
+    </>
   );
 }

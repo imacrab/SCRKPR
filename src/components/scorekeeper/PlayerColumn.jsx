@@ -8,7 +8,7 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditPl
   return (
     <div className="h-full flex flex-col border-r border-border last:border-r-0">
       {/* Header */}
-      <div className="flex-shrink-0 px-2 py-3 flex flex-col items-center gap-1 bg-card border-b border-border">
+      <div className="flex-shrink-0 px-2 py-3 flex flex-col items-center gap-2 bg-card border-b border-border">
         <button
           onClick={onEditPlayer}
           className="flex items-center gap-1 group"
@@ -24,7 +24,7 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditPl
         </button>
 
         {/* Total */}
-        <span className="text-2xl font-bold leading-none" style={{ color: player.color }}>{total}</span>
+        <span className="text-4xl font-bold leading-none" style={{ color: player.color }}>{total}</span>
       </div>
 
       {/* Score history */}

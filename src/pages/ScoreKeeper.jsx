@@ -8,10 +8,11 @@ export default function ScoreKeeper() {
   const [gameStarted, setGameStarted] = useState(false);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
 
-  const handleStartGame = useCallback((playerNames) => {
-    const initialPlayers = playerNames.map((name, i) => ({
+  const handleStartGame = useCallback((playerData) => {
+    const initialPlayers = playerData.map((p, i) => ({
       id: i + 1,
-      name,
+      name: p.name || p,
+      color: p.color || "#2DC5F8",
       scores: [],
     }));
     setPlayers(initialPlayers);

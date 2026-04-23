@@ -32,7 +32,7 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditNa
               className="flex-1 text-xs font-semibold text-center rounded-md px-1 py-1 outline-none min-w-0 bg-secondary text-foreground border border-border"
               maxLength={20}
             />
-            <button onClick={saveName} className="text-accent-blue flex-shrink-0">
+            <button onClick={saveName} className="flex-shrink-0" style={{ color: player.color }}>
               <Check size={13} />
             </button>
           </div>
@@ -49,7 +49,7 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditNa
         )}
 
         {/* Total */}
-        <span className="font-display text-2xl font-bold text-accent-blue leading-none">{total}</span>
+        <span className="font-display text-2xl font-bold leading-none" style={{ color: player.color }}>{total}</span>
       </div>
 
       {/* Score history */}
@@ -68,11 +68,10 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditNa
                 }`}
                 onClick={() => onEditScore(idx)}
               >
-                <span className={`font-semibold block leading-none text-xs ${
-                  isCurrent
-                    ? score < 0 ? "text-accent-red" : "text-accent-blue"
-                    : "text-muted-foreground"
-                }`}>
+                <span
+                  className={`font-semibold block leading-none text-xs ${!isCurrent ? "text-muted-foreground" : ""}`}
+                  style={isCurrent ? { color: player.color } : undefined}
+                >
                   {score > 0 ? `+${score}` : score}
                 </span>
               </motion.div>
@@ -85,7 +84,8 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditNa
       <div className="flex-shrink-0 p-2 bg-background border-t border-border">
         <button
           onClick={onAddScore}
-          className="w-full h-9 rounded-md bg-accent-blue/10 hover:bg-accent-blue/20 text-accent-blue flex items-center justify-center transition-colors active:scale-95"
+          className="w-full h-9 rounded-md flex items-center justify-center transition-colors active:scale-95"
+          style={{ backgroundColor: `${player.color}18`, color: player.color }}
           aria-label={`Add score for ${player.name}`}
         >
           <Plus size={16} />

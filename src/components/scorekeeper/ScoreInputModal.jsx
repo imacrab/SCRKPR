@@ -54,10 +54,10 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
 
               {/* Display */}
               <div className="text-center mb-4">
-                <span className={`text-5xl font-bold ${
-                  value === "" ? "text-muted-foreground/30" :
-                  parseFloat(value) < 0 ? "text-accent-red" : "text-accent-blue"
-                }`}>
+                <span
+                  className="text-5xl font-bold transition-colors"
+                  style={{ color: value === "" ? "hsl(var(--muted-foreground) / 0.3)" : player.color }}
+                >
                   {value === "" ? "0" : value}
                 </span>
                 <div className="mt-3 h-px bg-border mx-6" />

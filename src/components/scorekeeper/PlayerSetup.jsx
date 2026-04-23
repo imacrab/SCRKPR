@@ -197,7 +197,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
               <button
                 key={opt.value}
                 onClick={() => setWinMode(opt.value)}
-                className="flex-1 flex items-center gap-2.5 px-4 py-3 rounded-xl border transition-all"
+                className="flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border transition-all"
                 style={{
                   borderColor: active ? "rgba(255,255,255,0.5)" : "hsl(var(--border))",
                   backgroundColor: active ? "hsl(var(--card))" : "transparent",

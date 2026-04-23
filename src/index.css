@@ -6,26 +6,26 @@
 
 @layer base {
   :root {
-    --background: 240 4% 14%;
-    --foreground: 0 0% 95%;
-    --card: 240 4% 14%;
-    --card-foreground: 0 0% 95%;
-    --popover: 240 4% 14%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 28 80% 62%;
-    --primary-foreground: 240 4% 10%;
-    --secondary: 240 4% 20%;
-    --secondary-foreground: 0 0% 90%;
-    --muted: 240 4% 20%;
-    --muted-foreground: 0 0% 68%;
-    --accent: 240 4% 22%;
-    --accent-foreground: 0 0% 90%;
-    --destructive: 0 72% 58%;
+    --background: 220 13% 9%;
+    --foreground: 0 0% 93%;
+    --card: 220 13% 12%;
+    --card-foreground: 0 0% 93%;
+    --popover: 220 13% 12%;
+    --popover-foreground: 0 0% 93%;
+    --primary: 199 94% 57%;
+    --primary-foreground: 220 13% 9%;
+    --secondary: 220 13% 16%;
+    --secondary-foreground: 0 0% 80%;
+    --muted: 220 13% 16%;
+    --muted-foreground: 0 0% 50%;
+    --accent: 220 13% 18%;
+    --accent-foreground: 0 0% 93%;
+    --destructive: 0 100% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 100%;
-    --input: 0 0% 100%;
-    --ring: 28 80% 62%;
-    --radius: 1rem;
+    --border: 220 13% 18%;
+    --input: 220 13% 18%;
+    --ring: 199 94% 57%;
+    --radius: 0.75rem;
   }
 }
 
@@ -35,7 +35,7 @@
   }
 
   body {
-    @apply bg-[#212125] text-foreground;
+    @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
     overscroll-behavior: none;
   }
@@ -46,30 +46,27 @@
     font-family: 'Syne', sans-serif;
   }
 
-  .gradient-warm {
-    background: linear-gradient(135deg, hsl(22, 80%, 58%), hsl(35, 75%, 62%));
+  .accent-blue {
+    color: #2DC5F8;
   }
 
-  .app-bg {
-    background-color: #212125;
+  .accent-red {
+    color: #FF3A3A;
   }
 
-  .modal-bg {
-    background-color: #212125;
+  .bg-accent-blue {
+    background-color: #2DC5F8;
   }
 
-  .text-gradient {
-    background: linear-gradient(135deg, hsl(28, 90%, 68%), hsl(40, 85%, 68%));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .bg-accent-red {
+    background-color: #FF3A3A;
   }
 
-  .border-subtle {
-    border-color: rgba(255, 255, 255, 0.07);
+  .border-accent-blue {
+    border-color: #2DC5F8;
   }
 
-  .col-header-bg {
-    background-color: rgba(255, 255, 255, 0.04);
+  .border-accent-red {
+    border-color: #FF3A3A;
   }
 }

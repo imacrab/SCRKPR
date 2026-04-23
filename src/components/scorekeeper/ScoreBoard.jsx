@@ -2,6 +2,7 @@ import { useState } from "react";
 import { RotateCcw, UserPlus } from "lucide-react";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
+import { Button } from "@/components/ui/button";
 
 export default function ScoreBoard({ players, onAddScore, onEditScore, onEditName, onReset, onAddPlayer }) {
   const [activePlayer, setActivePlayer] = useState(null);
@@ -33,39 +34,40 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
     setEditingScore(null);
   };
 
-  // Each column = 25vw minimum, but if <=4 players fill evenly
-  const colCount = Math.min(players.length, 4);
   const colWidth = players.length <= 4 ? `${100 / players.length}vw` : "25vw";
 
   return (
-    <div className="h-screen w-screen app-bg flex flex-col overflow-hidden">
+    <div className="h-screen w-screen bg-background flex flex-col overflow-hidden">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 pt-10 pb-3 flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-        <h1 className="font-display text-xl text-gradient font-bold">ScorKeep</h1>
+      <div className="flex items-center justify-between px-4 pt-10 pb-3 flex-shrink-0 bg-card border-b border-border">
+        <h1 className="font-display text-lg font-bold text-foreground">
+          Scor<span className="text-accent-blue">Keep</span>
+        </h1>
         <div className="flex items-center gap-2">
           {players.length < 20 && (
-            <button
+            <Button
               onClick={onAddPlayer}
-              className="flex items-center gap-1.5 text-[#c8c8c8] text-xs font-medium py-1.5 px-3 rounded-full transition-all active:scale-95"
-              style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.07)" }}
-              aria-label="Add player"
+              variant="ghost"
+              size="sm"
+              className="h-8 text-xs text-muted-foreground hover:text-foreground gap-1.5"
             >
               <UserPlus size={12} />
-              Add Player
-            </button>
+              Add
+            </Button>
           )}
-          <button
+          <Button
             onClick={onReset}
-            className="flex items-center gap-1.5 text-[#c8c8c8] text-xs font-medium py-1.5 px-3 rounded-full transition-all active:scale-95"
-            style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.07)" }}
+            variant="ghost"
+            size="sm"
+            className="h-8 text-xs text-muted-foreground hover:text-accent-red gap-1.5"
           >
             <RotateCcw size={12} />
             New Game
-          </button>
+          </Button>
         </div>
       </div>
 
-      {/* Columns container */}
+      {/* Columns */}
       <div className="flex-1 overflow-hidden w-full">
         <div
           className="flex h-full w-full overflow-x-auto"

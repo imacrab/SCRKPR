@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X } from "lucide-react";
 import NumberPad from "./NumberPad";
+import { Button } from "@/components/ui/button";
 
 export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit, onClose }) {
   const [value, setValue] = useState("");
@@ -24,63 +25,65 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
     <AnimatePresence>
       {isOpen && player && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
             onClick={onClose}
           />
-
-          {/* Modal */}
           <motion.div
-            initial={{ scale: 0.4, opacity: 0, y: 60 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.4, opacity: 0, y: 60 }}
-            transition={{ type: "spring", stiffness: 420, damping: 30 }}
-            className="fixed inset-x-4 bottom-6 z-50 rounded-3xl overflow-hidden shadow-2xl shadow-black/50"
-            style={{ background: "#212125", border: "1px solid rgba(255,255,255,0.07)" }}
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "100%", opacity: 0 }}
+            transition={{ type: "spring", stiffness: 400, damping: 35 }}
+            className="fixed inset-x-0 bottom-0 z-50 bg-card border-t border-border rounded-t-2xl shadow-2xl"
           >
-            <div className="px-5 pt-6 pb-5">
-              {/* Player name */}
+            <div className="px-5 pt-5 pb-8">
+              {/* Handle */}
+              <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
+
+              {/* Player / mode label */}
               <div className="text-center mb-4">
-                <p className="text-xs font-semibold text-[#a8a8a8] uppercase tracking-widest mb-0.5">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-0.5">
                   {isEditing ? "Edit Score" : "Add Score"}
                 </p>
-                <h2 className="font-display text-2xl font-bold text-gradient">{player.name}</h2>
+                <h2 className="font-display text-xl font-bold text-foreground">{player.name}</h2>
               </div>
 
               {/* Display */}
-              <div className="relative mb-4 text-center">
-                <span className="text-5xl font-bold font-display text-white">
-                  {value === "" ? <span className="text-[#3a3a3e]">0</span> : value}
+              <div className="text-center mb-4">
+                <span className={`text-5xl font-bold font-display ${
+                  value === "" ? "text-muted-foreground/30" :
+                  parseFloat(value) < 0 ? "text-accent-red" : "text-accent-blue"
+                }`}>
+                  {value === "" ? "0" : value}
                 </span>
-                <div className="mt-2 h-px mx-8" style={{ background: "rgba(255,255,255,0.1)" }} />
+                <div className="mt-3 h-px bg-border mx-6" />
               </div>
 
               {/* Number pad */}
               <NumberPad value={value} onChange={setValue} />
 
-              {/* Action buttons */}
-              <div className="flex gap-3 mt-3">
-                <button
+              {/* Actions */}
+              <div className="flex gap-3 mt-4">
+                <Button
                   onClick={onClose}
-                  className="flex-1 h-12 rounded-2xl text-[#c8c8c8] font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform"
-                  style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.07)" }}
+                  variant="outline"
+                  className="flex-1 h-11"
                 >
-                  <X size={16} />
+                  <X size={15} className="mr-1.5" />
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleSubmit}
                   disabled={!isValid}
-                  className="flex-[2] h-12 rounded-2xl gradient-warm text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md disabled:opacity-30 active:scale-95 transition-transform"
+                  className="flex-[2] h-11 bg-accent-blue hover:bg-accent-blue/90 text-background font-semibold"
                 >
-                  <Check size={16} />
+                  <Check size={15} className="mr-1.5" />
                   {isEditing ? "Update" : "Add Score"}
-                </button>
+                </Button>
               </div>
             </div>
           </motion.div>

@@ -17,30 +17,22 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditNa
     setEditingName(false);
   };
 
-  const handleNameKeyDown = (e) => {
-    if (e.key === "Enter") saveName();
-  };
-
   return (
-    <div className="h-full flex flex-col" style={{ borderRight: "1px solid rgba(255,255,255,0.07)" }}>
+    <div className="h-full flex flex-col border-r border-border last:border-r-0">
       {/* Header */}
-      <div
-        className="flex-shrink-0 px-2 py-3 flex flex-col items-center gap-1"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.07)", background: "rgba(255,255,255,0.03)" }}
-      >
+      <div className="flex-shrink-0 px-2 py-3 flex flex-col items-center gap-1 bg-card border-b border-border">
         {editingName ? (
           <div className="flex items-center gap-1 w-full">
             <input
               ref={nameInputRef}
               value={nameVal}
               onChange={(e) => setNameVal(e.target.value.slice(0, 20))}
-              onKeyDown={handleNameKeyDown}
+              onKeyDown={(e) => { if (e.key === "Enter") saveName(); }}
               autoFocus
-              className="flex-1 text-xs font-semibold text-center rounded-lg px-1 py-1 outline-none min-w-0 text-white"
-              style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)" }}
+              className="flex-1 text-xs font-semibold text-center rounded-md px-1 py-1 outline-none min-w-0 bg-secondary text-foreground border border-border"
               maxLength={20}
             />
-            <button onClick={saveName} className="text-primary flex-shrink-0" aria-label="Save name">
+            <button onClick={saveName} className="text-accent-blue flex-shrink-0">
               <Check size={13} />
             </button>
           </div>
@@ -48,41 +40,39 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditNa
           <button
             onClick={() => { setEditingName(true); setTimeout(() => nameInputRef.current?.select(), 30); }}
             className="flex items-center gap-1 group"
-            aria-label={`Edit name: ${player.name}`}
           >
-            <span className="text-xs font-bold text-[#e0e0e0] truncate max-w-[70px] text-center leading-tight">
+            <span className="text-xs font-bold text-foreground truncate max-w-[70px] text-center leading-tight">
               {player.name}
             </span>
-            <Pencil size={10} className="text-[#a8a8a8] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+            <Pencil size={9} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
           </button>
         )}
 
-        {/* Total score */}
-        <span className="font-display text-2xl font-bold text-gradient leading-none">{total}</span>
+        {/* Total */}
+        <span className="font-display text-2xl font-bold text-accent-blue leading-none">{total}</span>
       </div>
 
       {/* Score history */}
-      <div className="flex-1 overflow-y-auto py-2 px-1">
+      <div className="flex-1 overflow-y-auto py-2 px-1 bg-background">
         <AnimatePresence initial={false}>
           {player.scores.map((score, idx) => {
             const isCurrent = idx === lastIdx;
             return (
               <motion.div
                 key={idx}
-                initial={{ opacity: 0, scale: 0.7, y: -8 }}
+                initial={{ opacity: 0, scale: 0.8, y: -6 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ type: "spring", stiffness: 380, damping: 28 }}
-                className="mb-1.5 mx-1 rounded-xl px-2 py-2 text-center cursor-pointer transition-all"
-                style={isCurrent ? { background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" } : {}}
+                className={`mb-1 mx-1 rounded-md px-2 py-1.5 text-center cursor-pointer transition-colors ${
+                  isCurrent ? "bg-card border border-border" : "hover:bg-card/50"
+                }`}
                 onClick={() => onEditScore(idx)}
-                role="button"
-                aria-label={`Edit score: ${score}`}
               >
-                <span
-                  className={`font-semibold block leading-none ${
-                    isCurrent ? "text-sm text-gradient" : "text-xs text-[#5a5a5e]"
-                  }`}
-                >
+                <span className={`font-semibold block leading-none text-xs ${
+                  isCurrent
+                    ? score < 0 ? "text-accent-red" : "text-accent-blue"
+                    : "text-muted-foreground"
+                }`}>
                   {score > 0 ? `+${score}` : score}
                 </span>
               </motion.div>
@@ -92,13 +82,13 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditNa
       </div>
 
       {/* Add score button */}
-      <div className="flex-shrink-0 p-2">
+      <div className="flex-shrink-0 p-2 bg-background border-t border-border">
         <button
           onClick={onAddScore}
-          className="w-full h-10 rounded-xl gradient-warm text-white flex items-center justify-center active:scale-95 transition-transform"
+          className="w-full h-9 rounded-md bg-accent-blue/10 hover:bg-accent-blue/20 text-accent-blue flex items-center justify-center transition-colors active:scale-95"
           aria-label={`Add score for ${player.name}`}
         >
-          <Plus size={18} />
+          <Plus size={16} />
         </button>
       </div>
     </div>

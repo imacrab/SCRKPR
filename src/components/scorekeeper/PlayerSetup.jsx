@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Play, Users, History, Save } from "lucide-react";
+import { Plus, Trash2, Play, Users, History, Save, Trophy, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
@@ -189,8 +189,8 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Win Condition</p>
         <div className="flex gap-2">
           {[
-            { value: "high", label: "High Score", emoji: "🏆" },
-            { value: "low",  label: "Low Score",  emoji: "🎯" },
+            { value: "high", label: "High Score", Icon: Trophy },
+            { value: "low",  label: "Low Score",  Icon: Target },
           ].map((opt) => {
             const active = winMode === opt.value;
             return (
@@ -211,8 +211,13 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
                 >
                   {active && <div className="w-2 h-2 rounded-full bg-white" />}
                 </div>
+                <opt.Icon
+                  size={20}
+                  strokeWidth={1.5}
+                  style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
+                />
                 <span className="text-sm font-medium" style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}>
-                  {opt.emoji} {opt.label}
+                  {opt.label}
                 </span>
               </button>
             );

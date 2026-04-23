@@ -1,33 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Play } from "lucide-react";
+import { Plus, Trash2, Play, Users, History, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { base44 } from "@/api/base44Client";
+import SaveGroupModal from "./SaveGroupModal";
 
 export const PLAYER_COLORS = [
-  "#2DC5F8", // sky blue
-  "#3B82F6", // blue
-  "#6366F1", // indigo
-  "#8B5CF6", // violet
-  "#A855F7", // purple
-  "#EC4899", // pink
-  "#FF3A3A", // red
-  "#F97316", // orange
-  "#F59E0B", // amber
-  "#EAB308", // yellow
-  "#84CC16", // lime
-  "#22C55E", // green
-  "#10B981", // emerald
-  "#14B8A6", // teal
-  "#06B6D4", // cyan
-  "#0EA5E9", // light blue
-  "#64748B", // slate
-  "#A78BFA", // lavender
-  "#FB7185", // rose
-  "#34D399", // mint
+  "#2DC5F8", "#3B82F6", "#6366F1", "#8B5CF6", "#A855F7",
+  "#EC4899", "#FF3A3A", "#F97316", "#F59E0B", "#EAB308",
+  "#84CC16", "#22C55E", "#10B981", "#14B8A6", "#06B6D4",
+  "#0EA5E9", "#64748B", "#A78BFA", "#FB7185", "#34D399",
 ];
-
-const DEFAULT_COLOR_IDX = 0;
 
 function ColorPicker({ selected, onChange }) {
   return (
@@ -36,21 +20,26 @@ function ColorPicker({ selected, onChange }) {
         <button
           key={color}
           onPointerDown={(e) => { e.preventDefault(); onChange(color); }}
-          className="w-6 h-6 rounded-full transition-transform active:scale-90 flex items-center justify-center"
-          style={{ backgroundColor: color, outline: selected === color ? `2px solid white` : "none", outlineOffset: "2px" }}
-          aria-label={`Select color ${color}`}
+          className="w-6 h-6 rounded-full transition-transform active:scale-90"
+          style={{ backgroundColor: color, outline: selected === color ? "2px solid white" : "none", outlineOffset: "2px" }}
         />
       ))}
     </div>
   );
 }
 
-export default function PlayerSetup({ onStart }) {
+export default function PlayerSetup({ onStart, onShowHistory }) {
   const [players, setPlayers] = useState([
     { name: "", color: PLAYER_COLORS[0] },
     { name: "", color: PLAYER_COLORS[1] },
   ]);
   const [expandedColor, setExpandedColor] = useState(null);
+  const [groups, setGroups] = useState([]);
+  const [showSaveGroup, setShowSaveGroup] = useState(false);
+
+  useEffect(() => {
+    base44.entities.PlayerGroup.list("-created_date", 20).then(setGroups);
+  }, []);
 
   const addPlayer = () => {
     if (players.length < 20) {
@@ -78,7 +67,26 @@ export default function PlayerSetup({ onStart }) {
     setExpandedColor(null);
   };
 
+  const handleSaveGroup = async (groupName) => {
+    const valid = players.filter((p) => p.name.trim());
+    if (valid.length < 2) return;
+    const group = await base44.entities.PlayerGroup.create({ name: groupName, players: valid });
+    setGroups((prev) => [group, ...prev]);
+    setShowSaveGroup(false);
+  };
+
+  const deleteGroup = async (id) => {
+    await base44.entities.PlayerGroup.delete(id);
+    setGroups((prev) => prev.filter((g) => g.id !== id));
+  };
+
+  const loadGroup = (group) => {
+    setPlayers(group.players.map((p) => ({ name: p.name, color: p.color })));
+    setExpandedColor(null);
+  };
+
   const canStart = players.filter((p) => p.name.trim()).length >= 2;
+  const hasValidPlayers = players.filter((p) => p.name.trim()).length >= 2;
 
   const handleStart = () => {
     const valid = players.filter((p) => p.name.trim());
@@ -88,12 +96,33 @@ export default function PlayerSetup({ onStart }) {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="pt-14 pb-8 px-6 text-center">
-        <h1 className="font-sans font-medium text-4xl text-foreground mb-1">
-          Scorkeepr
-        </h1>
-        <p className="text-muted-foreground text-sm">Add players to get started</p>
+      <div className="pt-14 pb-5 px-6 flex items-center justify-between">
+        <h1 className="font-sans font-medium text-4xl text-foreground">Scorkeepr</h1>
+        <button onClick={onShowHistory} className="text-muted-foreground hover:text-foreground transition-colors p-1">
+          <History size={18} />
+        </button>
       </div>
+
+      {/* Saved Groups */}
+      {groups.length > 0 && (
+        <div className="px-5 mb-4">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Saved Groups</p>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {groups.map((g) => (
+              <div key={g.id} className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-card border border-border">
+                <button onClick={() => loadGroup(g)} className="flex items-center gap-1.5">
+                  <Users size={12} className="text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground whitespace-nowrap">{g.name}</span>
+                  <span className="text-xs text-muted-foreground">({g.players.length})</span>
+                </button>
+                <button onClick={() => deleteGroup(g.id)} className="text-muted-foreground hover:text-accent-red transition-colors ml-1">
+                  <Trash2 size={11} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Player list */}
       <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-2">
@@ -108,12 +137,10 @@ export default function PlayerSetup({ onStart }) {
               className="rounded-lg border border-border bg-card overflow-hidden"
             >
               <div className="flex items-center gap-3 px-3 py-2.5">
-                {/* Color swatch / toggle */}
                 <button
                   onPointerDown={(e) => { e.preventDefault(); setExpandedColor(expandedColor === i ? null : i); }}
                   className="w-7 h-7 rounded-full flex-shrink-0 transition-transform active:scale-90 border-2 border-white/20"
                   style={{ backgroundColor: player.color }}
-                  aria-label="Pick color"
                 />
                 <Input
                   value={player.name}
@@ -123,16 +150,11 @@ export default function PlayerSetup({ onStart }) {
                   className="flex-1 bg-transparent border-none shadow-none h-9 px-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
                 />
                 {players.length > 2 && (
-                  <button
-                    onClick={() => removePlayer(i)}
-                    className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-accent-red transition-colors"
-                  >
+                  <button onClick={() => removePlayer(i)} className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-accent-red transition-colors">
                     <Trash2 size={14} />
                   </button>
                 )}
               </div>
-
-              {/* Color picker drawer */}
               <AnimatePresence>
                 {expandedColor === i && (
                   <motion.div
@@ -161,18 +183,34 @@ export default function PlayerSetup({ onStart }) {
         )}
       </div>
 
-      {/* Start button */}
-      <div className="px-5 pb-12 pt-4">
+      {/* Actions */}
+      <div className="px-5 pb-12 pt-2 flex flex-col gap-2">
+        {hasValidPlayers && (
+          <Button
+            onClick={() => setShowSaveGroup(true)}
+            variant="outline"
+            className="w-full h-10 text-sm text-muted-foreground"
+          >
+            <Save size={13} className="mr-1.5" />
+            Save as Group
+          </Button>
+        )}
         <Button
           onClick={handleStart}
           disabled={!canStart}
-          className="w-full h-13 text-base font-semibold bg-white hover:bg-white/90 text-background"
+          className="w-full text-base font-semibold bg-white hover:bg-white/90"
           style={{ height: "52px", color: "#111" }}
         >
           <Play size={16} className="mr-2" />
           Start Game
         </Button>
       </div>
+
+      <SaveGroupModal
+        isOpen={showSaveGroup}
+        onSave={handleSaveGroup}
+        onClose={() => setShowSaveGroup(false)}
+      />
     </div>
   );
 }

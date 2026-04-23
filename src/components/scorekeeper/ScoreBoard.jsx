@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { RotateCcw, UserPlus } from "lucide-react";
+import { RotateCcw, UserPlus, FlagOff } from "lucide-react";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
 import { Button } from "@/components/ui/button";
 
-export default function ScoreBoard({ players, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer }) {
+export default function ScoreBoard({ players, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [editingScore, setEditingScore] = useState(null);
 
@@ -56,13 +56,22 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
             </Button>
           )}
           <Button
+            onClick={onEndGame}
+            variant="ghost"
+            size="sm"
+            className="h-8 text-xs text-muted-foreground hover:text-foreground gap-1.5"
+          >
+            <FlagOff size={12} />
+            End Game
+          </Button>
+          <Button
             onClick={onReset}
             variant="ghost"
             size="sm"
             className="h-8 text-xs text-muted-foreground hover:text-accent-red gap-1.5"
           >
             <RotateCcw size={12} />
-            New Game
+            Reset
           </Button>
         </div>
       </div>

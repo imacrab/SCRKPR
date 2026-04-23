@@ -1,0 +1,37 @@
+{
+  "name": "GameHistory",
+  "type": "object",
+  "properties": {
+    "played_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "players": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number"
+          },
+          "scores": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "played_at",
+    "players"
+  ]
+}

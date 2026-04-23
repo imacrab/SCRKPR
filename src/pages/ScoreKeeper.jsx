@@ -1,12 +1,15 @@
 import { useState, useCallback } from "react";
+import { base44 } from "@/api/base44Client";
 import PlayerSetup from "@/components/scorekeeper/PlayerSetup";
 import ScoreBoard from "@/components/scorekeeper/ScoreBoard";
 import AddPlayerModal from "@/components/scorekeeper/AddPlayerModal";
+import History from "./History";
 
 export default function ScoreKeeper() {
   const [players, setPlayers] = useState([]);
   const [gameStarted, setGameStarted] = useState(false);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
+  const [view, setView] = useState("setup"); // "setup" | "game" | "history"
 
   const handleStartGame = useCallback((playerData) => {
     const initialPlayers = playerData.map((p, i) => ({
@@ -16,13 +19,31 @@ export default function ScoreKeeper() {
       scores: [],
     }));
     setPlayers(initialPlayers);
-    setGameStarted(true);
+    setView("game");
   }, []);
 
   const handleReset = useCallback(() => {
     setPlayers([]);
-    setGameStarted(false);
+    setView("setup");
   }, []);
+
+  const handleEndGame = useCallback(async () => {
+    if (players.length === 0) return;
+    const hasScores = players.some((p) => p.scores.length > 0);
+    if (hasScores) {
+      await base44.entities.GameHistory.create({
+        played_at: new Date().toISOString(),
+        players: players.map((p) => ({
+          name: p.name,
+          color: p.color,
+          total: p.scores.reduce((s, n) => s + n, 0),
+          scores: p.scores,
+        })),
+      });
+    }
+    setPlayers([]);
+    setView("setup");
+  }, [players]);
 
   const handleAddScore = useCallback((playerId, score) => {
     setPlayers((prev) =>
@@ -64,8 +85,17 @@ export default function ScoreKeeper() {
     setShowAddPlayer(false);
   }, []);
 
-  if (!gameStarted) {
-    return <PlayerSetup onStart={handleStartGame} />;
+  if (view === "history") {
+    return <History onBack={() => setView("setup")} />;
+  }
+
+  if (view === "setup") {
+    return (
+      <PlayerSetup
+        onStart={handleStartGame}
+        onShowHistory={() => setView("history")}
+      />
+    );
   }
 
   return (
@@ -77,6 +107,7 @@ export default function ScoreKeeper() {
         onEditName={handleEditName}
         onEditColor={handleEditColor}
         onReset={handleReset}
+        onEndGame={handleEndGame}
         onAddPlayer={() => setShowAddPlayer(true)}
       />
       <AddPlayerModal

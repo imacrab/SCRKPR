@@ -110,12 +110,12 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Saved Groups</p>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {groups.map((g) => (
-              <div key={g.id} className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-card border border-border">
-                <button onClick={() => loadGroup(g)} className="flex items-center gap-1.5">
+              <div key={g.id} className="flex-shrink-0 flex items-center rounded-lg bg-card border border-border overflow-hidden">
+                <button onClick={() => loadGroup(g)} className="flex items-center gap-1.5 px-3 py-2">
                   <span className="text-sm font-medium text-foreground whitespace-nowrap">{g.name}</span>
                 </button>
-                <button onClick={() => deleteGroup(g.id)} className="text-muted-foreground hover:text-accent-red transition-colors ml-1">
-                  <Trash2 size={24} />
+                <button onClick={() => deleteGroup(g.id)} className="self-stretch flex items-center px-3 text-muted-foreground hover:text-accent-red transition-colors border-l border-border">
+                  <Trash2 size={18} />
                 </button>
               </div>
             ))}

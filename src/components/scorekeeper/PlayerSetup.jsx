@@ -98,7 +98,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="pt-14 pb-5 px-6 flex items-center justify-between">
-        <h1 className="font-sans font-medium text-4xl text-foreground">Scorkeepr</h1>
+        <h1 className="font-sans font-medium text-4xl text-foreground">SCRKPR</h1>
         <button onClick={onShowHistory} className="text-muted-foreground hover:text-foreground transition-colors p-1">
           <History size={18} />
         </button>

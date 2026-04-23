@@ -54,7 +54,7 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
 
               {/* Display */}
               <div className="text-center mb-4">
-                <span className={`text-5xl font-bold font-display ${
+                <span className={`text-5xl font-bold ${
                   value === "" ? "text-muted-foreground/30" :
                   parseFloat(value) < 0 ? "text-accent-red" : "text-accent-blue"
                 }`}>

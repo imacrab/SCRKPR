@@ -113,7 +113,6 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
               <div key={g.id} className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-card border border-border">
                 <button onClick={() => loadGroup(g)} className="flex items-center gap-1.5">
                   <span className="text-sm font-medium text-foreground whitespace-nowrap">{g.name}</span>
-                  <span className="text-xs text-muted-foreground">({g.players.length})</span>
                 </button>
                 <button onClick={() => deleteGroup(g.id)} className="text-muted-foreground hover:text-accent-red transition-colors ml-1">
                   <Trash2 size={24} />

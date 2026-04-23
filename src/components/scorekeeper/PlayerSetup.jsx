@@ -112,7 +112,6 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
             {groups.map((g) => (
               <div key={g.id} className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-card border border-border">
                 <button onClick={() => loadGroup(g)} className="flex items-center gap-1.5">
-                  <Users size={24} className="text-muted-foreground" />
                   <span className="text-sm font-medium text-foreground whitespace-nowrap">{g.name}</span>
                   <span className="text-xs text-muted-foreground">({g.players.length})</span>
                 </button>

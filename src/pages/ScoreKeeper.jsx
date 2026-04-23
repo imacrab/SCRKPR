@@ -7,11 +7,11 @@ import History from "./History";
 
 export default function ScoreKeeper() {
   const [players, setPlayers] = useState([]);
-  const [gameStarted, setGameStarted] = useState(false);
+  const [winMode, setWinMode] = useState("high");
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [view, setView] = useState("setup"); // "setup" | "game" | "history"
 
-  const handleStartGame = useCallback((playerData) => {
+  const handleStartGame = useCallback((playerData, mode) => {
     const initialPlayers = playerData.map((p, i) => ({
       id: i + 1,
       name: p.name || p,
@@ -19,6 +19,7 @@ export default function ScoreKeeper() {
       scores: [],
     }));
     setPlayers(initialPlayers);
+    setWinMode(mode || "high");
     setView("game");
   }, []);
 

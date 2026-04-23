@@ -2,11 +2,13 @@ import { useState } from "react";
 import { RotateCcw, UserPlus, FlagOff } from "lucide-react";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
+import EditPlayerModal from "./EditPlayerModal";
 import { Button } from "@/components/ui/button";
 
 export default function ScoreBoard({ players, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [editingScore, setEditingScore] = useState(null);
+  const [editingPlayer, setEditingPlayer] = useState(null);
 
   const handleOpenScore = (player) => {
     setActivePlayer(player);
@@ -32,6 +34,13 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
   const handleClose = () => {
     setActivePlayer(null);
     setEditingScore(null);
+  };
+
+  const handleSavePlayer = ({ name, color }) => {
+    if (!editingPlayer) return;
+    onEditName(editingPlayer.id, name);
+    onEditColor(editingPlayer.id, color);
+    setEditingPlayer(null);
   };
 
   const colWidth = players.length <= 4 ? `${100 / players.length}vw` : "25vw";
@@ -92,8 +101,7 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
                 player={player}
                 onAddScore={() => handleOpenScore(player)}
                 onEditScore={(idx) => handleEditScore(player, idx)}
-                onEditName={(name) => onEditName(player.id, name)}
-                onEditColor={(color) => onEditColor(player.id, color)}
+                onEditPlayer={() => setEditingPlayer(player)}
               />
             </div>
           ))}
@@ -106,6 +114,13 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
         isOpen={!!activePlayer}
         onSubmit={handleSubmit}
         onClose={handleClose}
+      />
+
+      <EditPlayerModal
+        player={editingPlayer}
+        isOpen={!!editingPlayer}
+        onSave={handleSavePlayer}
+        onClose={() => setEditingPlayer(null)}
       />
     </div>
   );

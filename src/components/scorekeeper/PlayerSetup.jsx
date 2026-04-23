@@ -36,6 +36,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
   const [expandedColor, setExpandedColor] = useState(null);
   const [groups, setGroups] = useState([]);
   const [showSaveGroup, setShowSaveGroup] = useState(false);
+  const [winMode, setWinMode] = useState("high"); // "high" | "low"
 
   useEffect(() => {
     base44.entities.PlayerGroup.list("-created_date", 20).then(setGroups);
@@ -90,7 +91,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
 
   const handleStart = () => {
     const valid = players.filter((p) => p.name.trim());
-    if (valid.length >= 2) onStart(valid);
+    if (valid.length >= 2) onStart(valid, winMode);
   };
 
   return (
@@ -181,6 +182,42 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
             Add Player
           </button>
         )}
+      </div>
+
+      {/* Win mode */}
+      <div className="px-5 pt-2 pb-3">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Win Condition</p>
+        <div className="flex gap-2">
+          {[
+            { value: "high", label: "High Score", emoji: "🏆" },
+            { value: "low",  label: "Low Score",  emoji: "🎯" },
+          ].map((opt) => {
+            const active = winMode === opt.value;
+            return (
+              <button
+                key={opt.value}
+                onClick={() => setWinMode(opt.value)}
+                className="flex-1 flex items-center gap-2.5 px-4 py-3 rounded-xl border transition-all"
+                style={{
+                  borderColor: active ? "rgba(255,255,255,0.5)" : "hsl(var(--border))",
+                  backgroundColor: active ? "hsl(var(--card))" : "transparent",
+                }}
+              >
+                <div
+                  className="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all"
+                  style={{
+                    borderColor: active ? "white" : "hsl(var(--muted-foreground))",
+                  }}
+                >
+                  {active && <div className="w-2 h-2 rounded-full bg-white" />}
+                </div>
+                <span className="text-sm font-medium" style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}>
+                  {opt.emoji} {opt.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Actions */}

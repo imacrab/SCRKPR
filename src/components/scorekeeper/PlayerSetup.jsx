@@ -200,7 +200,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
       </div>
 
       {/* Win mode */}
-      <div className="px-5 pt-2 pb-3">
+      <div className="px-5 pt-2 pb-0">
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Win Condition</p>
         <div className="flex gap-2">
           {[

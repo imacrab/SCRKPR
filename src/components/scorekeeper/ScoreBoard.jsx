@@ -33,10 +33,12 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
     setEditingScore(null);
   };
 
-  const colWidth = players.length <= 4 ? `${100 / players.length}%` : "25%";
+  // Each column = 25vw minimum, but if <=4 players fill evenly
+  const colCount = Math.min(players.length, 4);
+  const colWidth = players.length <= 4 ? `${100 / players.length}vw` : "25vw";
 
   return (
-    <div className="h-screen app-bg flex flex-col overflow-hidden">
+    <div className="h-screen w-screen app-bg flex flex-col overflow-hidden">
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-10 pb-3 flex-shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
         <h1 className="font-display text-xl text-gradient font-bold">ScorKeep</h1>
@@ -64,16 +66,16 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
       </div>
 
       {/* Columns container */}
-      <div className="flex-1 overflow-hidden flex">
+      <div className="flex-1 overflow-hidden w-full">
         <div
-          className="flex h-full overflow-x-auto"
+          className="flex h-full w-full overflow-x-auto"
           style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
         >
           {players.map((player) => (
             <div
               key={player.id}
-              style={{ minWidth: colWidth, width: colWidth, scrollSnapAlign: "start" }}
-              className="h-full flex-shrink-0"
+              style={{ minWidth: colWidth, width: colWidth, scrollSnapAlign: "start", flexShrink: 0 }}
+              className="h-full"
             >
               <PlayerColumn
                 player={player}

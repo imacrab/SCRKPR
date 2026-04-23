@@ -36,6 +36,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
   const [expandedColor, setExpandedColor] = useState(null);
   const [groups, setGroups] = useState([]);
   const [showSaveGroup, setShowSaveGroup] = useState(false);
+  const [activeGroup, setActiveGroup] = useState(null); // the loaded group, if any
   const [winMode, setWinMode] = useState("low"); // "high" | "low"
 
   useEffect(() => {
@@ -79,11 +80,21 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
   const deleteGroup = async (id) => {
     await base44.entities.PlayerGroup.delete(id);
     setGroups((prev) => prev.filter((g) => g.id !== id));
+    if (activeGroup?.id === id) setActiveGroup(null);
   };
 
   const loadGroup = (group) => {
     setPlayers(group.players.map((p) => ({ name: p.name, color: p.color })));
     setExpandedColor(null);
+    setActiveGroup(group);
+  };
+
+  const handleUpdateGroup = async () => {
+    const valid = players.filter((p) => p.name.trim());
+    if (valid.length < 2 || !activeGroup) return;
+    const updated = await base44.entities.PlayerGroup.update(activeGroup.id, { players: valid });
+    setGroups((prev) => prev.map((g) => g.id === activeGroup.id ? { ...g, players: valid } : g));
+    setActiveGroup({ ...activeGroup, players: valid });
   };
 
   const canStart = players.filter((p) => p.name.trim()).length >= 2;
@@ -218,14 +229,26 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
       {/* Actions */}
       <div className="px-5 pb-12 pt-2 flex flex-col gap-2">
         {hasValidPlayers && (
-          <Button
-            onClick={() => setShowSaveGroup(true)}
-            variant="outline"
-            className="w-full h-10 text-sm text-muted-foreground"
-          >
-            <Save size={24} className="mr-1.5" />
-            Save as Group
-          </Button>
+          <div className="flex gap-2">
+            {activeGroup && (
+              <Button
+                onClick={handleUpdateGroup}
+                variant="outline"
+                className="flex-1 h-10 text-sm text-muted-foreground"
+              >
+                <Save size={24} className="mr-1.5" />
+                Update Group
+              </Button>
+            )}
+            <Button
+              onClick={() => setShowSaveGroup(true)}
+              variant="outline"
+              className="flex-1 h-10 text-sm text-muted-foreground"
+            >
+              <Save size={24} className="mr-1.5" />
+              Save as Group
+            </Button>
+          </div>
         )}
         <Button
           onClick={handleStart}

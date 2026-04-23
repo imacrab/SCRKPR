@@ -135,7 +135,12 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
       )}
 
       {/* Player list */}
-      <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-2">
+      <div className="flex-1 relative overflow-hidden">
+        {/* Top fade */}
+        <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
+      <div className="h-full overflow-y-auto px-5 py-4 space-y-2">
         <AnimatePresence>
           {players.map((player, i) => (
             <motion.div
@@ -191,6 +196,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
             Add Player
           </button>
         )}
+      </div>
       </div>
 
       {/* Win mode */}

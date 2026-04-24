@@ -8,7 +8,7 @@ import EndGameModal from "./EndGameModal";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-export default function ScoreBoard({ players, winMode, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer, onEndGame }) {
+export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [streakMap, setStreakMap] = useState({});
   const [gameStartTime] = useState(new Date());
@@ -135,6 +135,7 @@ export default function ScoreBoard({ players, winMode, onAddScore, onEditScore, 
             >
               <PlayerColumn
                 player={player}
+                isHighlighted={player.id === lastAddedPlayerId}
                 streak={streakMap[player.name] || 0}
                 onAddScore={() => handleOpenScore(player)}
                 onEditScore={(idx) => handleEditScore(player, idx)}

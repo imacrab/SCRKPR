@@ -56,6 +56,7 @@ export default function ScoreKeeper() {
   const [winMode, setWinMode] = useState(_winMode);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
+  const [lastAddedPlayerId, setLastAddedPlayerId] = useState(null);
 
   // On mount, load game state from localStorage and redirect to game if one exists
   useEffect(() => {
@@ -154,8 +155,10 @@ export default function ScoreKeeper() {
     setPlayers((prev) => {
       if (prev.length >= 20) return prev;
       const maxId = prev.reduce((m, p) => Math.max(m, p.id), 0);
-      const next = [...prev, { id: maxId + 1, name, scores: [] }];
+      const newId = maxId + 1;
+      const next = [...prev, { id: newId, name, scores: [] }];
       saveGameState(next, _winMode);
+      setLastAddedPlayerId(newId);
       return next;
     });
     setShowAddPlayer(false);
@@ -202,6 +205,7 @@ export default function ScoreKeeper() {
             <ScoreBoard
               players={players}
               winMode={winMode}
+              lastAddedPlayerId={lastAddedPlayerId}
               onAddScore={handleAddScore}
               onEditScore={handleEditScore}
               onEditName={handleEditName}

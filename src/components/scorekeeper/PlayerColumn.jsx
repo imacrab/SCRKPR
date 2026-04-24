@@ -31,7 +31,7 @@ function AnimatedTotal({ value, color }) {
   );
 }
 
-export default function PlayerColumn({ player, streak = 0, onAddScore, onEditScore, onEditPlayer }) {
+export default function PlayerColumn({ player, isHighlighted = false, streak = 0, onAddScore, onEditScore, onEditPlayer }) {
   const total = player.scores.reduce((s, n) => s + n, 0);
   const lastIdx = player.scores.length - 1;
   const scrollRef = useRef(null);
@@ -47,11 +47,12 @@ export default function PlayerColumn({ player, streak = 0, onAddScore, onEditSco
     <div className="h-full flex flex-col border-r border-border last:border-r-0">
       {/* Header — frosted glass */}
       <div
-        className="flex-shrink-0 px-2 py-3 flex flex-col items-center gap-2 border-b border-border z-10"
+        className="flex-shrink-0 px-2 py-3 flex flex-col items-center gap-2 border-b border-border z-10 transition-all"
         style={{
-          backgroundColor: "hsl(var(--card) / 0.9)",
+          backgroundColor: isHighlighted ? `hsl(var(--primary) / 0.1)` : "hsl(var(--card) / 0.9)",
           backdropFilter: "blur(1px)",
           WebkitBackdropFilter: "blur(1px)",
+          borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))",
         }}
       >
         <button onClick={onEditPlayer} className="flex flex-col items-center gap-1.5">

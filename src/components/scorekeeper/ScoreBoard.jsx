@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { RotateCcw, UserPlus, FlagOff, MoreHorizontal } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import PlayerColumn from "./PlayerColumn";
@@ -12,6 +12,8 @@ export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddS
   const [activePlayer, setActivePlayer] = useState(null);
   const [streakMap, setStreakMap] = useState({});
   const [gameStartTime] = useState(new Date());
+  const [scrollPos, setScrollPos] = useState(0);
+  const scrollContainerRef = useRef(null);
 
 
   useEffect(() => {
@@ -122,10 +124,12 @@ export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddS
       </div>
 
       {/* Columns */}
-      <div className="flex-1 overflow-hidden w-full">
+      <div className="flex-1 overflow-hidden w-full relative">
         <div
+          ref={scrollContainerRef}
           className="flex h-full w-full overflow-x-auto"
           style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+          onScroll={(e) => setScrollPos(e.currentTarget.scrollLeft)}
         >
           {players.map((player) => (
             <div
@@ -144,6 +148,17 @@ export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddS
             </div>
           ))}
         </div>
+        
+        {/* Right gradient fade for horizontal scroll */}
+        {players.length > 4 && (
+          <div
+            className="absolute right-0 top-0 bottom-0 w-8 pointer-events-none transition-opacity"
+            style={{
+              background: "linear-gradient(to right, transparent, hsl(var(--background)))",
+              opacity: scrollContainerRef.current && scrollContainerRef.current.scrollLeft < scrollContainerRef.current.scrollWidth - scrollContainerRef.current.clientWidth - 10 ? 1 : 0,
+            }}
+          />
+        )}
       </div>
 
       <ScoreInputModal

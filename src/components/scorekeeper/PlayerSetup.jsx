@@ -46,6 +46,11 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     setShowSaveGroup(val);
     onModalChange?.(val);
   };
+
+  const setEditingGroupWithNav = (val) => {
+    setEditingGroup(val);
+    onModalChange?.(!!val);
+  };
   const [activeGroup, setActiveGroup] = useState(null); // the loaded group, if any
   const [winMode, setWinMode] = useState("low"); // "high" | "low"
   const scrollRef = useRef(null);
@@ -149,7 +154,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     
     if (group.id === lastTappedGroupId && now - lastTapTime < 300) {
       // Double tap detected
-      setEditingGroup(group);
+      setEditingGroupWithNav(group);
       setLastTappedGroupId(null);
       lastTapTimeRef.current[group.id] = 0;
     } else {
@@ -345,7 +350,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         group={editingGroup}
         onSave={handleEditGroup}
         onDelete={deleteGroup}
-        onClose={() => setEditingGroup(null)}
+        onClose={() => setEditingGroupWithNav(null)}
       />
     </div>
   );

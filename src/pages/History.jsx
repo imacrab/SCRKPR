@@ -77,6 +77,7 @@ export default function History({ onBack }) {
       <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto px-5 py-4"
+        style={{ paddingBottom: "calc(56px + 16px + 16px + env(safe-area-inset-bottom))" }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

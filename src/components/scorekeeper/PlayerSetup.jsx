@@ -136,7 +136,7 @@ export default function PlayerSetup({ onStart }) {
         <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
         {/* Bottom fade */}
         <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
-      <div className="h-full overflow-y-auto px-5 py-4 space-y-2">
+      <div className="h-full overflow-y-auto px-5 py-4 space-y-2" style={{ paddingBottom: "calc(56px + 16px + 16px + env(safe-area-inset-bottom))" }}>
         <AnimatePresence>
           {players.map((player, i) => (
             <motion.div

@@ -80,7 +80,7 @@ export default function EditGroupModal({ isOpen, group, onSave, onClose, onDelet
                   onClick={() => onDelete?.(group.id)}
                   className="w-full h-6 mb-3 bg-red-500/15 hover:bg-red-500/25 text-red-600"
                 >
-                  Delete Group
+                  Delete
                 </Button>
                 <Button
                   onClick={handleSubmit}

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function AccountSettings({ onBack }) {
+export default function AccountSettings({ onBack, onModalChange }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [theme, setTheme] = useState("dark");
@@ -55,6 +55,10 @@ export default function AccountSettings({ onBack }) {
       setShowConfirm(false);
     }
   };
+
+  useEffect(() => {
+    onModalChange?.(showConfirm);
+  }, [showConfirm, onModalChange]);
 
   return (
     <div

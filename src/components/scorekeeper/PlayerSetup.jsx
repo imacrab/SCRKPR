@@ -147,10 +147,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         <img src="https://media.base44.com/images/public/69ea763700078809357a164a/bbacfd24a_SCRKPR.png" alt="SCRKPR!" className="mx-auto" style={{ maxWidth: 200, height: "auto" }} />
       </div>
 
-      {/* Saved Groups — always reserve space to avoid layout shift */}
-      <div className="mb-2" style={{ minHeight: 48 }}>
-        {groups && groups.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-1 px-5">
+      {/* Saved Groups */}
+      {groups && groups.length > 0 && (
+        <div className="mb-2">
+          <div className="flex gap-2 overflow-x-auto pb-1 px-5">
             {groups.map((g) => (
               <div key={g.id} className="flex-shrink-0 flex items-center rounded-lg bg-card border overflow-hidden"
                 style={{ borderColor: g.pinned ? "rgba(255,255,255,0.35)" : "hsl(var(--border))" }}>
@@ -166,8 +166,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Player list */}
       <div className="flex-1 relative overflow-hidden">

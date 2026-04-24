@@ -329,9 +329,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 onClick={() => setWinMode(opt.value)}
                 className="flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border transition-all"
                 style={{
-                  borderColor: active ? "rgba(255,255,255,0.5)" : "hsl(var(--border))",
-                  backgroundColor: active ? "hsl(var(--card))" : "transparent",
-                  boxShadow: active ? "0 10px 10px -3px rgba(0, 0, 0, 0.1)" : "none",
+                  borderColor: active ? "#1e7fd9" : "hsl(var(--border))",
+                  backgroundColor: active ? "#e3f2fd" : "transparent",
                 }}
               >
                 <opt.Icon

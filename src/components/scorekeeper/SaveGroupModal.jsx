@@ -45,7 +45,6 @@ export default function SaveGroupModal({ isOpen, onSave, onClose }) {
                 <h2 className="font-sans font-medium text-xl text-foreground">Name this group</h2>
               </div>
               <Input
-                autoFocus
                 value={name}
                 onChange={(e) => setName(e.target.value.slice(0, 30))}
                 onKeyDown={(e) => { if (e.key === "Enter") handleSave(); if (e.key === "Escape") handleClose(); }}

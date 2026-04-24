@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { RotateCcw, UserPlus, FlagOff, MoreHorizontal, Maximize, Minimize } from "lucide-react";
+import { useState, useEffect } from "react";
+import { RotateCcw, UserPlus, FlagOff, MoreHorizontal } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
@@ -11,15 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 export default function ScoreBoard({ players, winMode, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [streakMap, setStreakMap] = useState({});
-  const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const toggleFullscreen = useCallback(() => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
-    } else {
-      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
-    }
-  }, []);
 
   useEffect(() => {
     base44.entities.GameHistory.list("-played_at", 20).then((games) => {
@@ -89,12 +81,6 @@ export default function ScoreBoard({ players, winMode, onAddScore, onEditScore, 
       <div className="flex items-center justify-between px-4 pt-10 pb-3 flex-shrink-0 border-b border-border" style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <img src="https://media.base44.com/images/public/69ea763700078809357a164a/bbacfd24a_SCRKPR.png" alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
         <div className="flex items-center gap-1">
-          <button
-            onClick={toggleFullscreen}
-            className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-          >
-            {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
-          </button>
         <Popover>
           <PopoverTrigger asChild>
             <button className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">

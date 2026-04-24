@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ArrowLeft, Trash2, AlertTriangle, LogOut } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Trash2, AlertTriangle, LogOut, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,6 +7,24 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function AccountSettings({ onBack }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [theme, setTheme] = useState("dark");
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    setTheme(savedTheme);
+  }, []);
+
+  const handleThemeChange = (newTheme) => {
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    if (newTheme === "dark") {
+      document.documentElement.style.colorScheme = "dark";
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.style.colorScheme = "light";
+      document.documentElement.classList.remove("dark");
+    }
+  };
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
@@ -40,6 +58,42 @@ export default function AccountSettings({ onBack }) {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-6 space-y-4">
+         {/* Theme */}
+         <div className="rounded-xl border border-border bg-card overflow-hidden">
+            <div className="px-4 py-4 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Sun size={20} className="text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">Theme</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Choose your preferred appearance.</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2 px-4 pb-4">
+              {[
+                { value: "light", label: "Light", Icon: Sun },
+                { value: "dark", label: "Dark", Icon: Moon },
+              ].map((opt) => {
+                const active = theme === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => handleThemeChange(opt.value)}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border transition-all text-sm font-medium"
+                    style={{
+                      borderColor: active ? "hsl(199 94% 40% / 0.4)" : "hsl(var(--border))",
+                      backgroundColor: active ? "hsl(199 94% 40% / 0.12)" : "transparent",
+                      color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))",
+                    }}
+                  >
+                    <opt.Icon size={16} />
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
          {/* Sign Out */}
          <div className="rounded-xl border border-border bg-card overflow-hidden">
            <div className="px-4 py-4 flex items-center justify-between gap-4">

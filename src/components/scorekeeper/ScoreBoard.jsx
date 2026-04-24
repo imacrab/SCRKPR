@@ -15,6 +15,7 @@ export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddS
   const [gameStartTime] = useState(new Date());
   const [scrollPos, setScrollPos] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const scrollContainerRef = useRef(null);
 
   useEffect(() => {
@@ -95,7 +96,7 @@ export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddS
           <img src={isDarkMode ? "https://media.base44.com/images/public/69ea763700078809357a164a/87badac38_SCRKPR_dark_mode.png" : "https://media.base44.com/images/public/69ea763700078809357a164a/6de7dc994_SCRKPR_light_mode.png"} alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
         </button>
         <div className="flex items-center gap-1">
-        <Popover>
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
             <button className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
               <MoreHorizontal size={24} />
@@ -112,7 +113,10 @@ export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddS
               </button>
             )}
             <button
-              onClick={onReset}
+              onClick={() => {
+                onReset();
+                setPopoverOpen(false);
+              }}
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-foreground hover:bg-accent transition-colors"
             >
               <RotateCcw size={24} className="text-muted-foreground" />

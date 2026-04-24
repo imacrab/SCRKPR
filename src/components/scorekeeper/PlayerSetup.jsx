@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Play, History, Save, Trophy, Target, Settings } from "lucide-react";
+import { Plus, Trash2, Play, Save, Trophy, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
@@ -28,7 +28,7 @@ function ColorPicker({ selected, onChange }) {
   );
 }
 
-export default function PlayerSetup({ onStart, onShowHistory, onShowAccount }) {
+export default function PlayerSetup({ onStart }) {
   const [players, setPlayers] = useState([
     { name: "", color: PLAYER_COLORS[0] },
     { name: "", color: PLAYER_COLORS[1] },
@@ -108,16 +108,8 @@ export default function PlayerSetup({ onStart, onShowHistory, onShowAccount }) {
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden" style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* Header */}
-      <div className="pt-10 pb-5 px-6 flex items-center justify-between">
+      <div className="pt-10 pb-5 px-6">
         <h1 className="font-sans font-bold text-4xl text-foreground">Scorkeepr</h1>
-        <div className="flex items-center gap-1">
-          <button onClick={onShowHistory} className="text-muted-foreground hover:text-foreground transition-colors p-1">
-            <History size={22} />
-          </button>
-          <button onClick={onShowAccount} className="text-muted-foreground hover:text-foreground transition-colors p-1">
-            <Settings size={22} />
-          </button>
-        </div>
       </div>
 
       {/* Saved Groups */}

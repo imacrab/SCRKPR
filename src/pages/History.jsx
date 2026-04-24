@@ -47,8 +47,13 @@ export default function History({ onBack }) {
   };
 
   const deleteGame = async (id) => {
-    await base44.entities.GameHistory.delete(id);
-    setGames((prev) => prev.filter((g) => g.id !== id));
+    const prev = games;
+    setGames((g) => g.filter((item) => item.id !== id));
+    try {
+      await base44.entities.GameHistory.delete(id);
+    } catch {
+      setGames(prev);
+    }
   };
 
   return (
@@ -118,9 +123,9 @@ export default function History({ onBack }) {
                   </div>
 
                   {/* Player scores */}
-                  <div className="px-4 py-3 space-y-2">
+                  <div className="px-4 py-3 space-y-1">
                     {sorted.map((p, i) => (
-                      <div key={p.name} className="flex items-center gap-3">
+                      <div key={p.name} className="flex items-center gap-3 py-1.5 min-h-[44px]">
                         <span className="text-xs text-muted-foreground w-4 text-right">{i + 1}</span>
                         <div
                           className="w-2.5 h-2.5 rounded-full flex-shrink-0"

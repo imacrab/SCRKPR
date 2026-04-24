@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import PlayerSetup from "@/components/scorekeeper/PlayerSetup";
 import ScoreBoard from "@/components/scorekeeper/ScoreBoard";
 import AddPlayerModal from "@/components/scorekeeper/AddPlayerModal";
+import BottomNavigationBar from "@/components/scorekeeper/BottomNavigationBar";
 import History from "./History";
 import AccountSettings from "./AccountSettings";
 
@@ -120,49 +121,56 @@ export default function ScoreKeeper() {
   };
   const pageTransition = { duration: 0.4, ease: [0.4, 0, 0.2, 1] };
 
+  // Height reserved for the bottom nav bar (hidden on /game)
+  const navHeight = view === "/game" ? "0px" : "calc(56px + env(safe-area-inset-bottom))";
+
   return (
-    <AnimatePresence mode="wait">
-      {view === "/history" && (
-        <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden">
-          <History onBack={() => navigate(-1)} />
-        </motion.div>
-      )}
+    <>
+      <AnimatePresence mode="wait">
+        {view === "/history" && (
+          <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden" style={{ paddingBottom: navHeight }}>
+            <History onBack={() => navigate(-1)} />
+          </motion.div>
+        )}
 
-      {view === "/account" && (
-        <motion.div key="account" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden">
-          <AccountSettings onBack={() => navigate(-1)} />
-        </motion.div>
-      )}
+        {view === "/account" && (
+          <motion.div key="account" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden" style={{ paddingBottom: navHeight }}>
+            <AccountSettings onBack={() => navigate(-1)} />
+          </motion.div>
+        )}
 
-      {view === "/" && (
-        <motion.div key="setup" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden">
-          <PlayerSetup
-            onStart={handleStartGame}
-            onShowHistory={() => navigate("/history")}
-            onShowAccount={() => navigate("/account")}
-          />
-        </motion.div>
-      )}
+        {view === "/" && (
+          <motion.div key="setup" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden" style={{ paddingBottom: navHeight }}>
+            <PlayerSetup
+              onStart={handleStartGame}
+              onShowHistory={() => navigate("/history")}
+              onShowAccount={() => navigate("/account")}
+            />
+          </motion.div>
+        )}
 
-      {view === "/game" && (
-        <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden">
-          <ScoreBoard
-            players={players}
-            onAddScore={handleAddScore}
-            onEditScore={handleEditScore}
-            onEditName={handleEditName}
-            onEditColor={handleEditColor}
-            onReset={handleReset}
-            onEndGame={handleEndGame}
-            onAddPlayer={() => setShowAddPlayer(true)}
-          />
-          <AddPlayerModal
-            isOpen={showAddPlayer}
-            onAdd={handleAddPlayer}
-            onClose={() => setShowAddPlayer(false)}
-          />
-        </motion.div>
-      )}
-    </AnimatePresence>
+        {view === "/game" && (
+          <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden">
+            <ScoreBoard
+              players={players}
+              onAddScore={handleAddScore}
+              onEditScore={handleEditScore}
+              onEditName={handleEditName}
+              onEditColor={handleEditColor}
+              onReset={handleReset}
+              onEndGame={handleEndGame}
+              onAddPlayer={() => setShowAddPlayer(true)}
+            />
+            <AddPlayerModal
+              isOpen={showAddPlayer}
+              onAdd={handleAddPlayer}
+              onClose={() => setShowAddPlayer(false)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <BottomNavigationBar />
+    </>
   );
 }

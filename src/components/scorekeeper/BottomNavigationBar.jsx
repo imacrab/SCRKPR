@@ -1,8 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Gamepad2, History, Settings } from "lucide-react";
+import { Dices, History, Settings } from "lucide-react";
 
 const TABS = [
-  { label: "New Game", icon: Gamepad2, path: "/" },
+  { label: "New Game", icon: Dices, path: "/" },
   { label: "History",  icon: History,  path: "/history" },
   { label: "Account",  icon: Settings,  path: "/account" },
 ];

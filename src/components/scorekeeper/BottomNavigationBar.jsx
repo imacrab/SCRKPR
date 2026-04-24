@@ -19,7 +19,7 @@ export default function BottomNavigationBar({ hidden = false }) {
     <motion.div
       className="fixed inset-x-0 bottom-0 z-30 flex"
       animate={{ y: hidden ? 120 : 0 }}
-      transition={{ type: "spring", stiffness: 400, damping: 35 }}
+      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)", paddingLeft: "8px", paddingRight: "8px" }}
     >
     <div className="flex flex-1 border border-border rounded-full overflow-hidden" style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)" }}>

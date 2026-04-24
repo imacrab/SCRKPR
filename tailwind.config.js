@@ -48,7 +48,7 @@ module.exports = {
   		},
   		fontFamily: {
   			display: ['Syne', 'sans-serif'],
-  			sans: ['Inter', 'sans-serif'],
+  			sans: ['Geist', 'sans-serif'],
   		},
   		keyframes: {
   			'accordion-down': {

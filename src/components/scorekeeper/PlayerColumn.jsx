@@ -90,11 +90,13 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))",
         }}
       >
-        <button onClick={onEditPlayer} className="flex flex-col items-center gap-1.5">
-          <div className="flex items-center gap-1">
-            <span className="text-s font-bold text-foreground truncate max-w-[90] text-center leading-tight">
+        <button onClick={onEditPlayer} className="flex flex-col items-center gap-1.5 relative">
+          <div className="flex items-center gap-1 relative w-20">
+            <span className="text-s font-bold text-foreground truncate text-center leading-tight w-full" title={player.name}>
               {player.name}
             </span>
+          </div>
+          <div>
             {streak >= 2 && (
               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 leading-none">
                 🔥{streak}

@@ -17,7 +17,7 @@ export default function BottomNavigationBar() {
   return (
     <div
       className="fixed inset-x-0 bottom-0 z-30 flex"
-      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)", paddingLeft: "16px", paddingRight: "16px" }}
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)", paddingLeft: "8px", paddingRight: "8px" }}
     >
     <div className="flex flex-1 bg-card border border-border rounded-full overflow-hidden">
       {TABS.map(({ label, icon: Icon, path }) => {

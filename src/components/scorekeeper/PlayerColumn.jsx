@@ -50,8 +50,8 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditPl
         className="flex-shrink-0 px-2 py-3 flex flex-col items-center gap-2 border-b border-border z-10"
         style={{
           backgroundColor: "hsl(var(--card) / 0.9)",
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
+          backdropFilter: "blur(1px)",
+          WebkitBackdropFilter: "blur(1px)",
         }}
       >
         <button onClick={onEditPlayer} className="flex flex-col items-center gap-1.5">

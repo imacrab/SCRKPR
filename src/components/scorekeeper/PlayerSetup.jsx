@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Play, Save, Trophy, Target, Pencil } from "lucide-react";
+import { Plus, Trash2, Play, Save, TrendingUp, TrendingDown, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
@@ -257,8 +257,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       <div className="px-5 pt-2 pb-2">
         <div className="flex gap-2">
           {[
-            { value: "low",  label: "Low Score",  Icon: Target },
-            { value: "high", label: "High Score", Icon: Trophy },
+            { value: "low",  label: "Low Score",  Icon: TrendingDown },
+            { value: "high", label: "High Score", Icon: TrendingUp },
           ].map((opt) => {
             const active = winMode === opt.value;
             return (

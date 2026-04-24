@@ -40,7 +40,11 @@ export default function PlayerSetup({ onStart }) {
   const [winMode, setWinMode] = useState("low"); // "high" | "low"
 
   useEffect(() => {
-    base44.entities.PlayerGroup.list("-created_date", 20).then(setGroups);
+    base44.entities.PlayerGroup.list("-created_date", 20).then((data) => {
+      const pinned = data.filter((g) => g.name === "The Best Group");
+      const rest = data.filter((g) => g.name !== "The Best Group");
+      setGroups([...pinned, ...rest]);
+    });
   }, []);
 
   const addPlayer = () => {
@@ -73,7 +77,12 @@ export default function PlayerSetup({ onStart }) {
     const valid = players.filter((p) => p.name.trim());
     if (valid.length < 2) return;
     const group = await base44.entities.PlayerGroup.create({ name: groupName, players: valid });
-    setGroups((prev) => [group, ...prev]);
+    setGroups((prev) => {
+      const pinned = prev.filter((g) => g.name === "The Best Group");
+      const rest = prev.filter((g) => g.name !== "The Best Group");
+      if (group.name === "The Best Group") return [group, ...rest];
+      return [...pinned, group, ...rest];
+    });
     setShowSaveGroup(false);
   };
 

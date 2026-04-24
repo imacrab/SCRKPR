@@ -195,7 +195,7 @@ export default function History({ onBack }) {
               className="fixed inset-x-0 z-50 bg-card border border-border rounded-[20px] shadow-2xl"
               style={{ bottom: "calc(56px + 8px)", left: "8px", right: "8px", paddingBottom: "env(safe-area-inset-bottom)" }}
             >
-              <div className="px-5 pt-5 pb-8">
+              <div className="px-5 pt-5 pb-16">
                 <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
                 <div className="flex flex-col items-center text-center mb-6">
                   <AlertTriangle size={32} className="mb-3" style={{ color: "#FF3A3A" }} />

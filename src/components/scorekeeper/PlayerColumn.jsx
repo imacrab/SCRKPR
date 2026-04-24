@@ -56,7 +56,7 @@ export default function PlayerColumn({ player, streak = 0, onAddScore, onEditSco
       >
         <button onClick={onEditPlayer} className="flex flex-col items-center gap-1.5">
           <div className="flex items-center gap-1">
-            <span className="text-xs font-bold text-foreground truncate max-w-[70px] text-center leading-tight">
+            <span className="text-s font-bold text-foreground truncate max-w-[70px] text-center leading-tight">
               {player.name}
             </span>
             {streak >= 2 && (

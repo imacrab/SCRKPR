@@ -30,16 +30,10 @@ export default function BottomNavigationBar() {
             style={{ minHeight: 56 }}
           >
             <Icon
-              size={22}
+              size={28}
               strokeWidth={active ? 2.2 : 1.6}
               style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
             />
-            <span
-              className="text-[10px] font-medium leading-none"
-              style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
-            >
-              {label}
-            </span>
           </button>
         );
       })}

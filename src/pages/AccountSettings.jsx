@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Trash2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Trash2, AlertTriangle, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,23 +40,42 @@ export default function AccountSettings({ onBack }) {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-6 space-y-4">
-        {/* Delete Account */}
-        <div className="rounded-xl border border-border bg-card overflow-hidden">
-          <div className="px-4 py-4 flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-medium text-foreground">Delete Account</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Permanently remove your account and all data.</p>
-            </div>
-            <button
-              onClick={() => setShowConfirm(true)}
-              className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
-              style={{ color: "#FF3A3A", backgroundColor: "rgba(255,58,58,0.08)" }}
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      </div>
+         {/* Sign Out */}
+         <div className="rounded-xl border border-border bg-card overflow-hidden">
+           <div className="px-4 py-4 flex items-center justify-between gap-4">
+             <div className="flex items-center gap-3">
+               <LogOut size={20} className="text-muted-foreground" />
+               <div>
+                 <p className="text-sm font-medium text-foreground">Sign Out</p>
+                 <p className="text-xs text-muted-foreground mt-0.5">End your session and return to login.</p>
+               </div>
+             </div>
+             <button
+               onClick={() => base44.auth.logout("/")}
+               className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors hover:text-foreground text-muted-foreground"
+             >
+               Sign Out
+             </button>
+           </div>
+         </div>
+
+         {/* Delete Account */}
+         <div className="rounded-xl border border-border bg-card overflow-hidden">
+           <div className="px-4 py-4 flex items-center justify-between gap-4">
+             <div>
+               <p className="text-sm font-medium text-foreground">Delete Account</p>
+               <p className="text-xs text-muted-foreground mt-0.5">Permanently remove your account and all data.</p>
+             </div>
+             <button
+               onClick={() => setShowConfirm(true)}
+               className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
+               style={{ color: "#FF3A3A", backgroundColor: "rgba(255,58,58,0.08)" }}
+             >
+               Delete
+             </button>
+           </div>
+         </div>
+       </div>
 
       {/* Confirm modal */}
       <AnimatePresence>

@@ -151,12 +151,12 @@ export default function ScoreKeeper() {
     });
   }, []);
 
-  const handleAddPlayer = useCallback((name) => {
+  const handleAddPlayer = useCallback((name, color) => {
     setPlayers((prev) => {
       if (prev.length >= 20) return prev;
       const maxId = prev.reduce((m, p) => Math.max(m, p.id), 0);
       const newId = maxId + 1;
-      const next = [...prev, { id: newId, name, scores: [] }];
+      const next = [...prev, { id: newId, name, color: color || "#2DC5F8", scores: [] }];
       saveGameState(next, _winMode);
       setLastAddedPlayerId(newId);
       return next;

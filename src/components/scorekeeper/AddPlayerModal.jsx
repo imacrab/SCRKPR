@@ -4,13 +4,22 @@ import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+const PLAYER_COLORS = [
+  "#2DC5F8", "#3B82F6", "#6366F1", "#8B5CF6", "#A855F7",
+  "#EC4899", "#FF3A3A", "#F97316", "#F59E0B", "#EAB308",
+  "#84CC16", "#22C55E", "#10B981", "#14B8A6", "#06B6D4",
+  "#0EA5E9", "#64748B", "#A78BFA", "#FB7185", "#34D399",
+];
+
 export default function AddPlayerModal({ isOpen, onAdd, onClose }) {
   const [name, setName] = useState("");
+  const [color, setColor] = useState(PLAYER_COLORS[0]);
   const inputRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
       setName("");
+      setColor(PLAYER_COLORS[0]);
       setTimeout(() => inputRef.current?.focus(), 120);
     }
   }, [isOpen]);
@@ -18,8 +27,9 @@ export default function AddPlayerModal({ isOpen, onAdd, onClose }) {
   const handleSubmit = () => {
     const trimmed = name.trim();
     if (!trimmed) return;
-    onAdd(trimmed);
+    onAdd(trimmed, color);
     setName("");
+    setColor(PLAYER_COLORS[0]);
   };
 
   return (
@@ -60,6 +70,19 @@ export default function AddPlayerModal({ isOpen, onAdd, onClose }) {
                 className="mb-5 text-center text-base bg-secondary border-border"
                 aria-label="New player name"
               />
+
+              <div className="mb-5">
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {PLAYER_COLORS.map((c) => (
+                    <button
+                      key={c}
+                      onPointerDown={(e) => { e.preventDefault(); setColor(c); }}
+                      className="w-7 h-7 rounded-full transition-transform active:scale-90"
+                      style={{ backgroundColor: c, outline: color === c ? "2px solid white" : "none", outlineOffset: "2px" }}
+                    />
+                  ))}
+                </div>
+              </div>
 
               <div className="flex gap-3">
                 <Button onClick={onClose} variant="outline" className="flex-1 h-11">

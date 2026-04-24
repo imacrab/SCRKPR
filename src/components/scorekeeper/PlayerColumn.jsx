@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { Pencil, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 function AnimatedTotal({ value, color }) {
   const [displayValue, setDisplayValue] = useState(value);
@@ -39,18 +39,14 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditPl
     <div className="h-full flex flex-col border-r border-border last:border-r-0">
       {/* Header */}
       <div className="flex-shrink-0 px-2 py-3 flex flex-col items-center gap-2 bg-card border-b border-border">
-        <button
-          onClick={onEditPlayer}
-          className="flex items-center gap-1 group"
-        >
+        <button onClick={onEditPlayer} className="flex flex-col items-center gap-1.5">
           <div
-            className="w-2 h-2 rounded-full flex-shrink-0"
+            className="w-2.5 h-2.5 rounded-full"
             style={{ backgroundColor: player.color }}
           />
           <span className="text-xs font-bold text-foreground truncate max-w-[70px] text-center leading-tight">
             {player.name}
           </span>
-          <Pencil size={24} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
         </button>
 
         {/* Total */}
@@ -68,8 +64,8 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditPl
                 initial={{ opacity: 0, scale: 0.8, y: -6 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ type: "spring", stiffness: 380, damping: 28 }}
-                className={`mb-1 mx-1 rounded-md px-2 py-1.5 text-center cursor-pointer transition-colors ${
-                  isCurrent ? "bg-card border border-border" : "hover:bg-card/50"
+                className={`mb-1 mx-1 rounded-md px-2 py-1.5 text-center cursor-pointer ${
+                  isCurrent ? "bg-card border border-border" : ""
                 }`}
                 onClick={() => onEditScore(idx)}
               >

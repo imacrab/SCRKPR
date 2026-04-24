@@ -70,7 +70,7 @@ export default function AccountSettings({ onBack }) {
         <h1 className="font-sans font-medium text-lg text-foreground">Account Settings</h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-6 space-y-4">
+      <div className="flex-1 overflow-y-auto px-5 pt-2 pb-6 space-y-4">
          {/* Theme */}
          <div className="rounded-xl border border-border bg-card overflow-hidden">
             <div className="px-4 py-4 flex items-center justify-between gap-4">

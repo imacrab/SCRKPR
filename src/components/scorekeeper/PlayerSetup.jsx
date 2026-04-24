@@ -192,7 +192,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
         {/* Bottom fade */}
         <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
-      <div ref={scrollRef} className="h-full overflow-y-auto px-5 py-4 space-y-2">
+      <div ref={scrollRef} className="h-full overflow-y-auto px-5 pt-2 pb-4 space-y-2">
         <AnimatePresence>
           {players.map((player, i) => (
             <motion.div

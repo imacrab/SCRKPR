@@ -8,7 +8,6 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScoreKeeper from './pages/ScoreKeeper';
 import AccountSettings from './pages/AccountSettings';
 import { motion } from 'framer-motion';
-import MeshGradientBackground from '@/components/MeshGradientBackground';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -46,7 +45,6 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
-          <MeshGradientBackground />
           <motion.div
             initial={{ opacity: 0, filter: "blur(12px)", scale: 0.97 }}
             animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}

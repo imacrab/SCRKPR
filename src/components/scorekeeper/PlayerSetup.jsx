@@ -189,7 +189,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 />
                 {players.length > 2 && (
                   <button onClick={() => removePlayer(i)} className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-accent-red transition-colors">
-                    <Trash2 size={24} />
+                    <Trash2 size={20} />
                   </button>
                 )}
               </div>

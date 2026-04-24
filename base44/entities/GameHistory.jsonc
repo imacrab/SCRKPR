@@ -6,6 +6,14 @@
       "type": "string",
       "format": "date-time"
     },
+    "win_mode": {
+      "type": "string",
+      "enum": [
+        "high",
+        "low"
+      ],
+      "default": "high"
+    },
     "players": {
       "type": "array",
       "items": {

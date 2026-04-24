@@ -94,7 +94,8 @@ export default function History({ onBack }) {
         ) : (
           <AnimatePresence>
             {games.map((game) => {
-              const sorted = [...game.players].sort((a, b) => b.total - a.total);
+              const isLowWin = game.win_mode === "low";
+              const sorted = [...game.players].sort((a, b) => isLowWin ? a.total - b.total : b.total - a.total);
               const winner = sorted[0];
               return (
                 <motion.div

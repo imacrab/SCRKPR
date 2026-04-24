@@ -51,6 +51,7 @@ export default function ScoreKeeper() {
     if (hasScores) {
       await base44.entities.GameHistory.create({
         played_at: new Date().toISOString(),
+        win_mode: winMode,
         players: players.map((p) => ({
           name: p.name,
           color: p.color,

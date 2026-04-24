@@ -12,13 +12,11 @@ export default function AccountSettings({ onBack }) {
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "dark";
     setTheme(savedTheme);
+    applyTheme(savedTheme);
   }, []);
 
-  const handleThemeChange = (newTheme) => {
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    
-    if (newTheme === "system") {
+  const applyTheme = (themeValue) => {
+    if (themeValue === "system") {
       document.documentElement.style.colorScheme = "light dark";
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       if (prefersDark) {
@@ -26,13 +24,19 @@ export default function AccountSettings({ onBack }) {
       } else {
         document.documentElement.classList.remove("dark");
       }
-    } else if (newTheme === "dark") {
+    } else if (themeValue === "dark") {
       document.documentElement.style.colorScheme = "dark";
       document.documentElement.classList.add("dark");
-    } else if (newTheme === "light") {
+    } else if (themeValue === "light") {
       document.documentElement.style.colorScheme = "light";
       document.documentElement.classList.remove("dark");
     }
+  };
+
+  const handleThemeChange = (newTheme) => {
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    applyTheme(newTheme);
   };
 
   const handleDeleteAccount = async () => {

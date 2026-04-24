@@ -1,17 +1,25 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, X } from "lucide-react";
+import { Check, X, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function SaveGroupModal({ isOpen, onSave, onClose }) {
   const [name, setName] = useState("");
+  const [pinned, setPinned] = useState(false);
 
   const handleSave = () => {
     const trimmed = name.trim();
     if (!trimmed) return;
-    onSave(trimmed);
+    onSave(trimmed, pinned);
     setName("");
+    setPinned(false);
+  };
+
+  const handleClose = () => {
+    setName("");
+    setPinned(false);
+    onClose();
   };
 
   return (
@@ -21,7 +29,7 @@ export default function SaveGroupModal({ isOpen, onSave, onClose }) {
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-            onClick={onClose}
+            onClick={handleClose}
           />
           <motion.div
             initial={{ y: "100%", opacity: 0 }}
@@ -40,12 +48,26 @@ export default function SaveGroupModal({ isOpen, onSave, onClose }) {
                 autoFocus
                 value={name}
                 onChange={(e) => setName(e.target.value.slice(0, 30))}
-                onKeyDown={(e) => { if (e.key === "Enter") handleSave(); if (e.key === "Escape") onClose(); }}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSave(); if (e.key === "Escape") handleClose(); }}
                 placeholder="e.g. Friday Night Crew"
-                className="mb-5 text-center text-base bg-secondary border-border"
+                className="mb-3 text-center text-base bg-secondary border-border"
               />
+              {/* Pin toggle */}
+              <button
+                onClick={() => setPinned((p) => !p)}
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 mb-4 rounded-lg border transition-colors"
+                style={{
+                  borderColor: pinned ? "rgba(255,255,255,0.4)" : "hsl(var(--border))",
+                  backgroundColor: pinned ? "hsl(var(--accent))" : "transparent",
+                }}
+              >
+                <Pin size={16} style={{ color: pinned ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }} />
+                <span className="text-sm" style={{ color: pinned ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}>
+                  Pin to front
+                </span>
+              </button>
               <div className="flex gap-3">
-                <Button onClick={onClose} variant="outline" className="flex-1 h-11">
+                <Button onClick={handleClose} variant="outline" className="flex-1 h-11">
                   <X size={24} className="mr-1.5" /> Cancel
                 </Button>
                 <Button

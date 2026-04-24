@@ -5,6 +5,10 @@
     "name": {
       "type": "string"
     },
+    "pinned": {
+      "type": "boolean",
+      "default": false
+    },
     "players": {
       "type": "array",
       "items": {

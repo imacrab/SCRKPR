@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Play, Save, Trophy, Target } from "lucide-react";
+import { Plus, Trash2, Play, Save, Trophy, Target, Pin, PinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
@@ -39,11 +39,15 @@ export default function PlayerSetup({ onStart }) {
   const [activeGroup, setActiveGroup] = useState(null); // the loaded group, if any
   const [winMode, setWinMode] = useState("low"); // "high" | "low"
 
+  const sortGroups = (data) => {
+    const pinned = data.filter((g) => g.pinned);
+    const rest = data.filter((g) => !g.pinned);
+    return [...pinned, ...rest];
+  };
+
   useEffect(() => {
     base44.entities.PlayerGroup.list("-created_date", 20).then((data) => {
-      const pinned = data.filter((g) => g.name === "The Best Group");
-      const rest = data.filter((g) => g.name !== "The Best Group");
-      setGroups([...pinned, ...rest]);
+      setGroups(sortGroups(data));
     });
   }, []);
 
@@ -73,17 +77,18 @@ export default function PlayerSetup({ onStart }) {
     setExpandedColor(null);
   };
 
-  const handleSaveGroup = async (groupName) => {
+  const handleSaveGroup = async (groupName, pinned) => {
     const valid = players.filter((p) => p.name.trim());
     if (valid.length < 2) return;
-    const group = await base44.entities.PlayerGroup.create({ name: groupName, players: valid });
-    setGroups((prev) => {
-      const pinned = prev.filter((g) => g.name === "The Best Group");
-      const rest = prev.filter((g) => g.name !== "The Best Group");
-      if (group.name === "The Best Group") return [group, ...rest];
-      return [...pinned, group, ...rest];
-    });
+    const group = await base44.entities.PlayerGroup.create({ name: groupName, pinned: !!pinned, players: valid });
+    setGroups((prev) => sortGroups([group, ...prev]));
     setShowSaveGroup(false);
+  };
+
+  const handleTogglePin = async (group) => {
+    const updated = { ...group, pinned: !group.pinned };
+    await base44.entities.PlayerGroup.update(group.id, { pinned: !group.pinned });
+    setGroups((prev) => sortGroups(prev.map((g) => g.id === group.id ? updated : g)));
   };
 
   const deleteGroup = async (id) => {
@@ -126,12 +131,17 @@ export default function PlayerSetup({ onStart }) {
         <div className="px-5 mb-2">
           <div className="flex gap-2 overflow-x-auto pb-1">
             {groups.map((g) => (
-              <div key={g.id} className="flex-shrink-0 flex items-center rounded-lg bg-card border border-border overflow-hidden">
+              <div key={g.id} className="flex-shrink-0 flex items-center rounded-lg bg-card border overflow-hidden"
+                style={{ borderColor: g.pinned ? "rgba(255,255,255,0.35)" : "hsl(var(--border))" }}>
                 <button onClick={() => loadGroup(g)} className="flex items-center gap-1.5 px-3 py-2">
+                  {g.pinned && <Pin size={12} className="text-muted-foreground flex-shrink-0" />}
                   <span className="text-sm font-medium text-foreground whitespace-nowrap">{g.name}</span>
                 </button>
-                <button onClick={() => deleteGroup(g.id)} className="self-stretch flex items-center px-3 text-muted-foreground hover:text-accent-red transition-colors border-l border-border">
-                  <Trash2 size={18} />
+                <button onClick={() => handleTogglePin(g)} className="self-stretch flex items-center px-2.5 text-muted-foreground hover:text-foreground transition-colors border-l border-border">
+                  {g.pinned ? <PinOff size={15} /> : <Pin size={15} />}
+                </button>
+                <button onClick={() => deleteGroup(g.id)} className="self-stretch flex items-center px-2.5 text-muted-foreground hover:text-accent-red transition-colors border-l border-border">
+                  <Trash2 size={15} />
                 </button>
               </div>
             ))}

@@ -6,6 +6,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScoreKeeper from './pages/ScoreKeeper';
+import AccountSettings from './pages/AccountSettings';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -30,6 +31,9 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={<ScoreKeeper />} />
+      <Route path="/game" element={<ScoreKeeper />} />
+      <Route path="/history" element={<ScoreKeeper />} />
+      <Route path="/account" element={<ScoreKeeper />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

@@ -5,39 +5,73 @@
 @tailwind utilities;
 
 @layer base {
+  /* Light mode defaults */
   :root {
-    --background: 220 13% 9%;
-    --foreground: 0 0% 93%;
-    --card: 220 13% 12%;
-    --card-foreground: 0 0% 93%;
-    --popover: 220 13% 12%;
-    --popover-foreground: 0 0% 93%;
-    --primary: 199 94% 57%;
-    --primary-foreground: 220 13% 9%;
-    --secondary: 220 13% 16%;
-    --secondary-foreground: 0 0% 80%;
-    --muted: 220 13% 16%;
-    --muted-foreground: 0 0% 50%;
-    --accent: 220 13% 18%;
-    --accent-foreground: 0 0% 93%;
-    --destructive: 0 100% 60%;
+    --background: 0 0% 98%;
+    --foreground: 220 13% 9%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 13% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 13% 9%;
+    --primary: 199 94% 40%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 220 13% 92%;
+    --secondary-foreground: 220 13% 20%;
+    --muted: 220 13% 92%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 220 13% 88%;
+    --accent-foreground: 220 13% 9%;
+    --destructive: 0 100% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 13% 18%;
-    --input: 220 13% 18%;
-    --ring: 199 94% 57%;
+    --border: 220 13% 85%;
+    --input: 220 13% 85%;
+    --ring: 199 94% 40%;
     --radius: 0.75rem;
+  }
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: 220 13% 9%;
+      --foreground: 0 0% 93%;
+      --card: 220 13% 12%;
+      --card-foreground: 0 0% 93%;
+      --popover: 220 13% 12%;
+      --popover-foreground: 0 0% 93%;
+      --primary: 199 94% 57%;
+      --primary-foreground: 220 13% 9%;
+      --secondary: 220 13% 16%;
+      --secondary-foreground: 0 0% 80%;
+      --muted: 220 13% 16%;
+      --muted-foreground: 0 0% 50%;
+      --accent: 220 13% 18%;
+      --accent-foreground: 0 0% 93%;
+      --destructive: 0 100% 60%;
+      --destructive-foreground: 0 0% 98%;
+      --border: 220 13% 18%;
+      --input: 220 13% 18%;
+      --ring: 199 94% 57%;
+    }
   }
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Allow text selection in inputs */
+  input, textarea, [contenteditable] {
+    user-select: text;
+    -webkit-user-select: text;
   }
 
   *::-webkit-scrollbar {
-    display: none; /* Chrome/Safari/WebKit */
+    display: none;
   }
 
   body {

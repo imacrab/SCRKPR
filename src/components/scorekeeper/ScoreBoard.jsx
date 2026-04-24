@@ -47,7 +47,7 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
   const colWidth = players.length <= 4 ? `${100 / players.length}vw` : "25vw";
 
   return (
-    <div className="h-screen w-screen bg-background flex flex-col overflow-hidden">
+    <div className="h-screen w-screen bg-background flex flex-col overflow-hidden" style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-10 pb-3 flex-shrink-0 bg-card border-b border-border">
         <h1 className="font-sans font-medium text-lg text-foreground">

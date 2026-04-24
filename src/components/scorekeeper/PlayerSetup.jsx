@@ -317,6 +317,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         isOpen={!!editingGroup}
         group={editingGroup}
         onSave={handleEditGroup}
+        onDelete={deleteGroup}
         onClose={() => setEditingGroup(null)}
       />
     </div>

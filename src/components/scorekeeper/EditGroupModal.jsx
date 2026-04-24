@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, X, Pin, PinOff } from "lucide-react";
+import { Check, X, Pin, PinOff, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export default function EditGroupModal({ isOpen, group, onSave, onClose }) {
+export default function EditGroupModal({ isOpen, group, onSave, onClose, onDelete }) {
   const [name, setName] = useState("");
   const [pinned, setPinned] = useState(false);
   const inputRef = useRef(null);
@@ -74,6 +74,14 @@ export default function EditGroupModal({ isOpen, group, onSave, onClose }) {
                   {pinned ? <Pin size={20} /> : <PinOff size={20} />}
                 </button>
               </div>
+
+              <Button
+                onClick={() => onDelete?.(group.id)}
+                className="w-full h-9 mb-3 bg-red-500/15 hover:bg-red-500/25 text-red-600 text-xs"
+              >
+                <Trash2 size={16} className="mr-1.5" />
+                Delete Group
+              </Button>
 
               <div className="flex gap-3">
                 <Button onClick={onClose} variant="outline" className="flex-1 h-11">

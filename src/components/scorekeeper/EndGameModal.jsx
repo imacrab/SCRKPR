@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
-export default function EndGameModal({ isOpen, players, winMode, onConfirm, onCancel }) {
+export default function EndGameModal({ isOpen, players, winMode, gameStartTime, onConfirm, onCancel }) {
   if (!isOpen || players.length === 0) return null;
 
   const isLowWin = winMode === "low";
@@ -13,6 +13,23 @@ export default function EndGameModal({ isOpen, players, winMode, onConfirm, onCa
   const tied = sorted.filter((p) => p.total === topScore);
   const isTie = tied.length > 1;
   const winner = sorted[0];
+
+  // Calculate stats
+  const totalRounds = players.reduce((sum, p) => sum + p.scores.length, 0) / players.length;
+  const roundsWon = {};
+  players.forEach((p) => {
+    roundsWon[p.id] = p.scores.length;
+  });
+  const playerWithMostRounds = Object.entries(roundsWon).reduce((a, b) => b[1] > a[1] ? b : a)[0];
+  const mostRoundsPlayer = players.find((p) => p.id == playerWithMostRounds);
+  
+  const loserPlayer = isLowWin 
+    ? sorted[sorted.length - 1]
+    : sorted[sorted.length - 1];
+  
+  const elapsedMs = gameStartTime ? new Date() - gameStartTime : 0;
+  const minutes = Math.floor(elapsedMs / 60000);
+  const seconds = Math.floor((elapsedMs % 60000) / 1000);
 
   return (
     <AnimatePresence>
@@ -58,6 +75,26 @@ export default function EndGameModal({ isOpen, players, winMode, onConfirm, onCa
                     <span className="text-sm font-semibold" style={{ color: p.color }}>{p.total}</span>
                   </div>
                 ))}
+              </div>
+
+              {/* Stats */}
+              <div className="space-y-2 mb-6">
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
+                  <span className="text-xs text-muted-foreground">Most Rounds Played</span>
+                  <span className="text-sm font-semibold text-foreground">{mostRoundsPlayer?.name}</span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
+                  <span className="text-xs text-muted-foreground">{isLowWin ? "Worst Score" : "Worst Score"}</span>
+                  <span className="text-sm font-semibold text-foreground">{loserPlayer?.name} ({loserPlayer?.total})</span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
+                  <span className="text-xs text-muted-foreground">Total Rounds</span>
+                  <span className="text-sm font-semibold text-foreground">{Math.round(totalRounds)}</span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
+                  <span className="text-xs text-muted-foreground">Time Elapsed</span>
+                  <span className="text-sm font-semibold text-foreground">{minutes}m {seconds}s</span>
+                </div>
               </div>
 
               <div className="flex gap-3">

@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 export default function ScoreBoard({ players, winMode, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [streakMap, setStreakMap] = useState({});
+  const [gameStartTime] = useState(new Date());
 
 
   useEffect(() => {
@@ -163,6 +164,7 @@ export default function ScoreBoard({ players, winMode, onAddScore, onEditScore, 
         isOpen={showEndGame}
         players={players}
         winMode={winMode}
+        gameStartTime={gameStartTime}
         onConfirm={() => { setShowEndGame(false); onEndGame(); }}
         onCancel={() => setShowEndGame(false)}
       />

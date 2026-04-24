@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Play, Save, Trophy, Target, Pin, PinOff } from "lucide-react";
+import { Plus, Trash2, Play, Save, Trophy, Target, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
 import SaveGroupModal from "./SaveGroupModal";
+import EditGroupModal from "./EditGroupModal";
 
 export const PLAYER_COLORS = [
   "#2DC5F8", "#3B82F6", "#6366F1", "#8B5CF6", "#A855F7",
@@ -36,6 +37,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [expandedColor, setExpandedColor] = useState(null);
   const [groups, setGroups] = useState(null); // null = loading, [] = no groups
   const [showSaveGroup, setShowSaveGroup] = useState(false);
+  const [editingGroup, setEditingGroup] = useState(null);
 
   const setShowSaveGroupWithNav = (val) => {
     setShowSaveGroup(val);
@@ -106,10 +108,12 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     setShowSaveGroupWithNav(false);
   };
 
-  const handleTogglePin = async (group) => {
-    const updated = { ...group, pinned: !group.pinned };
-    await base44.entities.PlayerGroup.update(group.id, { pinned: !group.pinned });
-    setGroups((prev) => sortGroups(prev.map((g) => g.id === group.id ? updated : g)));
+  const handleEditGroup = async (newName, pinned) => {
+    if (!editingGroup) return;
+    const updated = { ...editingGroup, name: newName, pinned };
+    await base44.entities.PlayerGroup.update(editingGroup.id, { name: newName, pinned });
+    setGroups((prev) => sortGroups(prev.map((g) => g.id === editingGroup.id ? updated : g)));
+    setEditingGroup(null);
   };
 
   const deleteGroup = async (id) => {
@@ -157,8 +161,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 <button onClick={() => loadGroup(g)} className="flex items-center gap-1.5 px-3 py-2">
                   <span className="text-sm font-medium text-foreground whitespace-nowrap">{g.name}</span>
                 </button>
-                <button onClick={() => handleTogglePin(g)} className="self-stretch flex items-center px-2.5 text-muted-foreground hover:text-foreground transition-colors border-l border-border">
-                  {g.pinned ? <PinOff size={15} /> : <Pin size={15} />}
+                <button onClick={() => setEditingGroup(g)} className="self-stretch flex items-center px-2.5 text-muted-foreground hover:text-foreground transition-colors border-l border-border">
+                  <Pencil size={15} />
                 </button>
                 <button onClick={() => deleteGroup(g.id)} className="self-stretch flex items-center px-2.5 text-muted-foreground hover:text-accent-red transition-colors border-l border-border">
                   <Trash2 size={15} />
@@ -307,6 +311,13 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         isOpen={showSaveGroup}
         onSave={handleSaveGroup}
         onClose={() => setShowSaveGroupWithNav(false)}
+      />
+
+      <EditGroupModal
+        isOpen={!!editingGroup}
+        group={editingGroup}
+        onSave={handleEditGroup}
+        onClose={() => setEditingGroup(null)}
       />
     </div>
   );

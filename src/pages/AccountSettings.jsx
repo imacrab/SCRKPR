@@ -42,7 +42,7 @@ export default function AccountSettings({ onBack }) {
       <div className="flex-1 overflow-y-auto px-5 py-6 space-y-4">
         {/* Delete Account */}
         <div className="rounded-xl border border-border bg-card overflow-hidden">
-          <div className="px-4 py-4 flex items-center justify-between">
+          <div className="px-4 py-4 flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-foreground">Delete Account</p>
               <p className="text-xs text-muted-foreground mt-0.5">Permanently remove your account and all data.</p>

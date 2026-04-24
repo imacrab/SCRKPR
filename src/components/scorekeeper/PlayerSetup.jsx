@@ -164,9 +164,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 <button onClick={() => setEditingGroup(g)} className="self-stretch flex items-center px-2.5 text-muted-foreground hover:text-foreground transition-colors border-l border-border">
                   <Pencil size={15} />
                 </button>
-                <button onClick={() => deleteGroup(g.id)} className="self-stretch flex items-center px-2.5 text-muted-foreground hover:text-accent-red transition-colors border-l border-border">
-                  <Trash2 size={15} />
-                </button>
               </div>
             ))}
           </div>

@@ -128,13 +128,12 @@ export default function PlayerSetup({ onStart }) {
 
       {/* Saved Groups */}
       {groups.length > 0 && (
-        <div className="px-5 mb-2">
-          <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="mb-2">
+          <div className="flex gap-2 overflow-x-auto pb-1 px-5">
             {groups.map((g) => (
               <div key={g.id} className="flex-shrink-0 flex items-center rounded-lg bg-card border overflow-hidden"
                 style={{ borderColor: g.pinned ? "rgba(255,255,255,0.35)" : "hsl(var(--border))" }}>
                 <button onClick={() => loadGroup(g)} className="flex items-center gap-1.5 px-3 py-2">
-                  {g.pinned && <Pin size={12} className="text-muted-foreground flex-shrink-0" />}
                   <span className="text-sm font-medium text-foreground whitespace-nowrap">{g.name}</span>
                 </button>
                 <button onClick={() => handleTogglePin(g)} className="self-stretch flex items-center px-2.5 text-muted-foreground hover:text-foreground transition-colors border-l border-border">

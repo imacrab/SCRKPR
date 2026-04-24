@@ -93,7 +93,6 @@ export default function AddPlayerModal({ isOpen, onAdd, onClose }) {
                   disabled={!name.trim()}
                   className="flex-[2] h-11 bg-white hover:bg-white/90 font-semibold" style={{ color: "#111" }}
                 >
-                  <Check size={24} className="mr-1.5" />
                   Add Player
                 </Button>
               </div>

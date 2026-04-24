@@ -76,7 +76,7 @@ export default function SaveGroupModal({ isOpen, onSave, onClose }) {
                   className="flex-[2] h-11 bg-white hover:bg-white/90 font-semibold"
                   style={{ color: "#111" }}
                 >
-                  <Check size={24} className="mr-1.5" /> Save Group
+                  Save Group
                 </Button>
               </div>
             </div>

@@ -73,7 +73,7 @@ export default function SaveGroupModal({ isOpen, onSave, onClose }) {
                   onClick={handleSave}
                   disabled={!name.trim()}
                   className="flex-[2] h-11 bg-white hover:bg-white/90 font-semibold"
-                  style={{ color: "#111" }}
+                  style={{ color: "#111", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
                 >
                   Save Group
                 </Button>

@@ -104,7 +104,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
                 <Button
                   onClick={onConfirm}
                   className="flex-1 h-11 font-semibold bg-white hover:bg-white/90"
-                  style={{ color: "#111" }}
+                  style={{ color: "#111", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
                 >
                   End Game
                 </Button>

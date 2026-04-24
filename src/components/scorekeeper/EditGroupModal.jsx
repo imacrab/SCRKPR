@@ -51,22 +51,21 @@ export default function EditGroupModal({ isOpen, group, onSave, onClose }) {
                 <h2 className="font-display text-xl font-bold text-foreground">Group Name</h2>
               </div>
 
-              <Input
-                ref={inputRef}
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value.slice(0, 30))}
-                onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); if (e.key === "Escape") onClose(); }}
-                placeholder="Group name"
-                maxLength={30}
-                className="mb-5 text-center text-base bg-secondary border-border"
-                aria-label="Group name"
-              />
-
-              <div className="flex items-center justify-center mb-6">
+              <div className="flex gap-3 mb-5">
+                <Input
+                  ref={inputRef}
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value.slice(0, 30))}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); if (e.key === "Escape") onClose(); }}
+                  placeholder="Group name"
+                  maxLength={30}
+                  className="flex-1 text-center text-base bg-secondary border-border"
+                  aria-label="Group name"
+                />
                 <button
                   onClick={() => setPinned(!pinned)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors flex-[2] justify-center"
                   style={{
                     borderColor: pinned ? "rgba(255,255,255,0.35)" : "hsl(var(--border))",
                     backgroundColor: pinned ? "hsl(var(--card))" : "transparent",

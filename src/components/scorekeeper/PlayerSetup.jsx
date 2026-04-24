@@ -118,7 +118,7 @@ export default function PlayerSetup({ onStart }) {
     <div className="h-full bg-background flex flex-col overflow-hidden" style={{ paddingTop: "env(safe-area-inset-top)" }}>
       {/* Header */}
       <div className="pt-10 pb-5 px-6">
-        <h1 className="font-sans font-bold text-4xl text-foreground">Scorkeepr</h1>
+        <img src="https://media.base44.com/images/public/69ea763700078809357a164a/04e01c596_SCRKPR.png" alt="SCRKPR!" className="mx-auto" style={{ maxWidth: 200, height: "auto" }} />
       </div>
 
       {/* Saved Groups */}

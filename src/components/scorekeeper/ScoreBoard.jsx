@@ -52,9 +52,7 @@ export default function ScoreBoard({ players, winMode, onAddScore, onEditScore, 
     <div className="h-screen w-screen bg-background flex flex-col overflow-hidden" style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-10 pb-3 flex-shrink-0 bg-card border-b border-border">
-        <h1 className="font-sans font-medium text-lg text-foreground">
-          Scorkeepr
-        </h1>
+        <img src="https://media.base44.com/images/public/69ea763700078809357a164a/04e01c596_SCRKPR.png" alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
         <Popover>
           <PopoverTrigger asChild>
             <button className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">

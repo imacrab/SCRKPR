@@ -257,8 +257,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       <div className="px-5 pt-2 pb-2">
         <div className="flex gap-2">
           {[
-            { value: "low",  label: "Low Score",  Icon: TrendingDown },
-            { value: "high", label: "High Score", Icon: TrendingUp },
+            { value: "low",  label: "Low Score Wins",  Icon: TrendingDown },
+            { value: "high", label: "High Score Wins", Icon: TrendingUp },
           ].map((opt) => {
             const active = winMode === opt.value;
             return (

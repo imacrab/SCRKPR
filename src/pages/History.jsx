@@ -12,6 +12,7 @@ export default function History({ onBack, onModalChange }) {
   const [pullDistance, setPullDistance] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
   const [clearing, setClearing] = useState(false);
+  const [canScroll, setCanScroll] = useState(false);
   const scrollRef = useRef(null);
   const touchStartY = useRef(null);
   const PULL_THRESHOLD = 64;
@@ -72,6 +73,18 @@ export default function History({ onBack, onModalChange }) {
     setClearing(false);
   };
 
+  // Check if content can scroll
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollRef.current) {
+        setCanScroll(scrollRef.current.scrollHeight > scrollRef.current.clientHeight);
+      }
+    };
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+    return () => window.removeEventListener("resize", checkScroll);
+  }, [games, loading]);
+
   // Update parent when modal opens/closes
   useEffect(() => {
     onModalChange?.(showConfirm);
@@ -103,14 +116,20 @@ export default function History({ onBack, onModalChange }) {
         </div>
       )}
 
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto px-5 py-4"
-        style={{ paddingBottom: "calc(56px + 16px + 16px + env(safe-area-inset-bottom))" }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
+      <div className="flex-1 relative overflow-hidden">
+        {/* Top fade */}
+        {canScroll && <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />}
+        {/* Bottom fade */}
+        {canScroll && <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />}
+
+        <div
+          ref={scrollRef}
+          className="h-full overflow-y-auto px-5 py-4"
+          style={{ paddingBottom: "calc(56px + 16px + 16px + env(safe-area-inset-bottom))" }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
@@ -179,6 +198,7 @@ export default function History({ onBack, onModalChange }) {
             })}
           </AnimatePresence>
         )}
+        </div>
       </div>
 
       {/* Confirm modal */}

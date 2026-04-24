@@ -5,7 +5,7 @@ import { ArrowLeft, Trophy, Trash2, RefreshCw, Handshake, AlertTriangle } from "
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 
-export default function History({ onBack }) {
+export default function History({ onBack, onModalChange }) {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -71,6 +71,11 @@ export default function History({ onBack }) {
     }
     setClearing(false);
   };
+
+  // Update parent when modal opens/closes
+  useEffect(() => {
+    onModalChange?.(showConfirm);
+  }, [showConfirm, onModalChange]);
 
   return (
     <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>

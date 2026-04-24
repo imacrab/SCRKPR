@@ -181,7 +181,7 @@ export default function ScoreKeeper() {
       <AnimatePresence mode="wait">
         {view === "/history" && (
           <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
-            <History onBack={() => navigate(-1)} />
+            <History onBack={() => navigate(-1)} onModalChange={setNavHidden} />
           </motion.div>
         )}
 

@@ -143,11 +143,11 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
       </div>
 
       {/* Add score button */}
-      <div className="flex-shrink-0 p-2 bg-transparent">
+      <div className="flex-shrink-0 p-2 bg-background border-t border-border">
         <button
           onClick={onAddScore}
-          className="w-full h-10 rounded-full flex items-center justify-center transition-colors active:scale-95"
-          style={{ backgroundColor: "hsl(199 94% 40% / 0.9)", backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)", color: "white" }}
+          className="w-full h-9 rounded-md flex items-center justify-center transition-colors active:scale-95"
+          style={{ backgroundColor: `${player.color}18`, color: player.color }}
           aria-label={`Add score for ${player.name}`}
         >
           <Plus size={24} />

@@ -188,10 +188,10 @@ export default function History({ onBack }) {
               onClick={() => !clearing && setShowConfirm(false)}
             />
             <motion.div
-              initial={{ y: "100%", opacity: 0 }}
+              initial={{ y: 120, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: "100%", opacity: 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 35 }}
+              exit={{ y: 120, opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
               className="fixed inset-x-0 z-50 bg-card border border-border rounded-[30px] shadow-2xl"
               style={{ bottom: "8px", left: "8px", right: "8px", paddingBottom: "env(safe-area-inset-bottom)" }}
             >

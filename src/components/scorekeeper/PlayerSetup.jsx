@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Play, Save, Trophy, Target } from "lucide-react";
+import { Plus, Trash2, Play, Users, History, Save, Trophy, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
@@ -28,7 +28,7 @@ function ColorPicker({ selected, onChange }) {
   );
 }
 
-export default function PlayerSetup({ onStart }) {
+export default function PlayerSetup({ onStart, onShowHistory }) {
   const [players, setPlayers] = useState([
     { name: "", color: PLAYER_COLORS[0] },
     { name: "", color: PLAYER_COLORS[1] },
@@ -106,15 +106,19 @@ export default function PlayerSetup({ onStart }) {
   };
 
   return (
-    <div className="h-full bg-background flex flex-col overflow-hidden" style={{ paddingTop: "env(safe-area-inset-top)" }}>
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="pt-10 pb-5 px-6">
+      <div className="pt-14 pb-5 px-6 flex items-center justify-between">
         <h1 className="font-sans font-bold text-4xl text-foreground">Scorkeepr</h1>
+        <button onClick={onShowHistory} className="text-muted-foreground hover:text-foreground transition-colors p-1">
+          <History size={24} />
+        </button>
       </div>
 
       {/* Saved Groups */}
       {groups.length > 0 && (
-        <div className="px-5 mb-2">
+        <div className="px-5 mb-4">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Saved Groups</p>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {groups.map((g) => (
               <div key={g.id} className="flex-shrink-0 flex items-center rounded-lg bg-card border border-border overflow-hidden">
@@ -136,7 +140,7 @@ export default function PlayerSetup({ onStart }) {
         <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
         {/* Bottom fade */}
         <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
-      <div className="h-full overflow-y-auto px-5 py-4 space-y-2" style={{ paddingBottom: "calc(56px + 16px + 16px + env(safe-area-inset-bottom))" }}>
+      <div className="h-full overflow-y-auto px-5 py-4 space-y-2">
         <AnimatePresence>
           {players.map((player, i) => (
             <motion.div
@@ -196,7 +200,7 @@ export default function PlayerSetup({ onStart }) {
       </div>
 
       {/* Win mode */}
-      <div className="px-5 pt-2 pb-2">
+      <div className="px-5 pt-2 pb-0">
         <div className="flex gap-2">
           {[
             { value: "low",  label: "Low Score",  Icon: Target },
@@ -228,7 +232,7 @@ export default function PlayerSetup({ onStart }) {
       </div>
 
       {/* Actions */}
-      <div className="px-5 pt-0 flex flex-col gap-3" style={{ paddingBottom: "calc(56px + env(safe-area-inset-bottom))" }}>
+      <div className="px-5 pb-12 pt-2 flex flex-col gap-2">
         {hasValidPlayers && (
           <div className="flex gap-2">
             {activeGroup && (

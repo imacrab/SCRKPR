@@ -17,7 +17,7 @@ export default function AccountSettings({ onBack }) {
 
   const applyTheme = (themeValue) => {
     if (themeValue === "system") {
-      document.documentElement.style.colorScheme = "light dark";
+      document.documentElement.style.colorScheme = "";
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       if (prefersDark) {
         document.documentElement.classList.add("dark");

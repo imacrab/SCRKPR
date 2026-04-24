@@ -29,9 +29,32 @@
     --radius: 0.75rem;
   }
 
-  /* Dark mode */
+  /* Dark mode - class-based */
+  .dark {
+    --background: 220 13% 9%;
+    --foreground: 0 0% 93%;
+    --card: 220 13% 12%;
+    --card-foreground: 0 0% 93%;
+    --popover: 220 13% 12%;
+    --popover-foreground: 0 0% 93%;
+    --primary: 199 94% 57%;
+    --primary-foreground: 220 13% 9%;
+    --secondary: 220 13% 16%;
+    --secondary-foreground: 0 0% 80%;
+    --muted: 220 13% 16%;
+    --muted-foreground: 0 0% 50%;
+    --accent: 220 13% 18%;
+    --accent-foreground: 0 0% 93%;
+    --destructive: 0 100% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 13% 18%;
+    --input: 220 13% 18%;
+    --ring: 199 94% 57%;
+  }
+
+  /* Fallback for system preference if no explicit theme set */
   @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme]) {
       --background: 220 13% 9%;
       --foreground: 0 0% 93%;
       --card: 220 13% 12%;

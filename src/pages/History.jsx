@@ -80,7 +80,7 @@ export default function History({ onBack, onModalChange }) {
   return (
     <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* Header */}
-      <div className="pt-10 pb-2 px-5 flex items-center gap-2 bg-card border-b border-border flex-shrink-0">
+      <div className="pt-10 pb-2 px-5 flex items-center gap-2 flex-shrink-0" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft size={18} />
         </button>

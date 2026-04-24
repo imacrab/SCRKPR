@@ -63,7 +63,7 @@ export default function AccountSettings({ onBack }) {
 
     >
       {/* Header */}
-      <div className="pt-10 pb-4 px-5 flex items-center gap-3 border-b border-border flex-shrink-0">
+      <div className="pt-10 pb-4 px-5 flex items-center gap-3 flex-shrink-0" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors p-1">
           <ArrowLeft size={20} />
         </button>

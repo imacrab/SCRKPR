@@ -31,7 +31,7 @@ function AnimatedTotal({ value, color }) {
   );
 }
 
-export default function PlayerColumn({ player, onAddScore, onEditScore, onEditPlayer }) {
+export default function PlayerColumn({ player, streak = 0, onAddScore, onEditScore, onEditPlayer }) {
   const total = player.scores.reduce((s, n) => s + n, 0);
   const lastIdx = player.scores.length - 1;
   const scrollRef = useRef(null);
@@ -62,6 +62,11 @@ export default function PlayerColumn({ player, onAddScore, onEditScore, onEditPl
           <span className="text-xs font-bold text-foreground truncate max-w-[70px] text-center leading-tight">
             {player.name}
           </span>
+          {streak >= 2 && (
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 leading-none">
+              🔥{streak}
+            </span>
+          )}
         </button>
 
         {/* Total */}

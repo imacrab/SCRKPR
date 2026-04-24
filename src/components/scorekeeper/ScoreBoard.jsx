@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RotateCcw, UserPlus, FlagOff, MoreHorizontal } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
 import EditPlayerModal from "./EditPlayerModal";
@@ -9,6 +10,31 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 export default function ScoreBoard({ players, winMode, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
+  const [streakMap, setStreakMap] = useState({});
+
+  useEffect(() => {
+    base44.entities.GameHistory.list("-played_at", 20).then((games) => {
+      // For each current player, count consecutive wins from most recent game
+      const map = {};
+      players.forEach((player) => {
+        let streak = 0;
+        for (const game of games) {
+          const isLowWin = game.win_mode === "low";
+          const sorted = [...game.players].sort((a, b) =>
+            isLowWin ? a.total - b.total : b.total - a.total
+          );
+          const winner = sorted[0];
+          if (winner?.name === player.name) {
+            streak++;
+          } else {
+            break;
+          }
+        }
+        if (streak >= 2) map[player.name] = streak;
+      });
+      setStreakMap(map);
+    });
+  }, []);
   const [editingScore, setEditingScore] = useState(null);
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [showEndGame, setShowEndGame] = useState(false);
@@ -103,6 +129,7 @@ export default function ScoreBoard({ players, winMode, onAddScore, onEditScore, 
             >
               <PlayerColumn
                 player={player}
+                streak={streakMap[player.name] || 0}
                 onAddScore={() => handleOpenScore(player)}
                 onEditScore={(idx) => handleEditScore(player, idx)}
                 onEditPlayer={() => setEditingPlayer(player)}

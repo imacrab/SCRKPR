@@ -9,6 +9,9 @@ export default function EndGameModal({ isOpen, players, winMode, onConfirm, onCa
     .map((p) => ({ ...p, total: p.scores.reduce((s, n) => s + n, 0) }))
     .sort((a, b) => isLowWin ? a.total - b.total : b.total - a.total);
 
+  const topScore = sorted[0].total;
+  const tied = sorted.filter((p) => p.total === topScore);
+  const isTie = tied.length > 1;
   const winner = sorted[0];
 
   return (
@@ -31,16 +34,17 @@ export default function EndGameModal({ isOpen, players, winMode, onConfirm, onCa
             <div className="px-5 pt-5 pb-6">
               <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
 
-              {/* Winner */}
+              {/* Winner / Tie */}
               <div className="flex flex-col items-center text-center mb-6">
-                <div
-                  className="w-12 h-12 rounded-full mb-3 flex items-center justify-center text-2xl font-bold"
-                  style={{ backgroundColor: `${winner.color}22`, color: winner.color }}
-                >
-                  🏆
+                <div className="w-12 h-12 rounded-full mb-3 flex items-center justify-center text-2xl font-bold bg-muted">
+                  {isTie ? "🤝" : "🏆"}
                 </div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">Winner</p>
-                <h2 className="font-display text-2xl font-bold text-foreground">{winner.name}</h2>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">
+                  {isTie ? "It's a Tie!" : "Winner"}
+                </p>
+                <h2 className="font-display text-2xl font-bold text-foreground">
+                  {isTie ? tied.map((p) => p.name).join(" & ") : winner.name}
+                </h2>
                 <p className="text-sm text-muted-foreground mt-0.5">{winner.total} pts · {isLowWin ? "lowest score" : "highest score"} wins</p>
               </div>
 

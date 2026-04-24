@@ -41,7 +41,7 @@ export default function EditGroupModal({ isOpen, group, onSave, onClose, onDelet
             exit={{ y: "100%", opacity: 0 }}
             transition={{ type: "spring", stiffness: 400, damping: 35 }}
             className="fixed inset-x-0 z-50 bg-card border border-border rounded-[20px] shadow-2xl"
-            style={{ bottom: "calc(56px + 8px)", left: "8px", right: "8px" }}
+            style={{ bottom: "8px", left: "8px", right: "8px" }}
           >
             <div className="px-5 pt-5 pb-10">
               <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />

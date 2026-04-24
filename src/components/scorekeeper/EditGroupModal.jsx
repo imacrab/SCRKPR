@@ -76,8 +76,14 @@ export default function EditGroupModal({ isOpen, group, onSave, onClose, onDelet
               </div>
 
               <div className="flex gap-3">
-                <Button onClick={onClose} variant="outline" className="flex-1 h-11">
-                  Cancel
+                // <Button onClick={onClose} variant="outline" className="flex-1 h-11">
+                //   Cancel
+                // </Button>
+                <Button
+                  onClick={() => onDelete?.(group.id)}
+                  className="w-full h-6 mb-3 bg-red-500/15 hover:bg-red-500/25 text-red-600"
+                >
+                  Delete Group
                 </Button>
                 <Button
                   onClick={handleSubmit}
@@ -87,14 +93,6 @@ export default function EditGroupModal({ isOpen, group, onSave, onClose, onDelet
                 >
                   Save
                 </Button>
-
-              <Button
-                onClick={() => onDelete?.(group.id)}
-                className="w-full h-6 mb-3 bg-red-500/15 hover:bg-red-500/25 text-red-600 text-xs"
-              >
-                <Trash2 size={16} className="mr-1.5" />
-                Delete Group
-              </Button>
               </div>
             </div>
           </motion.div>

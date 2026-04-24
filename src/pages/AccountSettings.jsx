@@ -27,8 +27,9 @@ export default function AccountSettings({ onBack }) {
 
   return (
     <div
-      className="h-screen bg-background flex flex-col overflow-hidden"
-      style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
+      className="bg-background flex flex-col overflow-hidden"
+      style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
+
     >
       {/* Header */}
       <div className="pt-10 pb-4 px-5 flex items-center gap-3 border-b border-border flex-shrink-0">

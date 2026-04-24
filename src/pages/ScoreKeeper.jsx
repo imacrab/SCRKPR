@@ -130,19 +130,19 @@ export default function ScoreKeeper() {
     <>
       <AnimatePresence mode="wait">
         {view === "/history" && (
-          <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden" style={{ paddingBottom: navHeight }}>
+          <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
             <History onBack={() => navigate(-1)} />
           </motion.div>
         )}
 
         {view === "/account" && (
-          <motion.div key="account" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden" style={{ paddingBottom: navHeight }}>
+          <motion.div key="account" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
             <AccountSettings onBack={() => navigate(-1)} />
           </motion.div>
         )}
 
         {view === "/" && (
-          <motion.div key="setup" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden" style={{ paddingBottom: navHeight }}>
+          <motion.div key="setup" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
             <PlayerSetup
               onStart={handleStartGame}
               onShowHistory={() => navigate("/history")}
@@ -153,7 +153,7 @@ export default function ScoreKeeper() {
         )}
 
         {view === "/game" && (
-          <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden">
+          <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh" }}>
             <ScoreBoard
               players={players}
               winMode={winMode}

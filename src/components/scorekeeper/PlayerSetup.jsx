@@ -129,7 +129,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   };
 
   return (
-    <div className="h-full bg-background flex flex-col overflow-hidden" style={{ paddingTop: "env(safe-area-inset-top)" }}>
+    <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100%", paddingTop: "env(safe-area-inset-top)" }}>
       {/* Header */}
       <div className="pt-10 pb-5 px-6" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <img src="https://media.base44.com/images/public/69ea763700078809357a164a/bbacfd24a_SCRKPR.png" alt="SCRKPR!" className="mx-auto" style={{ maxWidth: 200, height: "auto" }} />

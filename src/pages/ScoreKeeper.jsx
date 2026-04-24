@@ -154,6 +154,7 @@ export default function ScoreKeeper() {
           <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="h-screen w-screen overflow-hidden">
             <ScoreBoard
               players={players}
+              winMode={winMode}
               onAddScore={handleAddScore}
               onEditScore={handleEditScore}
               onEditName={handleEditName}

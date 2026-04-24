@@ -3,13 +3,15 @@ import { RotateCcw, UserPlus, FlagOff, MoreHorizontal } from "lucide-react";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
 import EditPlayerModal from "./EditPlayerModal";
+import EndGameModal from "./EndGameModal";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-export default function ScoreBoard({ players, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer, onEndGame }) {
+export default function ScoreBoard({ players, winMode, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [editingScore, setEditingScore] = useState(null);
   const [editingPlayer, setEditingPlayer] = useState(null);
+  const [showEndGame, setShowEndGame] = useState(false);
 
   const handleOpenScore = (player) => {
     setActivePlayer(player);
@@ -78,7 +80,7 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
             </button>
             <div className="my-1 h-px bg-border" />
             <button
-              onClick={onEndGame}
+              onClick={() => setShowEndGame(true)}
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               style={{ color: "#FF3A3A", backgroundColor: "rgba(255,58,58,0.08)" }}
             >
@@ -125,6 +127,14 @@ export default function ScoreBoard({ players, onAddScore, onEditScore, onEditNam
         isOpen={!!editingPlayer}
         onSave={handleSavePlayer}
         onClose={() => setEditingPlayer(null)}
+      />
+
+      <EndGameModal
+        isOpen={showEndGame}
+        players={players}
+        winMode={winMode}
+        onConfirm={() => { setShowEndGame(false); onEndGame(); }}
+        onCancel={() => setShowEndGame(false)}
       />
     </div>
   );

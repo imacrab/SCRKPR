@@ -44,6 +44,18 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [activeGroup, setActiveGroup] = useState(null); // the loaded group, if any
   const [winMode, setWinMode] = useState("low"); // "high" | "low"
   const scrollRef = useRef(null);
+  const inputRefs = useRef([]);
+
+  const handleKeyDown = (e, i) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const next = inputRefs.current[i + 1];
+      if (next) {
+        next.focus();
+        next.select();
+      }
+    }
+  };
 
   const sortGroups = (data) => {
     const pinned = data.filter((g) => g.pinned);
@@ -181,8 +193,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   style={{ backgroundColor: player.color }}
                 />
                 <Input
+                  ref={(el) => (inputRefs.current[i] = el)}
                   value={player.name}
                   onChange={(e) => updateName(i, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, i)}
                   placeholder={`Player ${i + 1}`}
                   maxLength={20}
                   className="flex-1 bg-transparent border-none shadow-none h-9 px-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"

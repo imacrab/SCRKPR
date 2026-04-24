@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { RotateCcw, UserPlus, FlagOff, MoreHorizontal } from "lucide-react";
+import { useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
@@ -13,7 +14,15 @@ export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddS
   const [streakMap, setStreakMap] = useState({});
   const [gameStartTime] = useState(new Date());
   const [scrollPos, setScrollPos] = useState(0);
+  const [isDarkMode, setIsDarkMode] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const scrollContainerRef = useRef(null);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => setIsDarkMode(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
 
   useEffect(() => {
@@ -83,7 +92,7 @@ export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddS
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-10 pb-3 flex-shrink-0 border-b border-border" style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <button onClick={() => setShowEndGame(true)} className="hover:opacity-75 transition-opacity">
-          <img src="https://media.base44.com/images/public/69ea763700078809357a164a/bbacfd24a_SCRKPR.png" alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
+          <img src={isDarkMode ? "https://media.base44.com/images/public/69ea763700078809357a164a/87badac38_SCRKPR_dark_mode.png" : "https://media.base44.com/images/public/69ea763700078809357a164a/6de7dc994_SCRKPR_light_mode.png"} alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
         </button>
         <div className="flex items-center gap-1">
         <Popover>

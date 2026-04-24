@@ -41,7 +41,15 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [editingGroup, setEditingGroup] = useState(null);
   const [lastTappedGroupId, setLastTappedGroupId] = useState(null);
   const [canScrollPlayers, setCanScrollPlayers] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const lastTapTimeRef = useRef({});
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => setIsDarkMode(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
   const setShowSaveGroupWithNav = (val) => {
     setShowSaveGroup(val);
@@ -197,7 +205,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100%", paddingTop: "env(safe-area-inset-top)" }}>
       {/* Header */}
       <div className="pt-10 pb-5 px-6" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
-        <img src="https://media.base44.com/images/public/69ea763700078809357a164a/bbacfd24a_SCRKPR.png" alt="SCRKPR!" className="mx-auto" style={{ maxWidth: 200, height: "auto" }} />
+        <img src={isDarkMode ? "https://media.base44.com/images/public/69ea763700078809357a164a/87badac38_SCRKPR_dark_mode.png" : "https://media.base44.com/images/public/69ea763700078809357a164a/6de7dc994_SCRKPR_light_mode.png"} alt="SCRKPR!" className="mx-auto" style={{ maxWidth: 200, height: "auto" }} />
       </div>
 
       {/* Saved Groups */}

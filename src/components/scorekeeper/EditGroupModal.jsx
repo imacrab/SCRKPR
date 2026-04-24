@@ -76,9 +76,6 @@ export default function EditGroupModal({ isOpen, group, onSave, onClose, onDelet
               </div>
 
               <div className="flex gap-3">
-                // <Button onClick={onClose} variant="outline" className="flex-1 h-11">
-                //   Cancel
-                // </Button>
                 <Button
                   onClick={() => onDelete?.(group.id)}
                   className="w-full h-6 mb-3 bg-red-500/15 hover:bg-red-500/25 text-red-600"

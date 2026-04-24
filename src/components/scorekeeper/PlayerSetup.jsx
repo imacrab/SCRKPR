@@ -176,7 +176,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
           <div className="flex gap-2 overflow-x-auto pb-1 px-5">
             {groups.map((g) => (
               <div key={g.id} className="flex-shrink-0 flex items-center rounded-lg bg-card border overflow-hidden"
-                style={{ borderColor: g.pinned ? "rgba(255,255,255,0.35)" : "hsl(var(--border))" }}>
+                style={{ borderColor: "hsl(var(--border))" }}>
                 <button onClick={() => handleGroupNameClick(g)} className="flex items-center gap-1.5 px-3 py-2">
                   <span className="text-sm font-medium text-foreground whitespace-nowrap">{g.name}</span>
                 </button>

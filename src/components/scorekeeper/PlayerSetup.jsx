@@ -255,6 +255,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
       {/* Win mode */}
       <div className="px-5 pt-2 pb-2">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Winner has</p>
         <div className="flex gap-2">
           {[
             { value: "low",  label: "Low Score",  Icon: TrendingDown },

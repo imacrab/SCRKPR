@@ -59,7 +59,7 @@ export default function History({ onBack }) {
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden" style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* Header */}
-      <div className="pt-10 pb-4 px-5 flex items-center gap-3 bg-card border-b border-border flex-shrink-0">
+      <div className="pt-10 pb-2 px-5 flex items-center gap-2 bg-card border-b border-border flex-shrink-0">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft size={18} />
         </button>

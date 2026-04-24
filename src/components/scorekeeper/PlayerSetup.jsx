@@ -356,7 +356,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 onClick={handleUpdateGroup}
                 variant="outline"
                 className="flex-1 h-10 text-sm text-muted-foreground"
-                style={{ boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
               >
                 <Save size={24} className="mr-1.5" />
                 Update Group
@@ -366,7 +365,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
               onClick={() => setShowSaveGroupWithNav(true)}
               variant="outline"
               className="flex-1 h-10 text-sm text-muted-foreground"
-              style={{ boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
             >
               <Save size={24} className="mr-1.5" />
               Save as Group

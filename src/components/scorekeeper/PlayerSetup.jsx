@@ -38,6 +38,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [groups, setGroups] = useState(null); // null = loading, [] = no groups
   const [showSaveGroup, setShowSaveGroup] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
+  const [lastTappedGroupId, setLastTappedGroupId] = useState(null);
+  const lastTapTimeRef = useRef({});
 
   const setShowSaveGroupWithNav = (val) => {
     setShowSaveGroup(val);
@@ -128,6 +130,23 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     setActiveGroup(group);
   };
 
+  const handleGroupNameClick = (group) => {
+    const now = Date.now();
+    const lastTapTime = lastTapTimeRef.current[group.id] || 0;
+    
+    if (group.id === lastTappedGroupId && now - lastTapTime < 300) {
+      // Double tap detected
+      setEditingGroup(group);
+      setLastTappedGroupId(null);
+      lastTapTimeRef.current[group.id] = 0;
+    } else {
+      // Single tap
+      loadGroup(group);
+      setLastTappedGroupId(group.id);
+      lastTapTimeRef.current[group.id] = now;
+    }
+  };
+
   const handleUpdateGroup = async () => {
     const valid = players.filter((p) => p.name.trim());
     if (valid.length < 2 || !activeGroup) return;
@@ -158,11 +177,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
             {groups.map((g) => (
               <div key={g.id} className="flex-shrink-0 flex items-center rounded-lg bg-card border overflow-hidden"
                 style={{ borderColor: g.pinned ? "rgba(255,255,255,0.35)" : "hsl(var(--border))" }}>
-                <button onClick={() => loadGroup(g)} className="flex items-center gap-1.5 px-3 py-2">
+                <button onClick={() => handleGroupNameClick(g)} className="flex items-center gap-1.5 px-3 py-2">
                   <span className="text-sm font-medium text-foreground whitespace-nowrap">{g.name}</span>
-                </button>
-                <button onClick={() => setEditingGroup(g)} className="self-stretch flex items-center px-2.5 text-muted-foreground hover:text-foreground transition-colors border-l border-border">
-                  <Pencil size={15} />
                 </button>
               </div>
             ))}

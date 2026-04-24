@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -9,22 +9,68 @@ import BottomNavigationBar from "@/components/scorekeeper/BottomNavigationBar";
 import History from "./History";
 import AccountSettings from "./AccountSettings";
 
-// Game state is kept in module scope so it survives route transitions
+// Game state is kept in module scope and localStorage so it survives route transitions and page refreshes
 let _players = [];
 let _winMode = "high";
 
+const STORAGE_KEY = "scorekeeper_game_state";
+
+function saveGameState(players, winMode) {
+  _players = players;
+  _winMode = winMode;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ players, winMode }));
+}
+
+function loadGameState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const { players, winMode } = JSON.parse(saved);
+      _players = players;
+      _winMode = winMode;
+      return true;
+    }
+  } catch (e) {
+    console.error("Failed to load game state:", e);
+  }
+  return false;
+}
+
+function clearGameState() {
+  _players = [];
+  _winMode = "high";
+  localStorage.removeItem(STORAGE_KEY);
+}
+
 export function getGameState() { return { players: _players, winMode: _winMode }; }
-export function setGameState(players, winMode) { _players = players; _winMode = winMode; }
+export function setGameState(players, winMode) { saveGameState(players, winMode); }
 
 export default function ScoreKeeper() {
   const navigate = useNavigate();
   const location = useLocation();
   const view = location.pathname; // "/", "/game", "/history", "/account"
 
+  // Load saved game state on mount
+  const [initialized, setInitialized] = useState(false);
   const [players, setPlayers] = useState(_players);
   const [winMode, setWinMode] = useState(_winMode);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
+
+  // On mount, load game state from localStorage and redirect to game if one exists
+  useEffect(() => {
+    if (!initialized) {
+      const hasGame = loadGameState();
+      setPlayers(_players);
+      setWinMode(_winMode);
+      setInitialized(true);
+      
+      // If game was restored and we're on home, go to game screen
+      if (hasGame && _players.length > 0 && view === "/") {
+        navigate("/game", { replace: true });
+      }
+    }
+  }, [initialized, navigate, view]);
 
   const handleStartGame = useCallback((playerData, mode) => {
     const initialPlayers = playerData.map((p, i) => ({
@@ -33,15 +79,14 @@ export default function ScoreKeeper() {
       color: p.color || "#2DC5F8",
       scores: [],
     }));
-    _players = initialPlayers;
-    _winMode = mode || "high";
+    saveGameState(initialPlayers, mode || "high");
     setPlayers(initialPlayers);
     setWinMode(mode || "high");
     navigate("/game");
   }, [navigate]);
 
   const handleReset = useCallback(() => {
-    _players = [];
+    clearGameState();
     setPlayers([]);
     navigate("/");
   }, [navigate]);
@@ -61,17 +106,17 @@ export default function ScoreKeeper() {
         })),
       });
     }
-    _players = [];
+    clearGameState();
     setPlayers([]);
     navigate("/");
-  }, [players, navigate]);
+  }, [players, navigate, winMode]);
 
   const handleAddScore = useCallback((playerId, score) => {
     setPlayers((prev) => {
       const next = prev.map((p) =>
         p.id === playerId ? { ...p, scores: [...p.scores, score] } : p
       );
-      _players = next;
+      saveGameState(next, _winMode);
       return next;
     });
   }, []);
@@ -84,7 +129,7 @@ export default function ScoreKeeper() {
         newScores[scoreIndex] = newScore;
         return { ...p, scores: newScores };
       });
-      _players = next;
+      saveGameState(next, _winMode);
       return next;
     });
   }, []);
@@ -92,7 +137,7 @@ export default function ScoreKeeper() {
   const handleEditName = useCallback((playerId, newName) => {
     setPlayers((prev) => {
       const next = prev.map((p) => (p.id === playerId ? { ...p, name: newName } : p));
-      _players = next;
+      saveGameState(next, _winMode);
       return next;
     });
   }, []);
@@ -100,7 +145,7 @@ export default function ScoreKeeper() {
   const handleEditColor = useCallback((playerId, color) => {
     setPlayers((prev) => {
       const next = prev.map((p) => (p.id === playerId ? { ...p, color } : p));
-      _players = next;
+      saveGameState(next, _winMode);
       return next;
     });
   }, []);
@@ -110,7 +155,7 @@ export default function ScoreKeeper() {
       if (prev.length >= 20) return prev;
       const maxId = prev.reduce((m, p) => Math.max(m, p.id), 0);
       const next = [...prev, { id: maxId + 1, name, scores: [] }];
-      _players = next;
+      saveGameState(next, _winMode);
       return next;
     });
     setShowAddPlayer(false);

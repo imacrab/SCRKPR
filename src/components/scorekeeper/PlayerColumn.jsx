@@ -57,6 +57,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
   const total = player.scores.reduce((s, n) => s + n, 0);
   const lastIdx = player.scores.length - 1;
   const scrollRef = useRef(null);
+  const [canScroll, setCanScroll] = useState(false);
 
   // Scroll to bottom whenever scores change so the latest is visible near the add button
   useEffect(() => {
@@ -64,6 +65,18 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [player.scores.length]);
+
+  // Check if content overflows
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollRef.current) {
+        setCanScroll(scrollRef.current.scrollHeight > scrollRef.current.clientHeight);
+      }
+    };
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+    return () => window.removeEventListener("resize", checkScroll);
+  }, [player.scores]);
 
   return (
     <div className="h-full flex flex-col border-r border-border last:border-r-0">
@@ -97,9 +110,9 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
       {/* Score history — newest at bottom, scrolls upward */}
       <div className="flex-1 relative overflow-hidden bg-background">
         {/* Top fade */}
-        <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
+        {canScroll && <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />}
         {/* Bottom fade */}
-        <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
+        {canScroll && <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />}
 
         <div ref={scrollRef} className="h-full overflow-y-auto py-2 px-1">
           <AnimatePresence initial={false}>

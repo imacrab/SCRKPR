@@ -71,7 +71,7 @@ export default function EditGroupModal({ isOpen, group, onSave, onClose, onDelet
                     backgroundColor: pinned ? "hsl(var(--card))" : "transparent",
                   }}
                 >
-                  {pinned ? <Pin size={20} /> : <PinOff size={20} />}
+                  {pinned ? <PinOff size={20} /> : <Pin size={20} />}
                 </button>
               </div>
 

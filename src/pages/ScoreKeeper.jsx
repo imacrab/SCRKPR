@@ -87,10 +87,12 @@ export default function ScoreKeeper() {
   }, [navigate]);
 
   const handleReset = useCallback(() => {
-    clearGameState();
-    setPlayers([]);
-    navigate("/");
-  }, [navigate]);
+    setPlayers((prev) => {
+      const reset = prev.map((p) => ({ ...p, scores: [] }));
+      saveGameState(reset, _winMode);
+      return reset;
+    });
+  }, []);
 
   const handleEndGame = useCallback(async () => {
     if (players.length === 0) return;

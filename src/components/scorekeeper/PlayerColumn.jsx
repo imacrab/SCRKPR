@@ -5,10 +5,32 @@ import { Plus } from "lucide-react";
 function AnimatedTotal({ value, color }) {
   const [displayValue, setDisplayValue] = useState(value);
   const [animKey, setAnimKey] = useState(0);
+  const [isResetting, setIsResetting] = useState(false);
   const prevValue = useRef(value);
 
   useEffect(() => {
-    if (value !== prevValue.current) {
+    if (value === 0 && prevValue.current > 0) {
+      // Countdown animation from previous value to 0
+      setIsResetting(true);
+      const startValue = prevValue.current;
+      const duration = 600; // ms
+      const startTime = Date.now();
+
+      const countdownInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const current = Math.round(startValue * (1 - progress));
+        setDisplayValue(current);
+
+        if (progress === 1) {
+          clearInterval(countdownInterval);
+          setIsResetting(false);
+          setAnimKey((k) => k + 1);
+        }
+      }, 16);
+
+      return () => clearInterval(countdownInterval);
+    } else if (value !== prevValue.current) {
       prevValue.current = value;
       setDisplayValue(value);
       setAnimKey((k) => k + 1);
@@ -23,7 +45,7 @@ function AnimatedTotal({ value, color }) {
         animate={{ scale: 1, opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 500, damping: 22 }}
         className="text-4xl font-bold leading-none block"
-        style={{ color }}
+        style={{ color, opacity: isResetting ? 0.7 : 1 }}
       >
         {displayValue}
       </motion.span>

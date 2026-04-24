@@ -65,14 +65,13 @@ export default function EditGroupModal({ isOpen, group, onSave, onClose }) {
                 />
                 <button
                   onClick={() => setPinned(!pinned)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors flex-[2] justify-center"
+                  className="flex items-center justify-center w-11 h-11 rounded-lg border transition-colors"
                   style={{
                     borderColor: pinned ? "rgba(255,255,255,0.35)" : "hsl(var(--border))",
                     backgroundColor: pinned ? "hsl(var(--card))" : "transparent",
                   }}
                 >
-                  {pinned ? <Pin size={18} /> : <PinOff size={18} />}
-                  <span className="text-sm font-medium">{pinned ? "Pinned" : "Not Pinned"}</span>
+                  {pinned ? <Pin size={20} /> : <PinOff size={20} />}
                 </button>
               </div>
 

@@ -35,33 +35,13 @@ export default function PlayerSetup({ onStart }) {
   ]);
   const [expandedColor, setExpandedColor] = useState(null);
   const [groups, setGroups] = useState([]);
-  const [gameHistory, setGameHistory] = useState([]);
   const [showSaveGroup, setShowSaveGroup] = useState(false);
   const [activeGroup, setActiveGroup] = useState(null); // the loaded group, if any
   const [winMode, setWinMode] = useState("low"); // "high" | "low"
 
   useEffect(() => {
     base44.entities.PlayerGroup.list("-created_date", 20).then(setGroups);
-    base44.entities.GameHistory.list("-played_at", 200).then(setGameHistory);
   }, []);
-
-  const getGroupRecord = (group) => {
-    const groupNames = new Set(group.players.map((p) => p.name.trim().toLowerCase()));
-    let wins = 0, losses = 0;
-    for (const game of gameHistory) {
-      const gamePlayers = game.players || [];
-      const gameNames = gamePlayers.map((p) => p.name.trim().toLowerCase());
-      // Only count games where all group players participated
-      const allPresent = [...groupNames].every((n) => gameNames.includes(n));
-      if (!allPresent) continue;
-      const isLow = game.win_mode === "low";
-      const sorted = [...gamePlayers].sort((a, b) => isLow ? a.total - b.total : b.total - a.total);
-      const winnerName = sorted[0]?.name?.trim().toLowerCase();
-      if (groupNames.has(winnerName)) wins++;
-      else losses++;
-    }
-    return { wins, losses };
-  };
 
   const addPlayer = () => {
     if (players.length < 20) {
@@ -136,22 +116,16 @@ export default function PlayerSetup({ onStart }) {
       {groups.length > 0 && (
         <div className="px-5 mb-2">
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {groups.map((g) => {
-              const { wins, losses } = getGroupRecord(g);
-              return (
-                <div key={g.id} className="flex-shrink-0 flex items-center rounded-lg bg-card border border-border overflow-hidden">
-                  <button onClick={() => loadGroup(g)} className="flex items-center gap-1.5 px-3 py-2">
-                    <span className="text-sm font-medium text-foreground whitespace-nowrap">{g.name}</span>
-                  </button>
-                  <span className="text-xs font-medium text-muted-foreground whitespace-nowrap pr-3">
-                    {wins}-{losses}
-                  </span>
-                  <button onClick={() => deleteGroup(g.id)} className="self-stretch flex items-center px-3 text-muted-foreground hover:text-accent-red transition-colors border-l border-border">
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              );
-            })}
+            {groups.map((g) => (
+              <div key={g.id} className="flex-shrink-0 flex items-center rounded-lg bg-card border border-border overflow-hidden">
+                <button onClick={() => loadGroup(g)} className="flex items-center gap-1.5 px-3 py-2">
+                  <span className="text-sm font-medium text-foreground whitespace-nowrap">{g.name}</span>
+                </button>
+                <button onClick={() => deleteGroup(g.id)} className="self-stretch flex items-center px-3 text-muted-foreground hover:text-accent-red transition-colors border-l border-border">
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       )}

@@ -17,7 +17,16 @@ export default function AccountSettings({ onBack }) {
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
-    if (newTheme === "dark") {
+    
+    if (newTheme === "system") {
+      document.documentElement.style.colorScheme = "light dark";
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (prefersDark) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    } else if (newTheme === "dark") {
       document.documentElement.style.colorScheme = "dark";
       document.documentElement.classList.add("dark");
     } else {
@@ -71,6 +80,7 @@ export default function AccountSettings({ onBack }) {
             </div>
             <div className="flex gap-2 px-4 pb-4">
               {[
+                { value: "system", label: "System", Icon: Sun },
                 { value: "light", label: "Light", Icon: Sun },
                 { value: "dark", label: "Dark", Icon: Moon },
               ].map((opt) => {

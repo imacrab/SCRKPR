@@ -200,7 +200,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
       </div>
 
       {/* Win mode */}
-      <div className="px-5 pt-2 pb-02>
+      <div className="px-5 pt-2 pb-2>
         <div className="flex gap-2">
           {[
             { value: "low",  label: "Low Score",  Icon: Target },
@@ -273,4 +273,3 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
       />
     </div>
   );
-}

@@ -252,6 +252,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                       className="rounded-lg border border-border bg-card overflow-hidden"
                       style={{
                         opacity: snapshot.isDragging ? 0.5 : 1,
+                        boxShadow: snapshot.isDragging ? "0 10px 15px -3px rgba(0, 0, 0, 0.1)" : "none",
                         ...provided.draggableProps.style,
                       }}
                     >

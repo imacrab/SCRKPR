@@ -200,7 +200,7 @@ export default function History({ onBack }) {
                 <div className="flex flex-col items-center text-center mb-6">
                   <AlertTriangle size={32} className="mb-3" style={{ color: "#FF3A3A" }} />
                   <h2 className="font-display text-xl font-bold text-foreground mb-1">Clear All Games?</h2>
-                  <p className="text-sm text-muted-foreground">This will permanently delete all {games.length} game record{games.length !== 1 ? 's' : ''}. This cannot be undone.</p>
+                  <p className="text-sm text-muted-foreground">This will permanently delete all {games.length} game record{games.length !== 1 ? 's' : ''}.<br>This cannot be undone.</p>
                 </div>
                 <div className="flex gap-3">
                   <Button onClick={() => setShowConfirm(false)} variant="outline" className="flex-1 h-11" disabled={clearing}>

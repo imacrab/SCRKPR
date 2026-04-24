@@ -330,6 +330,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 style={{
                   borderColor: active ? "rgba(255,255,255,0.5)" : "hsl(var(--border))",
                   backgroundColor: active ? "hsl(var(--card))" : "transparent",
+                  boxShadow: active ? "0 10px 15px -3px rgba(0, 0, 0, 0.1)" : "none",
                 }}
               >
                 <opt.Icon

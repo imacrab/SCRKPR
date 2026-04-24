@@ -232,7 +232,7 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
       </div>
 
       {/* Actions */}
-      <div className="px-5 pb-12 pt-2 flex flex-col gap-2">
+      <div className="px-5 pb-12 pt-2 flex flex-col gap-3">
         {hasValidPlayers && (
           <div className="flex gap-2">
             {activeGroup && (

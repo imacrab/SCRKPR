@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Dices, History, Settings } from "lucide-react";
+import { motion } from "framer-motion";
 
 const TABS = [
   { label: "New Game", icon: Dices, path: "/" },
@@ -7,7 +8,7 @@ const TABS = [
   { label: "Account",  icon: Settings,  path: "/account" },
 ];
 
-export default function BottomNavigationBar() {
+export default function BottomNavigationBar({ hidden = false }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -15,8 +16,10 @@ export default function BottomNavigationBar() {
   if (pathname === "/game") return null;
 
   return (
-    <div
+    <motion.div
       className="fixed inset-x-0 bottom-0 z-30 flex"
+      animate={{ y: hidden ? 120 : 0 }}
+      transition={{ type: "spring", stiffness: 400, damping: 35 }}
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)", paddingLeft: "8px", paddingRight: "8px" }}
     >
     <div className="flex flex-1 border border-border rounded-full overflow-hidden" style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)" }}>
@@ -38,6 +41,6 @@ export default function BottomNavigationBar() {
         );
       })}
     </div>
-    </div>
+    </motion.div>
   );
 }

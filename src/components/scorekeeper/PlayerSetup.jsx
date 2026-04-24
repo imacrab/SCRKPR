@@ -28,7 +28,7 @@ function ColorPicker({ selected, onChange }) {
   );
 }
 
-export default function PlayerSetup({ onStart }) {
+export default function PlayerSetup({ onStart, onModalChange }) {
   const [players, setPlayers] = useState([
     { name: "", color: PLAYER_COLORS[0] },
     { name: "", color: PLAYER_COLORS[1] },
@@ -36,6 +36,11 @@ export default function PlayerSetup({ onStart }) {
   const [expandedColor, setExpandedColor] = useState(null);
   const [groups, setGroups] = useState([]);
   const [showSaveGroup, setShowSaveGroup] = useState(false);
+
+  const setShowSaveGroupWithNav = (val) => {
+    setShowSaveGroup(val);
+    onModalChange?.(val);
+  };
   const [activeGroup, setActiveGroup] = useState(null); // the loaded group, if any
   const [winMode, setWinMode] = useState("low"); // "high" | "low"
   const scrollRef = useRef(null);
@@ -86,7 +91,7 @@ export default function PlayerSetup({ onStart }) {
     if (valid.length < 2) return;
     const group = await base44.entities.PlayerGroup.create({ name: groupName, pinned: !!pinned, players: valid });
     setGroups((prev) => sortGroups([group, ...prev]));
-    setShowSaveGroup(false);
+    setShowSaveGroupWithNav(false);
   };
 
   const handleTogglePin = async (group) => {
@@ -264,7 +269,7 @@ export default function PlayerSetup({ onStart }) {
               </Button>
             )}
             <Button
-              onClick={() => setShowSaveGroup(true)}
+              onClick={() => setShowSaveGroupWithNav(true)}
               variant="outline"
               className="flex-1 h-10 text-sm text-muted-foreground"
             >
@@ -287,7 +292,7 @@ export default function PlayerSetup({ onStart }) {
       <SaveGroupModal
         isOpen={showSaveGroup}
         onSave={handleSaveGroup}
-        onClose={() => setShowSaveGroup(false)}
+        onClose={() => setShowSaveGroupWithNav(false)}
       />
     </div>
   );

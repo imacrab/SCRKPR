@@ -24,6 +24,7 @@ export default function ScoreKeeper() {
   const [players, setPlayers] = useState(_players);
   const [winMode, setWinMode] = useState(_winMode);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
 
   const handleStartGame = useCallback((playerData, mode) => {
     const initialPlayers = playerData.map((p, i) => ({
@@ -146,6 +147,7 @@ export default function ScoreKeeper() {
               onStart={handleStartGame}
               onShowHistory={() => navigate("/history")}
               onShowAccount={() => navigate("/account")}
+              onModalChange={setNavHidden}
             />
           </motion.div>
         )}
@@ -172,7 +174,7 @@ export default function ScoreKeeper() {
         )}
       </AnimatePresence>
 
-      <BottomNavigationBar />
+      <BottomNavigationBar hidden={navHidden} />
     </>
   );
 }

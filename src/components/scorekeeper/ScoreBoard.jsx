@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { RotateCcw, UserPlus, FlagOff, MoreHorizontal } from "lucide-react";
+import { RotateCcw, UserPlus, FlagOff, MoreHorizontal, Maximize2, Minimize2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
@@ -13,6 +13,7 @@ export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddS
   const [streakMap, setStreakMap] = useState({});
   const [gameStartTime] = useState(new Date());
   const [scrollPos, setScrollPos] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const scrollContainerRef = useRef(null);
 
 
@@ -78,6 +79,45 @@ export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddS
 
   const colWidth = players.length <= 4 ? `${100 / players.length}vw` : "25vw";
 
+  const toggleFullscreen = async () => {
+    const elem = document.documentElement;
+    if (!isFullscreen) {
+      try {
+        if (elem.requestFullscreen) {
+          await elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+          await elem.webkitRequestFullscreen();
+        }
+        setIsFullscreen(true);
+      } catch (err) {
+        console.error("Fullscreen request failed:", err);
+      }
+    } else {
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+        } else if (document.webkitFullscreenElement) {
+          await document.webkitExitFullscreen();
+        }
+        setIsFullscreen(false);
+      } catch (err) {
+        console.error("Exit fullscreen failed:", err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement || !!document.webkitFullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
   return (
     <div className="w-screen bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* Top bar */}
@@ -86,6 +126,9 @@ export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddS
           <img src="https://media.base44.com/images/public/69ea763700078809357a164a/bbacfd24a_SCRKPR.png" alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
         </button>
         <div className="flex items-center gap-1">
+          <button onClick={toggleFullscreen} className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+            {isFullscreen ? <Minimize2 size={24} /> : <Maximize2 size={24} />}
+          </button>
         <Popover>
           <PopoverTrigger asChild>
             <button className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">

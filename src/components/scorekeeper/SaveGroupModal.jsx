@@ -28,6 +28,7 @@ export default function SaveGroupModal({ isOpen, onSave, onClose }) {
         <>
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
             onClick={handleClose}
           />
@@ -35,7 +36,7 @@ export default function SaveGroupModal({ isOpen, onSave, onClose }) {
             initial={{ y: "100%", opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
-            transition={{ type: "spring", stiffness: 400, damping: 35 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
             className="fixed inset-x-0 bottom-0 z-50 bg-card border-t border-border rounded-t-2xl shadow-2xl"
           >
             <div className="px-5 pt-5 pb-10">

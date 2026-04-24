@@ -228,7 +228,7 @@ export default function PlayerSetup({ onStart }) {
       </div>
 
       {/* Actions */}
-      <div className="px-5 pt-0 flex flex-col gap-3" style={{ paddingBottom: "calc(56px + 16px + 8px + env(safe-area-inset-bottom))" }}>
+      <div className="px-5 pt-0 flex flex-col gap-3" style={{ paddingBottom: "calc(56px + 8px + env(safe-area-inset-bottom))" }}>
         {hasValidPlayers && (
           <div className="flex gap-2">
             {activeGroup && (

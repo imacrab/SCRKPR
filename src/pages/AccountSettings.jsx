@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Trash2, AlertTriangle, LogOut, Moon, Sun } from "lucide-react";
+import { ArrowLeft, Trash2, AlertTriangle, LogOut, Moon, Sun, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -29,7 +29,7 @@ export default function AccountSettings({ onBack }) {
     } else if (newTheme === "dark") {
       document.documentElement.style.colorScheme = "dark";
       document.documentElement.classList.add("dark");
-    } else {
+    } else if (newTheme === "light") {
       document.documentElement.style.colorScheme = "light";
       document.documentElement.classList.remove("dark");
     }
@@ -80,7 +80,7 @@ export default function AccountSettings({ onBack }) {
             </div>
             <div className="flex gap-2 px-4 pb-4">
               {[
-                { value: "system", label: "System", Icon: Sun },
+                { value: "system", label: "System", Icon: Smartphone },
                 { value: "light", label: "Light", Icon: Sun },
                 { value: "dark", label: "Dark", Icon: Moon },
               ].map((opt) => {

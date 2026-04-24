@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Trophy, Trash2, RefreshCw } from "lucide-react";
+import { ArrowLeft, Trophy, Trash2, RefreshCw, Handshake } from "lucide-react";
 import { format } from "date-fns";
 
 export default function History({ onBack }) {
@@ -98,6 +98,7 @@ export default function History({ onBack }) {
               const isLowWin = game.win_mode === "low";
               const sorted = [...game.players].sort((a, b) => isLowWin ? a.total - b.total : b.total - a.total);
               const winner = sorted[0];
+              const isTie = sorted.length > 1 && sorted[0].total === sorted[1].total;
               return (
                 <motion.div
                   key={game.id}
@@ -108,19 +109,23 @@ export default function History({ onBack }) {
                 >
                   {/* Game header */}
                   <div className="px-4 py-3 flex items-center justify-between border-b border-border">
-                    <div className="gap-1">
+                    <div className="flex flex-col gap-2">
                       <p className="text-xs text-muted-foreground">
                         {format(new Date(game.played_at), "MMM d, yyyy · h:mm a")}
                       </p>
-                      <p className="text-sm font-medium text-foreground mt-0.5">
-                        🏆 {winner.name}
+                      <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
+                        {isTie
+                          ? <Handshake size={20} className="text-muted-foreground" />
+                          : <Trophy size={20} className="text-yellow-500" />
+                        }
+                        {isTie ? "Tie" : winner.name}
                       </p>
                     </div>
                     <button
                       onClick={() => deleteGame(game.id)}
                       className="text-muted-foreground hover:text-accent-red transition-colors p-1"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={20} />
                     </button>
                   </div>
 

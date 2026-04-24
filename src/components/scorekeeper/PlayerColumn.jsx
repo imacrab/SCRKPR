@@ -55,10 +55,6 @@ export default function PlayerColumn({ player, streak = 0, onAddScore, onEditSco
         }}
       >
         <button onClick={onEditPlayer} className="flex flex-col items-center gap-1.5">
-          <div
-            className="w-2.5 h-2.5 rounded-full"
-            style={{ backgroundColor: player.color }}
-          />
           <div className="flex items-center gap-1">
             <span className="text-xs font-bold text-foreground truncate max-w-[70px] text-center leading-tight">
               {player.name}

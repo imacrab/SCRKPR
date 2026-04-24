@@ -118,7 +118,6 @@ export default function PlayerSetup({ onStart, onShowHistory }) {
       {/* Saved Groups */}
       {groups.length > 0 && (
         <div className="px-5 mb-4">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Saved Groups</p>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {groups.map((g) => (
               <div key={g.id} className="flex-shrink-0 flex items-center rounded-lg bg-card border border-border overflow-hidden">

@@ -59,14 +59,16 @@ export default function PlayerColumn({ player, streak = 0, onAddScore, onEditSco
             className="w-2.5 h-2.5 rounded-full"
             style={{ backgroundColor: player.color }}
           />
-          <span className="text-xs font-bold text-foreground truncate max-w-[70px] text-center leading-tight">
-            {player.name}
-          </span>
-          {streak >= 2 && (
-            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 leading-none">
-              🔥{streak}
+          <div className="flex items-center gap-1">
+            <span className="text-xs font-bold text-foreground truncate max-w-[70px] text-center leading-tight">
+              {player.name}
             </span>
-          )}
+            {streak >= 2 && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 leading-none">
+                🔥{streak}
+              </span>
+            )}
+          </div>
         </button>
 
         {/* Total */}

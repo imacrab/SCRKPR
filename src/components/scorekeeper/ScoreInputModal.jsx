@@ -64,7 +64,7 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-0.5">
                   {isEditing ? "Edit Score" : "Add Score"}
                 </p>
-                <h2 className="font-display text-xl font-bold text-foreground">{player.name}</h2>
+                <h2 className="font-display text-2xl font-bold text-foreground">{player.name}</h2>
               </div>
 
               {/* Display */}

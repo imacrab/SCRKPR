@@ -168,8 +168,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
           {players.map((player, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0, x: -16, height: 0 }}
               transition={{ duration: 0.2 }}
               className="rounded-lg border border-border bg-card overflow-hidden"

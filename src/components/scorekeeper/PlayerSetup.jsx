@@ -154,7 +154,7 @@ export default function PlayerSetup({ onStart }) {
         <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
         {/* Bottom fade */}
         <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
-      <div className="h-full overflow-y-auto px-5 py-4 space-y-2" style={{ paddingBottom: "calc(56px + 16px + 16px + env(safe-area-inset-bottom))" }}>
+      <div className="h-full overflow-y-auto px-5 py-4 space-y-2">
         <AnimatePresence>
           {players.map((player, i) => (
             <motion.div
@@ -200,18 +200,21 @@ export default function PlayerSetup({ onStart }) {
             </motion.div>
           ))}
         </AnimatePresence>
+      </div>
+      </div>
 
-        {players.length < 20 && (
+      {/* Add Player — pinned above bottom actions */}
+      {players.length < 20 && (
+        <div className="px-5 pt-2">
           <button
             onClick={addPlayer}
-            className="w-full mt-1 h-11 rounded-lg flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50"
+            className="w-full h-11 rounded-lg flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50"
           >
             <Plus size={24} />
             Add Player
           </button>
-        )}
-      </div>
-      </div>
+        </div>
+      )}
 
       {/* Win mode */}
       <div className="px-5 pt-2 pb-2">

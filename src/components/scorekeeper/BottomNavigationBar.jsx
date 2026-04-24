@@ -19,7 +19,7 @@ export default function BottomNavigationBar() {
       className="fixed inset-x-0 bottom-0 z-30 flex"
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)", paddingLeft: "8px", paddingRight: "8px" }}
     >
-    <div className="flex flex-1 bg-card border border-border rounded-full overflow-hidden">
+    <div className="flex flex-1 border border-border rounded-full overflow-hidden" style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
       {TABS.map(({ label, icon: Icon, path }) => {
         const active = pathname === path;
         return (

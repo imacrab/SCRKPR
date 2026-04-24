@@ -60,7 +60,7 @@ export default function EditGroupModal({ isOpen, group, onSave, onClose }) {
                   onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); if (e.key === "Escape") onClose(); }}
                   placeholder="Group name"
                   maxLength={30}
-                  className="flex-1 text-center text-base bg-secondary border-border"
+                  className="flex-1 text-center text-base bg-secondary border-border h-11"
                   aria-label="Group name"
                 />
                 <button
@@ -77,7 +77,6 @@ export default function EditGroupModal({ isOpen, group, onSave, onClose }) {
 
               <div className="flex gap-3">
                 <Button onClick={onClose} variant="outline" className="flex-1 h-11">
-                  <X size={24} className="mr-1.5" />
                   Cancel
                 </Button>
                 <Button

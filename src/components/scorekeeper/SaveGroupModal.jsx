@@ -68,8 +68,8 @@ export default function SaveGroupModal({ isOpen, onSave, onClose }) {
               </button>
               <div className="flex gap-3">
                 <Button onClick={handleClose} variant="outline" className="flex-1 h-11">
-                  <X size={24} className="mr-1.5" /> Cancel
-                </Button>
+                    Cancel
+                  </Button>
                 <Button
                   onClick={handleSave}
                   disabled={!name.trim()}

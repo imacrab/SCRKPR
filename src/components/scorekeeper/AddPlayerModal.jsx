@@ -86,7 +86,6 @@ export default function AddPlayerModal({ isOpen, onAdd, onClose }) {
 
               <div className="flex gap-3">
                 <Button onClick={onClose} variant="outline" className="flex-1 h-11">
-                  <X size={24} className="mr-1.5" />
                   Cancel
                 </Button>
                 <Button

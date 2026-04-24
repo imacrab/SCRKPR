@@ -39,6 +39,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [showSaveGroup, setShowSaveGroup] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
   const [lastTappedGroupId, setLastTappedGroupId] = useState(null);
+  const [canScrollPlayers, setCanScrollPlayers] = useState(false);
   const lastTapTimeRef = useRef({});
 
   const setShowSaveGroupWithNav = (val) => {
@@ -72,6 +73,18 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     setGroups(sortGroups(data));
     }).catch(() => setGroups([]));
   }, []);
+
+  // Check if players list can scroll
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollRef.current) {
+        setCanScrollPlayers(scrollRef.current.scrollHeight > scrollRef.current.clientHeight);
+      }
+    };
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+    return () => window.removeEventListener("resize", checkScroll);
+  }, [players]);
 
   const addPlayer = () => {
     if (players.length < 20) {
@@ -189,9 +202,9 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       {/* Player list */}
       <div className="flex-1 relative overflow-hidden">
         {/* Top fade */}
-        <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
+        {canScrollPlayers && <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />}
         {/* Bottom fade */}
-        <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
+        {canScrollPlayers && <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />}
       <div ref={scrollRef} className="h-full overflow-y-auto px-5 pt-2 pb-4 space-y-2">
         <AnimatePresence>
           {players.map((player, i) => (

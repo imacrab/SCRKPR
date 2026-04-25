@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+
 import { Plus } from "lucide-react";
 
 function AnimatedTotal({ value, color }) {
@@ -53,8 +54,9 @@ function AnimatedTotal({ value, color }) {
   );
 }
 
-export default function PlayerColumn({ player, isHighlighted = false, streak = 0, onAddScore, onEditScore, onEditPlayer }) {
+export default function PlayerColumn({ player, isHighlighted = false, streak = 0, winsNeeded = null, onAddScore, onEditScore, onEditPlayer }) {
   const total = player.scores.reduce((s, n) => s + n, 0);
+  const isBestOf = winsNeeded !== null;
   const lastIdx = player.scores.length - 1;
   const scrollRef = useRef(null);
   const [canScroll, setCanScroll] = useState(false);
@@ -109,39 +111,62 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
         <AnimatedTotal value={total} color={player.color} />
       </div>
 
-      {/* Score history — newest at bottom, scrolls upward */}
+      {/* Score history */}
       <div className="flex-1 relative overflow-hidden bg-background">
-        {/* Top fade */}
-        {canScroll && <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />}
-        {/* Bottom fade */}
-        {canScroll && <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />}
-
-        <div ref={scrollRef} className="h-full overflow-y-auto py-2 px-1">
-          <AnimatePresence initial={false}>
-            {player.scores.map((score, idx) => {
-              const isCurrent = idx === lastIdx;
+        {isBestOf ? (
+          // Best Of mode: show win dots
+          <div className="h-full flex flex-col items-center justify-center gap-2 px-2 py-3">
+            {Array.from({ length: winsNeeded }).map((_, idx) => {
+              const won = idx < total;
               return (
                 <motion.div
                   key={idx}
-                  initial={{ opacity: 0, scale: 0.8, y: 6 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ type: "spring", stiffness: 380, damping: 28 }}
-                  className={`mb-1 mx-1 rounded-md px-2 py-1.5 text-center cursor-pointer ${
-                    isCurrent ? "bg-card border border-border" : ""
-                  }`}
-                  onClick={() => onEditScore(idx)}
-                >
-                  <span
-                    className={`font-semibold block leading-none text-s ${!isCurrent ? "text-muted-foreground" : ""}`}
-                    style={isCurrent ? { color: player.color } : undefined}
-                  >
-                    {score > 0 ? `+${score}` : score}
-                  </span>
-                </motion.div>
+                  initial={won ? { scale: 0 } : false}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                  className="w-3 h-3 rounded-full border-2 flex-shrink-0"
+                  style={{
+                    backgroundColor: won ? player.color : "transparent",
+                    borderColor: won ? player.color : "hsl(var(--border))",
+                  }}
+                />
               );
             })}
-          </AnimatePresence>
-        </div>
+          </div>
+        ) : (
+          <>
+            {/* Top fade */}
+            {canScroll && <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />}
+            {/* Bottom fade */}
+            {canScroll && <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />}
+            <div ref={scrollRef} className="h-full overflow-y-auto py-2 px-1">
+              <AnimatePresence initial={false}>
+                {player.scores.map((score, idx) => {
+                  const isCurrent = idx === lastIdx;
+                  return (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, scale: 0.8, y: 6 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      transition={{ type: "spring", stiffness: 380, damping: 28 }}
+                      className={`mb-1 mx-1 rounded-md px-2 py-1.5 text-center cursor-pointer ${
+                        isCurrent ? "bg-card border border-border" : ""
+                      }`}
+                      onClick={() => onEditScore(idx)}
+                    >
+                      <span
+                        className={`font-semibold block leading-none text-s ${!isCurrent ? "text-muted-foreground" : ""}`}
+                        style={isCurrent ? { color: player.color } : undefined}
+                      >
+                        {score > 0 ? `+${score}` : score}
+                      </span>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Add score button */}

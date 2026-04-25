@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Play, Save, TrendingUp, TrendingDown, Pencil, GripVertical } from "lucide-react";
+import { Plus, Trash2, Play, Save, TrendingUp, TrendingDown, GripVertical, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import SaveGroupModal from "./SaveGroupModal";
 import EditGroupModal from "./EditGroupModal";
+import BestOfModal from "./BestOfModal";
 
 export const PLAYER_COLORS = [
   "#2DC5F8", "#3B82F6", "#6366F1", "#8B5CF6", "#A855F7",
@@ -61,7 +62,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     onModalChange?.(!!val);
   };
   const [activeGroup, setActiveGroup] = useState(null); // the loaded group, if any
-  const [winMode, setWinMode] = useState("low"); // "high" | "low"
+  const [winMode, setWinMode] = useState("low"); // "high" | "low" | "bestof"
+  const [showBestOf, setShowBestOf] = useState(false);
   const scrollRef = useRef(null);
   const inputRefs = useRef([]);
 
@@ -187,7 +189,20 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
   const handleStart = () => {
     const valid = players.filter((p) => p.name.trim());
-    if (valid.length >= 2) onStart(valid, winMode);
+    if (valid.length < 2) return;
+    if (winMode === "bestof") {
+      setShowBestOf(true);
+      onModalChange?.(true);
+    } else {
+      onStart(valid, winMode);
+    }
+  };
+
+  const handleBestOfConfirm = (bestOf) => {
+    const valid = players.filter((p) => p.name.trim());
+    setShowBestOf(false);
+    onModalChange?.(false);
+    onStart(valid, "bestof", bestOf);
   };
 
   const handleDragEnd = (result) => {
@@ -316,29 +331,30 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
       {/* Win mode */}
       <div className="px-5 pt-2 pb-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Winner has</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Game mode</p>
         <div className="flex gap-2">
           {[
-            { value: "low",  label: "Low Score",  Icon: TrendingDown },
-            { value: "high", label: "High Score", Icon: TrendingUp },
+            { value: "low",    label: "Low Score",  Icon: TrendingDown },
+            { value: "high",   label: "High Score", Icon: TrendingUp },
+            { value: "bestof", label: "Best Of",    Icon: Trophy },
           ].map((opt) => {
             const active = winMode === opt.value;
             return (
               <button
                 key={opt.value}
                 onClick={() => setWinMode(opt.value)}
-                className="flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border transition-all"
+                className="flex-1 flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl border transition-all"
                 style={{
                   borderColor: active ? "hsl(199 94% 40% / 0.4)" : "hsl(var(--border))",
                   backgroundColor: active ? "hsl(199 94% 40% / 0.12)" : "transparent",
                 }}
               >
                 <opt.Icon
-                  size={24}
+                  size={20}
                   strokeWidth={1.5}
                   style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
                 />
-                <span className="text-sm font-medium" style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}>
+                <span className="text-xs font-medium" style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}>
                   {opt.label}
                 </span>
               </button>
@@ -394,6 +410,12 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         onSave={handleEditGroup}
         onDelete={deleteGroup}
         onClose={() => setEditingGroupWithNav(null)}
+      />
+
+      <BestOfModal
+        isOpen={showBestOf}
+        onConfirm={handleBestOfConfirm}
+        onClose={() => { setShowBestOf(false); onModalChange?.(false); }}
       />
     </div>
   );

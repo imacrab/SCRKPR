@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { RotateCcw, UserPlus, FlagOff, MoreHorizontal } from "lucide-react";
-import { useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
@@ -9,7 +8,7 @@ import EndGameModal from "./EndGameModal";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer, onEndGame }) {
+export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [streakMap, setStreakMap] = useState({});
   const [gameStartTime] = useState(new Date());
@@ -53,12 +52,29 @@ export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddS
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [showEndGame, setShowEndGame] = useState(false);
 
+  const winsNeeded = bestOf ? Math.ceil(bestOf / 2) : null;
+
+  // Auto-end when someone reaches winsNeeded in bestof mode
+  useEffect(() => {
+    if (winMode !== "bestof" || !winsNeeded) return;
+    const winner = players.find((p) => p.scores.reduce((s, n) => s + n, 0) >= winsNeeded);
+    if (winner) {
+      setTimeout(() => setShowEndGame(true), 400);
+    }
+  }, [players, winMode, winsNeeded]);
+
   const handleOpenScore = (player) => {
+    if (winMode === "bestof") {
+      // In bestof mode, just add 1 win directly
+      onAddScore(player.id, 1);
+      return;
+    }
     setActivePlayer(player);
     setEditingScore(null);
   };
 
   const handleEditScore = (player, scoreIndex) => {
+    if (winMode === "bestof") return; // no editing in bestof mode
     setActivePlayer(player);
     setEditingScore({ playerId: player.id, scoreIndex });
   };
@@ -154,6 +170,7 @@ export default function ScoreBoard({ players, winMode, lastAddedPlayerId, onAddS
                 player={player}
                 isHighlighted={player.id === lastAddedPlayerId}
                 streak={streakMap[player.name] || 0}
+                winsNeeded={winsNeeded}
                 onAddScore={() => handleOpenScore(player)}
                 onEditScore={(idx) => handleEditScore(player, idx)}
                 onEditPlayer={() => setEditingPlayer(player)}

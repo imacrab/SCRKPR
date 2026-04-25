@@ -12,22 +12,25 @@ import AccountSettings from "./AccountSettings";
 // Game state is kept in module scope and localStorage so it survives route transitions and page refreshes
 let _players = [];
 let _winMode = "high";
+let _bestOf = null; // only set when winMode === "bestof"
 
 const STORAGE_KEY = "scorekeeper_game_state";
 
-function saveGameState(players, winMode) {
+function saveGameState(players, winMode, bestOf = null) {
   _players = players;
   _winMode = winMode;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ players, winMode }));
+  _bestOf = bestOf;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ players, winMode, bestOf }));
 }
 
 function loadGameState() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      const { players, winMode } = JSON.parse(saved);
+      const { players, winMode, bestOf } = JSON.parse(saved);
       _players = players;
       _winMode = winMode;
+      _bestOf = bestOf || null;
       return true;
     }
   } catch (e) {
@@ -39,11 +42,12 @@ function loadGameState() {
 function clearGameState() {
   _players = [];
   _winMode = "high";
+  _bestOf = null;
   localStorage.removeItem(STORAGE_KEY);
 }
 
-export function getGameState() { return { players: _players, winMode: _winMode }; }
-export function setGameState(players, winMode) { saveGameState(players, winMode); }
+export function getGameState() { return { players: _players, winMode: _winMode, bestOf: _bestOf }; }
+export function setGameState(players, winMode, bestOf) { saveGameState(players, winMode, bestOf); }
 
 export default function ScoreKeeper() {
   const navigate = useNavigate();
@@ -54,6 +58,7 @@ export default function ScoreKeeper() {
   const [initialized, setInitialized] = useState(false);
   const [players, setPlayers] = useState(_players);
   const [winMode, setWinMode] = useState(_winMode);
+  const [bestOf, setBestOf] = useState(_bestOf);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
   const [lastAddedPlayerId, setLastAddedPlayerId] = useState(null);
@@ -64,6 +69,7 @@ export default function ScoreKeeper() {
       const hasGame = loadGameState();
       setPlayers(_players);
       setWinMode(_winMode);
+      setBestOf(_bestOf);
       setInitialized(true);
       
       // If game was restored and we're on home, go to game screen
@@ -73,23 +79,24 @@ export default function ScoreKeeper() {
     }
   }, [initialized, navigate, view]);
 
-  const handleStartGame = useCallback((playerData, mode) => {
+  const handleStartGame = useCallback((playerData, mode, bestOfCount = null) => {
     const initialPlayers = playerData.map((p, i) => ({
       id: i + 1,
       name: p.name || p,
       color: p.color || "#2DC5F8",
       scores: [],
     }));
-    saveGameState(initialPlayers, mode || "high");
+    saveGameState(initialPlayers, mode || "high", bestOfCount);
     setPlayers(initialPlayers);
     setWinMode(mode || "high");
+    setBestOf(bestOfCount);
     navigate("/game");
   }, [navigate]);
 
   const handleReset = useCallback(() => {
     setPlayers((prev) => {
       const reset = prev.map((p) => ({ ...p, scores: [] }));
-      saveGameState(reset, _winMode);
+      saveGameState(reset, _winMode, _bestOf);
       return reset;
     });
   }, []);
@@ -119,7 +126,7 @@ export default function ScoreKeeper() {
       const next = prev.map((p) =>
         p.id === playerId ? { ...p, scores: [...p.scores, score] } : p
       );
-      saveGameState(next, _winMode);
+      saveGameState(next, _winMode, _bestOf);
       return next;
     });
   }, []);
@@ -187,7 +194,7 @@ export default function ScoreKeeper() {
 
         {view === "/account" && (
           <motion.div key="account" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
-            <AccountSettings onBack={() => navigate(-1)} />
+            <AccountSettings onBack={() => navigate(-1)} onModalChange={setNavHidden} />
           </motion.div>
         )}
 
@@ -207,6 +214,7 @@ export default function ScoreKeeper() {
             <ScoreBoard
               players={players}
               winMode={winMode}
+              bestOf={bestOf}
               lastAddedPlayerId={lastAddedPlayerId}
               onAddScore={handleAddScore}
               onEditScore={handleEditScore}

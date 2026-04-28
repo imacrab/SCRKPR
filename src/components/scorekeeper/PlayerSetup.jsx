@@ -45,6 +45,26 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [isDarkMode, setIsDarkMode] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const lastTapTimeRef = useRef({});
 
+  // Pull-to-refresh
+  const [pullY, setPullY] = useState(0);
+  const pullStartY = useRef(null);
+  const PULL_THRESHOLD = 80;
+
+  const handleTouchStart = (e) => {
+    const el = e.currentTarget;
+    if (el.scrollTop === 0) pullStartY.current = e.touches[0].clientY;
+  };
+  const handleTouchMove = (e) => {
+    if (pullStartY.current === null) return;
+    const delta = e.touches[0].clientY - pullStartY.current;
+    if (delta > 0) setPullY(Math.min(delta, PULL_THRESHOLD * 1.5));
+  };
+  const handleTouchEnd = () => {
+    if (pullY >= PULL_THRESHOLD) window.location.reload();
+    setPullY(0);
+    pullStartY.current = null;
+  };
+
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e) => setIsDarkMode(e.matches);
@@ -216,8 +236,26 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     setPlayers(newPlayers);
   };
 
+  const pullProgress = Math.min(pullY / PULL_THRESHOLD, 1);
+
   return (
-    <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100%", paddingTop: "env(safe-area-inset-top)" }}>
+    <div
+      className="bg-background flex flex-col overflow-hidden"
+      style={{ height: "100%", paddingTop: "env(safe-area-inset-top)" }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull-to-refresh indicator */}
+      <div
+        className="flex items-center justify-center overflow-hidden transition-all"
+        style={{ height: pullY > 0 ? `${pullY * 0.5}px` : 0, opacity: pullProgress }}
+      >
+        <div
+          className="w-6 h-6 rounded-full border-2 border-muted-foreground/40 border-t-foreground transition-transform"
+          style={{ transform: `rotate(${pullProgress * 360}deg)`, opacity: pullProgress >= 1 ? 1 : 0.5 }}
+        />
+      </div>
       {/* Header */}
       <div className="pt-10 pb-5 px-6" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <img src={isDarkMode ? "https://media.base44.com/images/public/69ea763700078809357a164a/87badac38_SCRKPR_dark_mode.png" : "https://media.base44.com/images/public/69ea763700078809357a164a/6de7dc994_SCRKPR_light_mode.png"} alt="SCRKPR!" className="mx-auto" style={{ maxWidth: 200, height: "auto" }} />

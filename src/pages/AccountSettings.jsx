@@ -163,7 +163,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: "100%", opacity: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 35 }}
-              className="fixed inset-x-0 bottom-0 z-50 bg-card border-t border-border rounded-t-2xl shadow-2xl"
+              className="fixed inset-x-0 bottom-0 z-50 bg-card border-t border-border rounded-t-[44px] shadow-2xl"
               style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
             >
               <div className="px-5 pt-5 pb-8">

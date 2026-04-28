@@ -140,7 +140,7 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
             </button>
             <div className="my-1 h-px bg-border" />
             <button
-              onClick={() => setShowEndGame(true)}
+              onClick={() => { setPopoverOpen(false); setShowEndGame(true); }}
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               style={{ color: "#FF3A3A", backgroundColor: "rgba(255,58,58,0.08)" }}
             >

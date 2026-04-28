@@ -112,9 +112,6 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
           <img src={isDarkMode ? "https://media.base44.com/images/public/69ea763700078809357a164a/87badac38_SCRKPR_dark_mode.png" : "https://media.base44.com/images/public/69ea763700078809357a164a/6de7dc994_SCRKPR_light_mode.png"} alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
         </button>
         <div className="flex items-center gap-1">
-        <button onClick={() => window.location.reload()} className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-          <RotateCcw size={18} />
-        </button>
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
             <button className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
@@ -140,6 +137,14 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
             >
               <RotateCcw size={24} className="text-muted-foreground" />
               Reset Scores
+            </button>
+            <div className="my-1 h-px bg-border" />
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-accent transition-colors"
+            >
+              <RotateCcw size={24} className="text-muted-foreground" />
+              Reload App
             </button>
             <div className="my-1 h-px bg-border" />
             <button

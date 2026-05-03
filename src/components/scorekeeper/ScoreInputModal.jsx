@@ -53,7 +53,7 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
             exit={{ y: "110%", opacity: 0 }}
             transition={{ type: "spring", stiffness: 380, damping: 28 }}
             className="fixed inset-x-0 z-50 border border-border rounded-[44px] shadow-2xl"
-            style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)", bottom: "calc(56px + 8px)", left: "8px", right: "8px" }}
+            style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)", bottom: "calc(56px + 8px)", left: "8px", right: "8px", paddingBottom: "env(safe-area-inset-bottom)" }}
           >
             <div className="px-5 pt-5 pb-8">
               {/* Handle */}

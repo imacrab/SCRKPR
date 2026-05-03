@@ -241,7 +241,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   return (
     <div
       className="bg-background flex flex-col overflow-hidden"
-      style={{ height: "100%", paddingTop: "env(safe-area-inset-top)" }}
+      style={{ height: "100%", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

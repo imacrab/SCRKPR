@@ -170,7 +170,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
       </div>
 
       {/* Add score button */}
-      <div className="flex-shrink-0 px-2" style={{ paddingTop: "8px", paddingBottom: "calc(8px + env(safe-area-inset-bottom))" }}>
+      <div className="flex-shrink-0 px-4" style={{ paddingTop: "16px", paddingBottom: "calc(16px + env(safe-area-inset-bottom))" }}>
         <div className="flex gap-2 border border-border rounded-full overflow-hidden" style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)" }}>
           <button
             onClick={onAddScore}

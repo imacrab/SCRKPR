@@ -84,7 +84,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
     <div className="h-full flex flex-col border-r border-border last:border-r-0">
       {/* Header — frosted glass */}
       <div
-        className="flex-shrink-0 px-2 py-3 flex flex-col items-center gap-2 z-10 transition-all"
+        className="flex-shrink-0 px-2 py-3 rounded-sm flex flex-col items-center gap-2 z-10 transition-all"
         style={{
           backgroundColor: isHighlighted ? `hsl(var(--primary) / 0.1)` : "hsl(var(--card) / 0.9)",
           backdropFilter: "blur(1px)",
@@ -171,7 +171,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
 
       {/* Add score button */}
       <div className="flex-shrink-0" style={{ paddingTop: "0", paddingBottom: "calc(0 + env(safe-area-inset-bottom))" }}>
-        <div className="flex gap-2 border-r border-border last:border-r-0 overflow-hidden" style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)" }}>
+        <div className="flex rounded-sm border-r border-border last:border-r-0 overflow-hidden" style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)" }}>
           <button
             onClick={onAddScore}
             className="flex-1 py-8 flex items-center justify-center transition-colors"

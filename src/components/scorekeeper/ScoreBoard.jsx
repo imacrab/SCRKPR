@@ -161,7 +161,7 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
       </div>
 
       {/* Columns */}
-      <div className="flex-1 gap-1 overflow-hidden w-full relative">
+      <div className="flex gap-2 overflow-hidden w-full relative">
         <div
           ref={scrollContainerRef}
           className="flex h-full w-full overflow-x-auto"

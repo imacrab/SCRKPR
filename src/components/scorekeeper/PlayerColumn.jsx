@@ -174,7 +174,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
         <div className="flex gap-2 border border-border overflow-hidden" style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)" }}>
           <button
             onClick={onAddScore}
-            className="flex-1 py-4 flex items-center justify-center transition-colors"
+            className="flex-1 py-8 flex items-center justify-center transition-colors"
             style={{ backgroundColor: `${player.color}18`, color: player.color }}
             aria-label={`Add score for ${player.name}`}
           >

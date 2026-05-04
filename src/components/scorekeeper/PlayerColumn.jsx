@@ -81,10 +81,10 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
   }, [player.scores]);
 
   return (
-    <div className="h-full flex gap-1 flex-col border-r border-border last:border-r-0">
+    <div className="h-full flex flex-col border-r border-border last:border-r-0">
       {/* Header — frosted glass */}
       <div
-        className="flex-shrink-0 px-2 py-3 rounded-sm flex flex-col items-center gap-2 z-10 transition-all"
+        className="px-2 py-3 rounded-sm flex flex-col items-center z-10 transition-all"
         style={{
           backgroundColor: isHighlighted ? `hsl(var(--primary) / 0.1)` : "hsl(var(--card) / 0.9)",
           backdropFilter: "blur(1px)",

@@ -168,7 +168,7 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
           style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
           onScroll={(e) => setScrollPos(e.currentTarget.scrollLeft)}
         >
-          {players.map((player) => (
+          {players.map((player, idx) => (
             <div
               key={player.id}
               style={{ minWidth: colWidth, width: colWidth, scrollSnapAlign: "start", flexShrink: 0 }}
@@ -179,6 +179,8 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
                 isHighlighted={player.id === lastAddedPlayerId}
                 streak={streakMap[player.name] || 0}
                 winsNeeded={winsNeeded}
+                isFirst={idx === 0}
+                isLast={idx === players.length - 1}
                 onAddScore={() => handleOpenScore(player)}
                 onEditScore={(idx) => handleEditScore(player, idx)}
                 onEditPlayer={() => setEditingPlayer(player)}

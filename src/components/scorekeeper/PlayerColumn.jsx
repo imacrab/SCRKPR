@@ -54,7 +54,7 @@ function AnimatedTotal({ value, color }) {
   );
 }
 
-export default function PlayerColumn({ player, isHighlighted = false, streak = 0, winsNeeded = null, onAddScore, onEditScore, onEditPlayer }) {
+export default function PlayerColumn({ player, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, onAddScore, onEditScore, onEditPlayer }) {
   const total = player.scores.reduce((s, n) => s + n, 0);
   const isBestOf = winsNeeded !== null;
   const lastIdx = player.scores.length - 1;
@@ -177,7 +177,13 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             whileTap={{ scale: 0.88 }}
             transition={{ type: "spring", stiffness: 600, damping: 12, mass: 0.5 }}
             className="flex-1 py-8 flex items-center justify-center transition-colors"
-            style={{ backgroundColor: `${player.color}18`, color: player.color, transformOrigin: "center" }}
+            style={{
+              backgroundColor: `${player.color}18`,
+              color: player.color,
+              transformOrigin: "center",
+              borderBottomLeftRadius: isFirst ? "44px" : undefined,
+              borderBottomRightRadius: isLast ? "44px" : undefined,
+            }}
             aria-label={`Add score for ${player.name}`}
           >
             <Plus size={24} />

@@ -161,10 +161,10 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
       </div>
 
       {/* Columns */}
-      <div className="flex-1 gap-2 overflow-hidden w-full relative">
+      <div className="flex-1 overflow-hidden w-full relative">
         <div
           ref={scrollContainerRef}
-          className="flex h-full w-full overflow-x-auto"
+          className="flex h-full gap-2 w-full overflow-x-auto"
           style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
           onScroll={(e) => setScrollPos(e.currentTarget.scrollLeft)}
         >

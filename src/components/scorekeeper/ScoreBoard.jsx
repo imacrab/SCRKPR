@@ -102,7 +102,9 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
     setEditingPlayer(null);
   };
 
-  const colWidth = players.length <= 4 ? `${100 / players.length}vw` : "25vw";
+  // Fit up to 4 columns on screen accounting for outer px-2 (16px) and gap-2 (8px) between columns
+  const visibleCols = Math.min(players.length, 4);
+  const colWidth = `calc((100vw - 16px - ${(visibleCols - 1) * 8}px) / ${visibleCols})`;
 
   return (
     <div className="w-screen bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>

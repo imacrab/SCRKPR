@@ -52,7 +52,7 @@ export default function BestOfModal({ isOpen, onConfirm, onClose }) {
                   disabled={bestOf === ODD_OPTIONS[0]}
                   className="w-12 h-12 rounded-full border border-border flex items-center justify-center text-foreground disabled:opacity-30 transition-opacity"
                 >
-                  <Minus size={20} />
+                  <Minus size={20} strokeWidth={2} />
                 </button>
 
                 <div className="text-center min-w-[80px]">
@@ -67,7 +67,7 @@ export default function BestOfModal({ isOpen, onConfirm, onClose }) {
                   disabled={bestOf === ODD_OPTIONS[ODD_OPTIONS.length - 1]}
                   className="w-12 h-12 rounded-full border border-border flex items-center justify-center text-foreground disabled:opacity-30 transition-opacity"
                 >
-                  <Plus size={20} />
+                  <Plus size={20} strokeWidth={2} />
                 </button>
               </div>
 

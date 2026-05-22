@@ -95,10 +95,10 @@ export default function History({ onBack, onModalChange }) {
       {/* Header */}
       <div className="pt-10 pb-2 px-5 flex items-center gap-2 flex-shrink-0" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft size={18} />
+          <ArrowLeft size={18} strokeWidth={2} />
         </button>
         <h1 className="font-sans font-medium text-lg text-foreground flex-1">Past Rounds</h1>
-        {refreshing && <RefreshCw size={16} className="text-muted-foreground animate-spin" />}
+        {refreshing && <RefreshCw size={16} strokeWidth={2} className="text-muted-foreground animate-spin" />}
         {games.length > 0 && (
           <button
             onClick={() => setShowConfirm(true)}
@@ -112,7 +112,7 @@ export default function History({ onBack, onModalChange }) {
       {/* Pull indicator */}
       {pullDistance > 0 && (
         <div className="flex justify-center py-2 text-muted-foreground" style={{ height: pullDistance }}>
-          <RefreshCw size={16} className={pullDistance >= PULL_THRESHOLD ? "text-foreground" : ""} style={{ transform: `rotate(${pullDistance * 4}deg)` }} />
+          <RefreshCw size={16} strokeWidth={2} className={pullDistance >= PULL_THRESHOLD ? "text-foreground" : ""} style={{ transform: `rotate(${pullDistance * 4}deg)` }} />
         </div>
       )}
 
@@ -136,7 +136,7 @@ export default function History({ onBack, onModalChange }) {
           </div>
         ) : games.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Trophy size={36} className="text-muted-foreground mb-3" />
+            <Trophy size={36} strokeWidth={2} className="text-muted-foreground mb-3" />
             <p className="text-muted-foreground text-sm">No rounds saved yet.</p>
             <p className="text-muted-foreground/60 text-xs mt-1">Finish a game to see it here.</p>
           </div>
@@ -163,8 +163,8 @@ export default function History({ onBack, onModalChange }) {
                       </p>
                       <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
                         {isTie
-                          ? <Handshake size={20} className="text-muted-foreground" />
-                          : <Trophy size={20} className="text-yellow-500" />
+                          ? <Handshake size={20} strokeWidth={2} className="text-muted-foreground" />
+                          : <Trophy size={20} strokeWidth={2} className="text-yellow-500" />
                         }
                         {isTie ? "Tie" : winner.name}
                       </p>
@@ -173,7 +173,7 @@ export default function History({ onBack, onModalChange }) {
                       onClick={() => deleteGame(game.id)}
                       className="text-muted-foreground hover:text-accent-red transition-colors p-1"
                     >
-                      <Trash2 size={20} />
+                      <Trash2 size={20} strokeWidth={2} />
                     </button>
                   </div>
 
@@ -223,7 +223,7 @@ export default function History({ onBack, onModalChange }) {
               <div className="px-5 pt-5 pb-16">
                 <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
                 <div className="flex flex-col items-center text-center mb-6">
-                  <AlertTriangle size={32} className="mb-3" style={{ color: "#FF3A3A" }} />
+                  <AlertTriangle size={32} strokeWidth={2} className="mb-3" style={{ color: "#FF3A3A" }} />
                   <h2 className="font-display text-xl font-bold text-foreground mb-1">Clear All Games?</h2>
                   <p className="text-sm text-muted-foreground">This will permanently delete all {games.length} game record{games.length !== 1 ? 's' : ''}.<br />This cannot be undone.</p>
                 </div>

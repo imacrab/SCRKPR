@@ -45,6 +45,7 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
+          <div className="animated-gradient-bg" aria-hidden="true" />
           <motion.div
             initial={{ opacity: 0, filter: "blur(12px)", scale: 0.97 }}
             animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}

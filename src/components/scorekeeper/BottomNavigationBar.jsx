@@ -34,7 +34,7 @@ export default function BottomNavigationBar({ hidden = false }) {
           >
             <Icon
               size={30}
-              strokeWidth={active ? 2.2 : 1.6}
+              strokeWidth={2}
               style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
             />
           </button>

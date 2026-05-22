@@ -186,7 +186,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             }}
             aria-label={`Add score for ${player.name}`}
           >
-            <Plus size={24} />
+            <Plus size={24} strokeWidth={2} />
           </motion.button>
         </div>
       </div>

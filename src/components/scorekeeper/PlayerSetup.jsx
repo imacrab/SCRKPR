@@ -311,7 +311,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                     >
                       <div className="flex items-center gap-3 px-3 py-2.5">
                         <div {...provided.dragHandleProps} className="flex items-center justify-center w-5 h-5 flex-shrink-0 text-muted-foreground cursor-grab active:cursor-grabbing">
-                          <GripVertical size={18} />
+                          <GripVertical size={18} strokeWidth={2} />
                         </div>
                         <button
                           onPointerDown={(e) => { e.preventDefault(); setExpandedColor(expandedColor === i ? null : i); }}
@@ -329,7 +329,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                         />
                         {players.length > 2 && (
                           <button onClick={() => removePlayer(i)} className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-accent-red transition-colors">
-                            <Trash2 size={20} />
+                            <Trash2 size={20} strokeWidth={2} />
                           </button>
                         )}
                       </div>
@@ -357,7 +357,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   onClick={addPlayer}
                   className="w-full mt-1 h-11 rounded-lg flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50"
                 >
-                  <Plus size={24} />
+                  <Plus size={24} strokeWidth={2} />
                   Add Player
                 </button>
               )}
@@ -389,7 +389,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
               >
                 <opt.Icon
                   size={20}
-                  strokeWidth={1.5}
+                  strokeWidth={2}
                   style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
                 />
                 <span className="text-xs font-medium" style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}>
@@ -411,7 +411,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 variant="outline"
                 className="flex-1 h-10 text-sm text-muted-foreground"
               >
-                <Save size={24} className="mr-1.5" />
+                <Save size={24} strokeWidth={2} className="mr-1.5" />
                 Update Group
               </Button>
             )}
@@ -420,7 +420,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
               variant="outline"
               className="flex-1 h-10 text-sm text-muted-foreground"
             >
-              <Save size={24} className="mr-1.5" />
+              <Save size={24} strokeWidth={2} className="mr-1.5" />
               Save as Group
             </Button>
           </div>
@@ -431,7 +431,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
           className="w-full text-base font-semibold bg-white hover:bg-white/90"
           style={{ height: "52px", color: "#111", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
         >
-          <Play size={24} className="mr-2" />
+          <Play size={24} strokeWidth={2} className="mr-2" />
           Start Game
         </Button>
       </div>

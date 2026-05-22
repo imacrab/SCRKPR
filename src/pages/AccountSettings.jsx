@@ -69,7 +69,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
       {/* Header */}
       <div className="pt-10 pb-4 px-5 flex items-center gap-3 flex-shrink-0" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors p-1">
-          <ArrowLeft size={20} />
+          <ArrowLeft size={20} strokeWidth={2} />
         </button>
         <h1 className="font-sans font-medium text-lg text-foreground">Account Settings</h1>
       </div>
@@ -79,7 +79,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
          <div className="rounded-xl border border-border bg-card overflow-hidden">
             <div className="px-4 py-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <Sun size={20} className="text-muted-foreground" />
+                <Sun size={20} strokeWidth={2} className="text-muted-foreground" />
                 <div>
                   <p className="text-sm font-medium text-foreground">Theme</p>
                   <p className="text-xs text-muted-foreground mt-0.5">Choose your preferred appearance.</p>
@@ -104,7 +104,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
                       color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))",
                     }}
                   >
-                    <opt.Icon size={16} />
+                    <opt.Icon size={16} strokeWidth={2} />
                     {opt.label}
                   </button>
                 );
@@ -116,7 +116,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
          <div className="rounded-xl border border-border bg-card overflow-hidden">
            <div className="px-4 py-4 flex items-center justify-between gap-4">
              <div className="flex items-center gap-3">
-               <LogOut size={20} className="text-muted-foreground" />
+               <LogOut size={20} strokeWidth={2} className="text-muted-foreground" />
                <div>
                  <p className="text-sm font-medium text-foreground">Sign Out</p>
                  <p className="text-xs text-muted-foreground mt-0.5">End your session and return to login.</p>
@@ -169,7 +169,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
               <div className="px-5 pt-5 pb-8">
                 <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
                 <div className="flex flex-col items-center text-center mb-6">
-                  <AlertTriangle size={32} className="mb-3" style={{ color: "#FF3A3A" }} />
+                  <AlertTriangle size={32} strokeWidth={2} className="mb-3" style={{ color: "#FF3A3A" }} />
                   <h2 className="font-display text-xl font-bold text-foreground mb-1">Delete Account?</h2>
                   <p className="text-sm text-muted-foreground">This will permanently delete all your games, groups, and account data. This cannot be undone.</p>
                 </div>

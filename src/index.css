@@ -109,6 +109,30 @@
     font-family: 'Syne', sans-serif;
   }
 
+  /* Subtle animated gradient background (lovable.dev style) */
+  .animated-gradient-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(at 20% 20%, hsl(199 94% 57% / 0.18) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsl(280 80% 60% / 0.15) 0px, transparent 50%),
+      radial-gradient(at 0% 80%, hsl(330 80% 60% / 0.15) 0px, transparent 50%),
+      radial-gradient(at 80% 80%, hsl(220 80% 60% / 0.18) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, hsl(160 70% 55% / 0.12) 0px, transparent 50%);
+    background-size: 200% 200%;
+    animation: gradient-shift 22s ease-in-out infinite;
+    filter: blur(40px);
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 50% 50%; }
+    25%      { background-position: 30% 20%, 70% 30%, 20% 70%, 80% 70%, 60% 40%; }
+    50%      { background-position: 60% 50%, 40% 60%, 50% 40%, 50% 60%, 40% 60%; }
+    75%      { background-position: 20% 70%, 80% 70%, 30% 30%, 70% 30%, 60% 50%; }
+  }
+
   .accent-blue {
     color: #2DC5F8;
   }

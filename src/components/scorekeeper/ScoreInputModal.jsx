@@ -95,7 +95,7 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
                   variant="outline"
                   className="flex-1 h-11"
                 >
-                  <X size={24} className="mr-1.5" />
+                  <X size={24} strokeWidth={2} className="mr-1.5" />
                   Cancel
                 </Button>
                 <Button
@@ -103,7 +103,7 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
                   disabled={!isValid}
                   className="flex-[2] h-11 bg-white hover:bg-white/90 font-semibold" style={{ color: "#111" }}
                 >
-                  <Check size={24} className="mr-1.5" />
+                  <Check size={24} strokeWidth={2} className="mr-1.5" />
                   {isEditing ? "Update" : "Add Score"}
                 </Button>
               </div>

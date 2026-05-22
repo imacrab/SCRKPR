@@ -47,7 +47,7 @@ export default function EditPlayerModal({ player, isOpen, onSave, onClose }) {
 
               <div className="text-center mb-5">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-0.5">Edit Player</p>
-                <h2 className="font-sans font-medium text-xl text-foreground">Name & Color</h2>
+                <h2 className="font-sans font-medium text-xl text-foreground">Name &amp; Color</h2>
               </div>
 
               {/* Name input with color dot */}
@@ -85,7 +85,7 @@ export default function EditPlayerModal({ player, isOpen, onSave, onClose }) {
 
               <div className="flex gap-3">
                 <Button onClick={onClose} variant="outline" className="flex-1 h-11">
-                  <X size={24} className="mr-1.5" /> Cancel
+                  <X size={24} strokeWidth={2} className="mr-1.5" /> Cancel
                 </Button>
                 <Button
                   onClick={handleSave}
@@ -93,7 +93,7 @@ export default function EditPlayerModal({ player, isOpen, onSave, onClose }) {
                   className="flex-[2] h-11 bg-white hover:bg-white/90 font-semibold"
                   style={{ color: "#111" }}
                 >
-                  <Check size={24} className="mr-1.5" /> Save
+                  <Check size={24} strokeWidth={2} className="mr-1.5" /> Save
                 </Button>
               </div>
             </div>

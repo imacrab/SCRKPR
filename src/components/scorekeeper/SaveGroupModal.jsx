@@ -62,7 +62,7 @@ export default function SaveGroupModal({ isOpen, onSave, onClose }) {
                     backgroundColor: pinned ? "hsl(var(--card))" : "transparent",
                   }}
                 >
-                  {pinned ? <Pin size={20} /> : <PinOff size={20} />}
+                  {pinned ? <Pin size={20} strokeWidth={2} /> : <PinOff size={20} strokeWidth={2} />}
                 </button>
               </div>
               <div className="flex gap-3">

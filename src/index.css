@@ -148,12 +148,12 @@
       transparent 95%,
       transparent 100%
     );
-    background-size: 200% 100%;
+    background-size: 100% 100%;
     animation: shimmer-rainbow 3s linear infinite;
   }
 
   @keyframes shimmer-rainbow {
-    0%   { background-position: 200% 0; }
+    0%   { background-position: 100% 0; }
     100% { background-position: -100% 0; }
   }
 

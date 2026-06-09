@@ -98,21 +98,19 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               e.currentTarget.addEventListener("pointerleave", cancel, { once: true });
               e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
             }}
-            className="flex-1 flex items-center gap-2 min-w-0 text-left"
+            className="flex-1 flex flex-col items-start gap-1 min-w-0 text-left"
             style={{ marginLeft: 16 }}
           >
-            <span className="text-s font-bold text-foreground truncate leading-tight" title={player.name}>
-              {player.name}
-            </span>
-            {streak >= 2 && (
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 leading-none flex-shrink-0">
-                🔥{streak}
+            <div className="flex items-center gap-2 w-full min-w-0">
+              <span className="text-s font-bold text-foreground truncate leading-tight" title={player.name}>
+                {player.name}
               </span>
-            )}
-          </button>
-
-          {/* Last round + total (right) */}
-          <div className="flex items-baseline gap-2 flex-shrink-0" style={{ marginRight: 16 }}>
+              {streak >= 2 && (
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 leading-none flex-shrink-0">
+                  🔥{streak}
+                </span>
+              )}
+            </div>
             {!isBestOf && lastScore !== null && (
               <motion.span
                 key={lastIdx}
@@ -125,6 +123,10 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
                 ({lastScore > 0 ? `+${lastScore}` : lastScore})
               </motion.span>
             )}
+          </button>
+
+          {/* Total (right) */}
+          <div className="flex-shrink-0" style={{ marginRight: 16 }}>
             <AnimatedTotal value={total} color={player.color} />
           </div>
 

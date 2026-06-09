@@ -55,10 +55,40 @@ function AnimatedTotal({ value, color }) {
 }
 
 export default function PlayerColumn({ player, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, onAddScore, onQuickScore, onEditScore, onEditPlayer }) {
-  const total = player.scores.reduce((s, n) => s + n, 0);
+  const baseTotal = player.scores.reduce((s, n) => s + n, 0);
   const isBestOf = winsNeeded !== null;
   const lastIdx = player.scores.length - 1;
   const lastScore = lastIdx >= 0 ? player.scores[lastIdx] : null;
+
+  // Batch rapid +/- taps within 1.5s into a single score entry
+  const [pendingDelta, setPendingDelta] = useState(0);
+  const commitTimerRef = useRef(null);
+  const pendingRef = useRef(0);
+
+  useEffect(() => () => {
+    if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
+  }, []);
+
+  const handleQuickTap = (delta) => {
+    if (isBestOf) {
+      onQuickScore?.(delta);
+      return;
+    }
+    pendingRef.current += delta;
+    setPendingDelta(pendingRef.current);
+
+    if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
+    commitTimerRef.current = setTimeout(() => {
+      const finalDelta = pendingRef.current;
+      pendingRef.current = 0;
+      setPendingDelta(0);
+      commitTimerRef.current = null;
+      if (finalDelta !== 0) onQuickScore?.(finalDelta);
+    }, 1500);
+  };
+
+  const total = baseTotal + pendingDelta;
+  const showPending = pendingDelta !== 0;
 
   return (
     <div className="flex flex-col rounded-xl border border-border overflow-hidden">
@@ -76,7 +106,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           {/* Minus (±1) — hidden in bestof mode */}
           {!isBestOf && (
             <motion.button
-              onClick={() => onQuickScore?.(-1)}
+              onClick={() => handleQuickTap(-1)}
               whileTap={{ scale: 0.85 }}
               transition={{ type: "spring", stiffness: 600, damping: 14 }}
               className="flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60 border border-border"
@@ -111,7 +141,19 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
                 </span>
               )}
             </div>
-            {!isBestOf && lastScore !== null && (
+            {!isBestOf && showPending && (
+              <motion.span
+                key="pending"
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 400, damping: 24 }}
+                className="text-sm font-semibold leading-none"
+                style={{ color: player.color }}
+              >
+                ({pendingDelta > 0 ? `+${pendingDelta}` : pendingDelta})
+              </motion.span>
+            )}
+            {!isBestOf && !showPending && lastScore !== null && (
               <motion.span
                 key={lastIdx}
                 initial={{ opacity: 0, y: -4 }}
@@ -133,7 +175,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           {/* Plus (±1) — hidden in bestof mode */}
           {!isBestOf && (
             <motion.button
-              onClick={() => onQuickScore?.(1)}
+              onClick={() => handleQuickTap(1)}
               whileTap={{ scale: 0.85 }}
               transition={{ type: "spring", stiffness: 600, damping: 14 }}
               className="flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60 border border-border"

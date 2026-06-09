@@ -344,7 +344,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       {/* Win mode — compact button opens modal */}
       <div className="px-5 pt-2 pb-2">
         <button
-          onClick={() => setShowGameMode(true)}
+          onClick={() => { setShowGameMode(true); onModalChange?.(true); }}
           className="w-full flex items-center justify-between gap-3 px-4 h-11 rounded-xl border border-border bg-card hover:bg-accent transition-colors"
         >
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Game mode</span>
@@ -421,7 +421,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         isOpen={showGameMode}
         winMode={winMode}
         onSelect={setWinMode}
-        onClose={() => setShowGameMode(false)}
+        onClose={() => { setShowGameMode(false); onModalChange?.(false); }}
       />
     </div>
   );

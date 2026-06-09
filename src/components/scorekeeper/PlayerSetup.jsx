@@ -216,11 +216,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
   // Detect unsaved changes vs the active group (or vs "no group at all" for save-as)
   const validPlayers = players.filter((p) => p.name.trim());
-  const playersMatch = (a, b) =>
-    a.length === b.length &&
-    a.every((p, i) => p.name.trim() === b[i].name && p.color === b[i].color);
+  const normalize = (list) =>
+    list.map((p) => `${(p.name || "").trim()}::${p.color}`).join("|");
   const hasUnsavedChanges = activeGroup
-    ? !playersMatch(validPlayers, activeGroup.players)
+    ? normalize(validPlayers) !== normalize(activeGroup.players)
     : hasValidPlayers;
 
   const handleStart = () => {

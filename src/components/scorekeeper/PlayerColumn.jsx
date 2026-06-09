@@ -81,7 +81,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
   }, [player.scores]);
 
   return (
-    <div className="h-full flex flex-col border-r border-border last:border-r-0">
+    <div className="flex flex-col rounded-xl border border-border overflow-hidden">
       {/* Header — frosted glass */}
       <div
         className="px-2 py-3 rounded-sm flex flex-col items-center z-10 transition-all"
@@ -92,7 +92,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))",
         }}
       >
-        <div className="flex flex-col items-center w-full gap-2">
+        <div className="flex items-center justify-between w-full gap-3">
           {/* Minus (±1) — hidden in bestof mode */}
           {!isBestOf && (
             <motion.button
@@ -118,7 +118,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               e.currentTarget.addEventListener("pointerleave", cancel, { once: true });
               e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
             }}
-            className="w-full flex flex-col items-center gap-1 min-w-0">
+            className="flex-1 flex flex-col items-center gap-1 min-w-0">
             <span className="text-s font-bold text-foreground truncate text-center leading-tight w-full" title={player.name}>
               {player.name}
             </span>
@@ -147,7 +147,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
       </div>
 
       {/* Score history */}
-      <div className="flex-1 relative overflow-hidden bg-background">
+      <div className="relative overflow-hidden bg-background" style={{ maxHeight: 120 }}>
         {isBestOf ? (
           // Best Of mode: show win dots
           <div className="h-full flex flex-col items-center justify-center gap-2 px-2 py-3">

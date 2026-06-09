@@ -102,9 +102,7 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
     setEditingPlayer(null);
   };
 
-  // Fit up to 4 columns on screen accounting for outer px-2 (16px) and gap-2 (8px) between columns
-  const visibleCols = Math.min(players.length, 4);
-  const colWidth = `calc((100vw - 16px - ${(visibleCols - 1) * 8}px) / ${visibleCols})`;
+
 
   return (
     <div className="w-screen bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
@@ -162,20 +160,15 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
         </div>
       </div>
 
-      {/* Columns */}
+      {/* Rows — one player per row, stacked vertically */}
       <div className="flex-1 px-2 pb-2 overflow-hidden w-full relative">
         <div
           ref={scrollContainerRef}
-          className="flex h-full gap-2 w-full overflow-x-auto"
-          style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
-          onScroll={(e) => setScrollPos(e.currentTarget.scrollLeft)}
+          className="flex flex-col h-full gap-2 w-full overflow-y-auto"
+          style={{ WebkitOverflowScrolling: "touch" }}
         >
           {players.map((player, idx) => (
-            <div
-              key={player.id}
-              style={{ minWidth: colWidth, width: colWidth, scrollSnapAlign: "start", flexShrink: 0 }}
-              className="h-full"
-            >
+            <div key={player.id} className="w-full flex-shrink-0">
               <PlayerColumn
                 player={player}
                 isHighlighted={player.id === lastAddedPlayerId}
@@ -191,17 +184,6 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
             </div>
           ))}
         </div>
-        
-        {/* Right gradient fade for horizontal scroll */}
-        {players.length > 4 && (
-          <div
-            className="absolute right-0 top-0 bottom-0 w-8 pointer-events-none transition-opacity"
-            style={{
-              background: "linear-gradient(to right, transparent, hsl(var(--background)))",
-              opacity: scrollContainerRef.current && scrollContainerRef.current.scrollLeft < scrollContainerRef.current.scrollWidth - scrollContainerRef.current.clientWidth - 10 ? 1 : 0,
-            }}
-          />
-        )}
       </div>
 
       <ScoreInputModal

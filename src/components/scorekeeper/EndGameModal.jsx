@@ -16,10 +16,10 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
 
     const fire = (originX) => {
       confetti({
-        particleCount: 90,
-        spread: 75,
-        startVelocity: 55,
-        origin: { x: originX, y: 0.7 },
+        particleCount: 120,
+        spread: 80,
+        startVelocity: 75,
+        origin: { x: originX, y: 1.05 },
         colors: winnerColors,
         zIndex: 9999,
       });

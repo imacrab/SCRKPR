@@ -19,7 +19,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
         particleCount: 120,
         spread: 80,
         startVelocity: 75,
-        origin: { x: originX, y: 1.05 },
+        origin: { x: originX, y: 1.05 + 40 / window.innerHeight },
         colors: winnerColors,
         zIndex: 9999,
       });

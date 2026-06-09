@@ -397,7 +397,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         <Button
           onClick={handleStart}
           disabled={!canStart}
-          className="w-full text-base font-semibold bg-white hover:bg-white/90"
+          className="w-full text-base font-semibold shimmer-rainbow hover:opacity-95"
           style={{ height: "52px", color: "#111", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
         >
           <Play size={24} strokeWidth={2} className="mr-2" />

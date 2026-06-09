@@ -133,6 +133,28 @@
     75%      { background-position: 20% 70%, 80% 70%, 30% 30%, 70% 30%, 60% 50%; }
   }
 
+  .shimmer-rainbow {
+    background-image: linear-gradient(
+      110deg,
+      #ffffff 0%,
+      #ffffff 25%,
+      #ffe2ec 33%,
+      #fff2c8 41%,
+      #d9f5d0 49%,
+      #cdeaff 57%,
+      #e6d8ff 65%,
+      #ffffff 75%,
+      #ffffff 100%
+    );
+    background-size: 250% 100%;
+    animation: shimmer-rainbow 3.5s linear infinite;
+  }
+
+  @keyframes shimmer-rainbow {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -100% 0; }
+  }
+
   .accent-blue {
     color: #2DC5F8;
   }

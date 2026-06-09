@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { MoreHorizontal, ArrowDownWideNarrow, ArrowUpWideNarrow } from "lucide-react";
+import { MoreHorizontal, Shuffle } from "lucide-react";
 import { motion, LayoutGroup } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import PlayerColumn from "./PlayerColumn";
@@ -127,11 +127,7 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
             className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             aria-label={sortDesc ? "Sort lowest to highest" : "Sort highest to lowest"}
           >
-            {sortDesc ? (
-              <ArrowDownWideNarrow size={22} strokeWidth={2} />
-            ) : (
-              <ArrowUpWideNarrow size={22} strokeWidth={2} />
-            )}
+            <Shuffle size={22} strokeWidth={2} />
           </button>
           <button
             onClick={() => setMenuOpen(true)}

@@ -142,7 +142,7 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
       <div className="flex-1 px-2 pb-2 overflow-hidden w-full relative">
         <div
           ref={scrollContainerRef}
-          className="flex flex-col h-full gap-2 w-full overflow-y-auto"
+          className="flex flex-col h-full gap-2 w-full overflow-y-auto justify-center"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           <LayoutGroup>

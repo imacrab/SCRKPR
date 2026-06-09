@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, ArrowDownWideNarrow, ArrowUpWideNarrow } from "lucide-react";
 import { motion, LayoutGroup } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import PlayerColumn from "./PlayerColumn";
@@ -15,6 +15,7 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
   const [scrollPos, setScrollPos] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [sortDesc, setSortDesc] = useState(true);
   const scrollContainerRef = useRef(null);
 
   useEffect(() => {
@@ -54,15 +55,14 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
 
   const winsNeeded = bestOf ? Math.ceil(bestOf / 2) : null;
 
-  // Sort players by total score (descending for high/bestof, ascending for low)
+  // Sort players by total score — direction toggled by user
   const sortedPlayers = useMemo(() => {
-    const isLow = winMode === "low";
     return [...players].sort((a, b) => {
       const totalA = a.scores.reduce((s, n) => s + n, 0);
       const totalB = b.scores.reduce((s, n) => s + n, 0);
-      return isLow ? totalA - totalB : totalB - totalA;
+      return sortDesc ? totalB - totalA : totalA - totalB;
     });
-  }, [players, winMode]);
+  }, [players, sortDesc]);
 
   // Auto-end when someone reaches winsNeeded in bestof mode
   useEffect(() => {
@@ -122,6 +122,17 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
           <img src={isDarkMode ? "https://media.base44.com/images/public/69ea763700078809357a164a/87badac38_SCRKPR_dark_mode.png" : "https://media.base44.com/images/public/69ea763700078809357a164a/6de7dc994_SCRKPR_light_mode.png"} alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
         </button>
         <div className="flex items-center gap-1">
+          <button
+            onClick={() => setSortDesc((v) => !v)}
+            className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            aria-label={sortDesc ? "Sort lowest to highest" : "Sort highest to lowest"}
+          >
+            {sortDesc ? (
+              <ArrowDownWideNarrow size={22} strokeWidth={2} />
+            ) : (
+              <ArrowUpWideNarrow size={22} strokeWidth={2} />
+            )}
+          </button>
           <button
             onClick={() => setMenuOpen(true)}
             className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"

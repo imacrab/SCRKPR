@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { RotateCcw, UserPlus, FlagOff, MoreHorizontal } from "lucide-react";
+import { motion, LayoutGroup } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
@@ -53,6 +54,16 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
   const [showEndGame, setShowEndGame] = useState(false);
 
   const winsNeeded = bestOf ? Math.ceil(bestOf / 2) : null;
+
+  // Sort players by total score (descending for high/bestof, ascending for low)
+  const sortedPlayers = useMemo(() => {
+    const isLow = winMode === "low";
+    return [...players].sort((a, b) => {
+      const totalA = a.scores.reduce((s, n) => s + n, 0);
+      const totalB = b.scores.reduce((s, n) => s + n, 0);
+      return isLow ? totalA - totalB : totalB - totalA;
+    });
+  }, [players, winMode]);
 
   // Auto-end when someone reaches winsNeeded in bestof mode
   useEffect(() => {
@@ -160,29 +171,36 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
         </div>
       </div>
 
-      {/* Rows — one player per row, stacked vertically */}
+      {/* Rows — one player per row, sorted by total */}
       <div className="flex-1 px-2 pb-2 overflow-hidden w-full relative">
         <div
           ref={scrollContainerRef}
           className="flex flex-col h-full gap-2 w-full overflow-y-auto"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
-          {players.map((player, idx) => (
-            <div key={player.id} className="w-full flex-shrink-0">
-              <PlayerColumn
-                player={player}
-                isHighlighted={player.id === lastAddedPlayerId}
-                streak={streakMap[player.name] || 0}
-                winsNeeded={winsNeeded}
-                isFirst={idx === 0}
-                isLast={idx === players.length - 1}
-                onAddScore={() => handleOpenScore(player)}
-                onQuickScore={(delta) => onAddScore(player.id, delta)}
-                onEditScore={(idx) => handleEditScore(player, idx)}
-                onEditPlayer={() => setEditingPlayer(player)}
-              />
-            </div>
-          ))}
+          <LayoutGroup>
+            {sortedPlayers.map((player, idx) => (
+              <motion.div
+                key={player.id}
+                layout
+                transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                className="w-full flex-shrink-0"
+              >
+                <PlayerColumn
+                  player={player}
+                  isHighlighted={player.id === lastAddedPlayerId}
+                  streak={streakMap[player.name] || 0}
+                  winsNeeded={winsNeeded}
+                  isFirst={idx === 0}
+                  isLast={idx === sortedPlayers.length - 1}
+                  onAddScore={() => handleOpenScore(player)}
+                  onQuickScore={(delta) => onAddScore(player.id, delta)}
+                  onEditScore={(i) => handleEditScore(player, i)}
+                  onEditPlayer={() => setEditingPlayer(player)}
+                />
+              </motion.div>
+            ))}
+          </LayoutGroup>
         </div>
       </div>
 

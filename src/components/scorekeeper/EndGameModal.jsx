@@ -1,7 +1,37 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
+import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
 
 export default function EndGameModal({ isOpen, players, winMode, gameStartTime, onConfirm, onCancel }) {
+  useEffect(() => {
+    if (!isOpen || players.length === 0) return;
+
+    const isLow = winMode === "low";
+    const sortedForColors = [...players]
+      .map((p) => ({ ...p, total: p.scores.reduce((s, n) => s + n, 0) }))
+      .sort((a, b) => isLow ? a.total - b.total : b.total - a.total);
+    const topTotal = sortedForColors[0].total;
+    const winnerColors = sortedForColors.filter((p) => p.total === topTotal).map((p) => p.color);
+
+    const fire = (originX) => {
+      confetti({
+        particleCount: 90,
+        spread: 75,
+        startVelocity: 55,
+        origin: { x: originX, y: 0.7 },
+        colors: winnerColors,
+        zIndex: 9999,
+      });
+    };
+
+    const t1 = setTimeout(() => fire(0.2), 250);
+    const t2 = setTimeout(() => fire(0.8), 400);
+    const t3 = setTimeout(() => fire(0.5), 600);
+
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [isOpen, players, winMode]);
+
   if (!isOpen || players.length === 0) return null;
 
   const isLowWin = winMode === "low";

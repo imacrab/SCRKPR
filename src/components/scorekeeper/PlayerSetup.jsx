@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Play, Save, TrendingUp, TrendingDown, GripVertical, Trophy } from "lucide-react";
+import { Plus, Trash2, Play, Save, TrendingUp, TrendingDown, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import SaveGroupModal from "./SaveGroupModal";
 import EditGroupModal from "./EditGroupModal";
 import BestOfModal from "./BestOfModal";
@@ -225,17 +224,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     onStart(valid, "bestof", bestOf);
   };
 
-  const handleDragEnd = (result) => {
-    const { source, destination } = result;
-    if (!destination || (source.index === destination.index && source.droppableId === destination.droppableId)) {
-      return;
-    }
-    const newPlayers = Array.from(players);
-    const [moved] = newPlayers.splice(source.index, 1);
-    newPlayers.splice(destination.index, 0, moved);
-    setPlayers(newPlayers);
-  };
-
   const pullProgress = Math.min(pullY / PULL_THRESHOLD, 1);
 
   return (
@@ -283,88 +271,66 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         {canScrollPlayers && <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />}
         {/* Bottom fade */}
         {canScrollPlayers && <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />}
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="players">
-          {(provided, snapshot) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              className="h-full overflow-y-auto px-5 pt-2 pb-4 space-y-2"
-              style={{ ...provided.droppableProps.style }}
-            >
-              {players.map((player, i) => (
-                <Draggable key={`player-${i}`} draggableId={`player-${i}`} index={i}>
-                  {(provided, snapshot) => (
-                    <motion.div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0, x: -16, height: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="rounded-lg border border-border bg-card overflow-hidden"
-                      style={{
-                        opacity: snapshot.isDragging ? 0.5 : 1,
-                        boxShadow: snapshot.isDragging ? "0 10px 15px -3px rgba(0, 0, 0, 0.1)" : "none",
-                        ...provided.draggableProps.style,
-                      }}
-                    >
-                      <div className="flex items-center gap-3 px-3 py-2.5">
-                        <div {...provided.dragHandleProps} className="flex items-center justify-center w-5 h-5 flex-shrink-0 text-muted-foreground cursor-grab active:cursor-grabbing">
-                          <GripVertical size={18} strokeWidth={2} />
-                        </div>
-                        <button
-                          onPointerDown={(e) => { e.preventDefault(); setExpandedColor(expandedColor === i ? null : i); }}
-                          className="w-7 h-7 rounded-full flex-shrink-0 transition-transform active:scale-90 border-2 border-white/20"
-                          style={{ backgroundColor: player.color }}
-                        />
-                        <Input
-                          ref={(el) => (inputRefs.current[i] = el)}
-                          value={player.name}
-                          onChange={(e) => updateName(i, e.target.value)}
-                          onKeyDown={(e) => handleKeyDown(e, i)}
-                          placeholder={`Player ${i + 1}`}
-                          maxLength={20}
-                          className="flex-1 bg-transparent border-none shadow-none h-9 px-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
-                        />
-                        {players.length > 2 && (
-                          <button onClick={() => removePlayer(i)} className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-accent-red transition-colors">
-                            <Trash2 size={20} strokeWidth={2} />
-                          </button>
-                        )}
-                      </div>
-                      <AnimatePresence>
-                        {expandedColor === i && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="overflow-hidden border-t border-border px-3 pb-3"
-                          >
-                            <ColorPicker selected={player.color} onChange={(c) => updateColor(i, c)} />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </motion.div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-
-              {players.length < 20 && (
-                <button
-                  onClick={addPlayer}
-                  className="w-full mt-1 h-11 rounded-lg flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50"
-                >
-                  <Plus size={24} strokeWidth={2} />
-                  Add Player
+      <div
+        ref={scrollRef}
+        className="h-full overflow-y-auto px-5 pt-2 pb-4 space-y-2"
+      >
+        {players.map((player, i) => (
+          <motion.div
+            key={`player-${i}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, x: -16, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="rounded-lg border border-border bg-card overflow-hidden"
+          >
+            <div className="flex items-center gap-3 px-3 py-2.5">
+              <button
+                onPointerDown={(e) => { e.preventDefault(); setExpandedColor(expandedColor === i ? null : i); }}
+                className="w-7 h-7 rounded-full flex-shrink-0 transition-transform active:scale-90 border-2 border-white/20"
+                style={{ backgroundColor: player.color }}
+              />
+              <Input
+                ref={(el) => (inputRefs.current[i] = el)}
+                value={player.name}
+                onChange={(e) => updateName(i, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(e, i)}
+                placeholder={`Player ${i + 1}`}
+                maxLength={20}
+                className="flex-1 bg-transparent border-none shadow-none h-9 px-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
+              />
+              {players.length > 2 && (
+                <button onClick={() => removePlayer(i)} className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-accent-red transition-colors">
+                  <Trash2 size={20} strokeWidth={2} />
                 </button>
               )}
             </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+            <AnimatePresence>
+              {expandedColor === i && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden border-t border-border px-3 pb-3"
+                >
+                  <ColorPicker selected={player.color} onChange={(c) => updateColor(i, c)} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        ))}
+
+        {players.length < 20 && (
+          <button
+            onClick={addPlayer}
+            className="w-full mt-1 h-11 rounded-lg flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50"
+          >
+            <Plus size={24} strokeWidth={2} />
+            Add Player
+          </button>
+        )}
+      </div>
       </div>
 
       {/* Win mode */}

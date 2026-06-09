@@ -102,15 +102,15 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))",
         }}
       >
-        <div className="flex items-center justify-between w-full gap-3">
+        <div className="flex items-stretch justify-between w-full gap-3 h-full">
           {/* Minus (±1) — hidden in bestof mode */}
           {!isBestOf && (
             <motion.button
               onClick={() => handleQuickTap(-1)}
               whileTap={{ scale: 0.85 }}
               transition={{ type: "spring", stiffness: 600, damping: 14 }}
-              className="flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60 border border-border"
-              style={{ width: 44, height: 44, borderRadius: 12 }}
+              className="flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60 border border-border h-full"
+              style={{ width: 44, borderRadius: 12 }}
               aria-label={`Subtract 1 from ${player.name}`}
             >
               <Minus size={20} strokeWidth={2.5} />
@@ -184,8 +184,8 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               onClick={() => handleQuickTap(1)}
               whileTap={{ scale: 0.85 }}
               transition={{ type: "spring", stiffness: 600, damping: 14 }}
-              className="flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60 border border-border"
-              style={{ width: 44, height: 44, borderRadius: 12 }}
+              className="flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60 border border-border h-full"
+              style={{ width: 44, borderRadius: 12 }}
               aria-label={`Add 1 to ${player.name}`}
             >
               <Plus size={20} strokeWidth={2.5} />

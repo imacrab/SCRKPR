@@ -7,12 +7,11 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
   useEffect(() => {
     if (!isOpen || players.length === 0) return;
 
-    const isLow = winMode === "low";
-    const sortedForColors = [...players]
-      .map((p) => ({ ...p, total: p.scores.reduce((s, n) => s + n, 0) }))
-      .sort((a, b) => isLow ? a.total - b.total : b.total - a.total);
-    const topTotal = sortedForColors[0].total;
-    const winnerColors = sortedForColors.filter((p) => p.total === topTotal).map((p) => p.color);
+    const rainbowColors = [
+      "#FF3A3A", "#F97316", "#F59E0B", "#EAB308", "#84CC16",
+      "#22C55E", "#10B981", "#14B8A6", "#06B6D4", "#0EA5E9",
+      "#2DC5F8", "#3B82F6", "#6366F1", "#8B5CF6", "#A855F7", "#EC4899",
+    ];
 
     const fire = (originX) => {
       confetti({
@@ -20,7 +19,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
         spread: 80,
         startVelocity: 75,
         origin: { x: originX, y: 1.05 + 40 / window.innerHeight },
-        colors: winnerColors,
+        colors: rainbowColors,
         zIndex: 9999,
       });
     };

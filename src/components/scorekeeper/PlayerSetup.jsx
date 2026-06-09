@@ -7,6 +7,13 @@ import { base44 } from "@/api/base44Client";
 import SaveGroupModal from "./SaveGroupModal";
 import EditGroupModal from "./EditGroupModal";
 import BestOfModal from "./BestOfModal";
+import GameModeModal from "./GameModeModal";
+
+const MODE_META = {
+  low:    { label: "Low Score",  Icon: TrendingDown },
+  high:   { label: "High Score", Icon: TrendingUp },
+  bestof: { label: "Best Of",    Icon: Trophy },
+};
 
 export const PLAYER_COLORS = [
   "#2DC5F8", "#3B82F6", "#6366F1", "#8B5CF6", "#A855F7",
@@ -83,6 +90,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [activeGroup, setActiveGroup] = useState(null); // the loaded group, if any
   const [winMode, setWinMode] = useState("low"); // "high" | "low" | "bestof"
   const [showBestOf, setShowBestOf] = useState(false);
+  const [showGameMode, setShowGameMode] = useState(false);
   const scrollRef = useRef(null);
   const inputRefs = useRef([]);
 
@@ -333,38 +341,25 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       </div>
       </div>
 
-      {/* Win mode */}
+      {/* Win mode — compact button opens modal */}
       <div className="px-5 pt-2 pb-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Game mode</p>
-        <div className="flex gap-2">
-          {[
-            { value: "low",    label: "Low Score",  Icon: TrendingDown },
-            { value: "high",   label: "High Score", Icon: TrendingUp },
-            { value: "bestof", label: "Best Of",    Icon: Trophy },
-          ].map((opt) => {
-            const active = winMode === opt.value;
-            return (
-              <button
-                key={opt.value}
-                onClick={() => setWinMode(opt.value)}
-                className="flex-1 flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl border transition-all"
-                style={{
-                  borderColor: active ? "hsl(199 94% 40% / 0.4)" : "hsl(var(--border))",
-                  backgroundColor: active ? "hsl(199 94% 40% / 0.12)" : "transparent",
-                }}
-              >
-                <opt.Icon
-                  size={20}
-                  strokeWidth={2}
-                  style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
-                />
-                <span className="text-xs font-medium" style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}>
-                  {opt.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        <button
+          onClick={() => setShowGameMode(true)}
+          className="w-full flex items-center justify-between gap-3 px-4 h-11 rounded-xl border border-border bg-card hover:bg-accent transition-colors"
+        >
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Game mode</span>
+          <span className="flex items-center gap-1.5">
+            {(() => {
+              const { Icon, label } = MODE_META[winMode];
+              return (
+                <>
+                  <Icon size={16} strokeWidth={2} className="text-foreground" />
+                  <span className="text-sm font-medium text-foreground">{label}</span>
+                </>
+              );
+            })()}
+          </span>
+        </button>
       </div>
 
       {/* Actions */}
@@ -420,6 +415,13 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         isOpen={showBestOf}
         onConfirm={handleBestOfConfirm}
         onClose={() => { setShowBestOf(false); onModalChange?.(false); }}
+      />
+
+      <GameModeModal
+        isOpen={showGameMode}
+        winMode={winMode}
+        onSelect={setWinMode}
+        onClose={() => setShowGameMode(false)}
       />
     </div>
   );

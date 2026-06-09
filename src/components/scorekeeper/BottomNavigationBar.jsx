@@ -1,9 +1,9 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Dices, History, Settings } from "lucide-react";
+import { Spade, History, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 
 const TABS = [
-  { label: "New Game", icon: Dices, path: "/" },
+  { label: "New Game", icon: Spade, path: "/" },
   { label: "History",  icon: History,  path: "/history" },
   { label: "Account",  icon: Settings,  path: "/account" },
 ];

@@ -92,17 +92,18 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))",
         }}
       >
-        <div className="flex items-center justify-between w-full gap-1">
+        <div className="flex flex-col items-center w-full gap-2">
           {/* Minus (±1) — hidden in bestof mode */}
           {!isBestOf && (
             <motion.button
               onClick={() => onQuickScore?.(-1)}
               whileTap={{ scale: 0.85 }}
               transition={{ type: "spring", stiffness: 600, damping: 14 }}
-              className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60"
+              className="flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60 border border-border"
+              style={{ width: 44, height: 44, borderRadius: 12 }}
               aria-label={`Subtract 1 from ${player.name}`}
             >
-              <Minus size={16} strokeWidth={2.5} />
+              <Minus size={20} strokeWidth={2.5} />
             </motion.button>
           )}
 
@@ -117,7 +118,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               e.currentTarget.addEventListener("pointerleave", cancel, { once: true });
               e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
             }}
-            className="flex-1 flex flex-col items-center gap-1 min-w-0">
+            className="w-full flex flex-col items-center gap-1 min-w-0">
             <span className="text-s font-bold text-foreground truncate text-center leading-tight w-full" title={player.name}>
               {player.name}
             </span>
@@ -135,10 +136,11 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               onClick={() => onQuickScore?.(1)}
               whileTap={{ scale: 0.85 }}
               transition={{ type: "spring", stiffness: 600, damping: 14 }}
-              className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60"
+              className="flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60 border border-border"
+              style={{ width: 44, height: 44, borderRadius: 12 }}
               aria-label={`Add 1 to ${player.name}`}
             >
-              <Plus size={16} strokeWidth={2.5} />
+              <Plus size={20} strokeWidth={2.5} />
             </motion.button>
           )}
         </div>
@@ -202,27 +204,6 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
         )}
       </div>
 
-      {/* Add score button */}
-      <div className="flex-shrink-0" style={{ paddingTop: "0", paddingBottom: "calc(0 + env(safe-area-inset-bottom))" }}>
-        <div className="flex rounded-sm border-r border-border last:border-r-0 overflow-hidden" style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)" }}>
-          <motion.button
-            onClick={onAddScore}
-            whileTap={{ scale: 0.88 }}
-            transition={{ type: "spring", stiffness: 600, damping: 12, mass: 0.5 }}
-            className="flex-1 py-8 flex items-center justify-center transition-colors"
-            style={{
-              backgroundColor: `${player.color}18`,
-              color: player.color,
-              transformOrigin: "center",
-              borderBottomLeftRadius: isFirst ? "44px" : undefined,
-              borderBottomRightRadius: isLast ? "44px" : undefined,
-            }}
-            aria-label={`Add score for ${player.name}`}
-          >
-            <Plus size={24} strokeWidth={2} />
-          </motion.button>
-        </div>
-      </div>
     </div>
   );
 }

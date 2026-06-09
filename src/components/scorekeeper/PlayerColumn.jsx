@@ -58,27 +58,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
   const total = player.scores.reduce((s, n) => s + n, 0);
   const isBestOf = winsNeeded !== null;
   const lastIdx = player.scores.length - 1;
-  const scrollRef = useRef(null);
-  const [canScroll, setCanScroll] = useState(false);
-
-  // Scroll to bottom whenever scores change so the latest is visible near the add button
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [player.scores.length]);
-
-  // Check if content overflows
-  useEffect(() => {
-    const checkScroll = () => {
-      if (scrollRef.current) {
-        setCanScroll(scrollRef.current.scrollHeight > scrollRef.current.clientHeight);
-      }
-    };
-    checkScroll();
-    window.addEventListener("resize", checkScroll);
-    return () => window.removeEventListener("resize", checkScroll);
-  }, [player.scores]);
+  const lastScore = lastIdx >= 0 ? player.scores[lastIdx] : null;
 
   return (
     <div className="flex flex-col rounded-xl border border-border overflow-hidden">
@@ -127,7 +107,21 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
                 🔥{streak}
               </span>
             )}
-            <AnimatedTotal value={total} color={player.color} />
+            <div className="flex items-baseline gap-2">
+              <AnimatedTotal value={total} color={player.color} />
+              {!isBestOf && lastScore !== null && (
+                <motion.span
+                  key={lastIdx}
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 24 }}
+                  onClick={(e) => { e.stopPropagation(); onEditScore?.(lastIdx); }}
+                  className="text-sm font-semibold text-muted-foreground leading-none cursor-pointer"
+                >
+                  ({lastScore > 0 ? `+${lastScore}` : lastScore})
+                </motion.span>
+              )}
+            </div>
           </button>
 
           {/* Plus (±1) — hidden in bestof mode */}
@@ -146,64 +140,27 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
         </div>
       </div>
 
-      {/* Score history */}
-      <div className="relative overflow-hidden bg-background" style={{ maxHeight: 120 }}>
-        {isBestOf ? (
-          // Best Of mode: show win dots
-          <div className="h-full flex flex-col items-center justify-center gap-2 px-2 py-3">
-            {Array.from({ length: winsNeeded }).map((_, idx) => {
-              const won = idx < total;
-              return (
-                <motion.div
-                  key={idx}
-                  initial={won ? { scale: 0 } : false}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 25 }}
-                  className="w-3 h-3 rounded-full border-2 flex-shrink-0"
-                  style={{
-                    backgroundColor: won ? player.color : "transparent",
-                    borderColor: won ? player.color : "hsl(var(--border))",
-                  }}
-                />
-              );
-            })}
-          </div>
-        ) : (
-          <>
-            {/* Top fade */}
-            {canScroll && <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />}
-            {/* Bottom fade */}
-            {canScroll && <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />}
-            <div ref={scrollRef} className="h-full overflow-y-auto py-2 px-1">
-              <AnimatePresence initial={false}>
-                {player.scores.map((score, idx) => {
-                  const isCurrent = idx === lastIdx;
-                  return (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, scale: 0.8, y: 6 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      transition={{ type: "spring", stiffness: 380, damping: 28 }}
-                      className={`mb-1 mx-1 rounded-md px-2 py-1.5 text-center cursor-pointer ${
-                        isCurrent ? "bg-card border border-border" : ""
-                      }`}
-                      onClick={() => onEditScore(idx)}
-                    >
-                      <span
-                        className={`font-semibold block leading-none text-s ${!isCurrent ? "text-muted-foreground" : ""}`}
-                        style={isCurrent ? { color: player.color } : undefined}
-                      >
-                        {score > 0 ? `+${score}` : score}
-                      </span>
-                    </motion.div>
-                  );
-                })}
-              </AnimatePresence>
-            </div>
-          </>
-        )}
-      </div>
-
+      {/* Best Of win dots (only in bestof mode) */}
+      {isBestOf && (
+        <div className="bg-background flex items-center justify-center gap-2 px-2 py-3">
+          {Array.from({ length: winsNeeded }).map((_, idx) => {
+            const won = idx < total;
+            return (
+              <motion.div
+                key={idx}
+                initial={won ? { scale: 0 } : false}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                className="w-3 h-3 rounded-full border-2 flex-shrink-0"
+                style={{
+                  backgroundColor: won ? player.color : "transparent",
+                  borderColor: won ? player.color : "hsl(var(--border))",
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

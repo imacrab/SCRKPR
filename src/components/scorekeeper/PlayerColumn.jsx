@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, Flame } from "lucide-react";
 
 function AnimatedTotal({ value, color }) {
   const [displayValue, setDisplayValue] = useState(value);
@@ -136,8 +136,11 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
                 {player.name}
               </span>
               {streak >= 2 && (
-                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 leading-none flex-shrink-0">
-                  🔥{streak}
+                <span className="inline-flex items-center gap-1 flex-shrink-0">
+                  <span className="inline-flex items-center justify-center rounded-full bg-orange-500/20 text-orange-400" style={{ width: 20, height: 20 }}>
+                    <Flame size={12} strokeWidth={2.5} />
+                  </span>
+                  <span className="text-[10px] font-semibold text-orange-400 leading-none">{streak}</span>
                 </span>
               )}
             </div>

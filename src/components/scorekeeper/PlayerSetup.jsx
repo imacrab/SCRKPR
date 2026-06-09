@@ -113,7 +113,19 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
   useEffect(() => {
     base44.entities.PlayerGroup.list("-created_date", 20).then((data) => {
-    setGroups(sortGroups(data));
+      const sorted = sortGroups(data);
+      setGroups(sorted);
+      // Auto-load the first group on initial mount (only if user hasn't edited)
+      if (sorted.length > 0) {
+        setPlayers((current) => {
+          const untouched = current.every((p) => !p.name.trim());
+          if (untouched) {
+            setActiveGroup(sorted[0]);
+            return sorted[0].players.map((p) => ({ name: p.name, color: p.color }));
+          }
+          return current;
+        });
+      }
     }).catch(() => setGroups([]));
   }, []);
 

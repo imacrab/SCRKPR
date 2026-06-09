@@ -214,6 +214,15 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const canStart = players.filter((p) => p.name.trim()).length >= 2;
   const hasValidPlayers = players.filter((p) => p.name.trim()).length >= 2;
 
+  // Detect unsaved changes vs the active group (or vs "no group at all" for save-as)
+  const validPlayers = players.filter((p) => p.name.trim());
+  const playersMatch = (a, b) =>
+    a.length === b.length &&
+    a.every((p, i) => p.name.trim() === b[i].name && p.color === b[i].color);
+  const hasUnsavedChanges = activeGroup
+    ? !playersMatch(validPlayers, activeGroup.players)
+    : hasValidPlayers;
+
   const handleStart = () => {
     const valid = players.filter((p) => p.name.trim());
     if (valid.length < 2) return;
@@ -364,7 +373,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
       {/* Actions */}
       <div className="px-5 pt-0 flex flex-col gap-3" style={{ paddingBottom: "calc(24px + env(safe-area-inset-bottom))" }}>
-        {hasValidPlayers && (
+        {hasUnsavedChanges && (
           <div className="flex gap-2">
             {activeGroup && (
               <Button

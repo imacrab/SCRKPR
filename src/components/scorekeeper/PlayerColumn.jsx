@@ -91,10 +91,10 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
   const showPending = pendingDelta !== 0;
 
   return (
-    <div className="flex flex-col rounded-xl border border-border overflow-hidden">
+    <div className="flex flex-col rounded-xl border border-border overflow-hidden h-full">
       {/* Header — frosted glass */}
       <div
-        className="px-2 py-3 rounded-sm flex flex-col items-center z-10 transition-all"
+        className="px-2 py-3 rounded-sm flex flex-col items-center justify-center z-10 transition-all flex-1"
         style={{
           backgroundColor: isHighlighted ? `hsl(var(--primary) / 0.1)` : "hsl(var(--card) / 0.9)",
           backdropFilter: "blur(1px)",

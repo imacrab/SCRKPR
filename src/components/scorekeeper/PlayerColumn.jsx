@@ -87,7 +87,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             </motion.button>
           )}
 
-          {/* Name + total — tap to open score modal, long-press to edit player */}
+          {/* Name (left) — tap to open score modal, long-press to edit player */}
           <button
             onClick={onAddScore}
             onContextMenu={(e) => { e.preventDefault(); onEditPlayer?.(); }}
@@ -98,31 +98,35 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               e.currentTarget.addEventListener("pointerleave", cancel, { once: true });
               e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
             }}
-            className="flex-1 flex flex-col items-center gap-1 min-w-0">
-            <span className="text-s font-bold text-foreground truncate text-center leading-tight w-full" title={player.name}>
+            className="flex-1 flex items-center gap-2 min-w-0 text-left"
+            style={{ marginLeft: 16 }}
+          >
+            <span className="text-s font-bold text-foreground truncate leading-tight" title={player.name}>
               {player.name}
             </span>
             {streak >= 2 && (
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 leading-none">
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 leading-none flex-shrink-0">
                 🔥{streak}
               </span>
             )}
-            <div className="flex items-baseline gap-2">
-              <AnimatedTotal value={total} color={player.color} />
-              {!isBestOf && lastScore !== null && (
-                <motion.span
-                  key={lastIdx}
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 24 }}
-                  onClick={(e) => { e.stopPropagation(); onEditScore?.(lastIdx); }}
-                  className="text-sm font-semibold text-muted-foreground leading-none cursor-pointer"
-                >
-                  ({lastScore > 0 ? `+${lastScore}` : lastScore})
-                </motion.span>
-              )}
-            </div>
           </button>
+
+          {/* Last round + total (right) */}
+          <div className="flex items-baseline gap-2 flex-shrink-0" style={{ marginRight: 16 }}>
+            {!isBestOf && lastScore !== null && (
+              <motion.span
+                key={lastIdx}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 400, damping: 24 }}
+                onClick={(e) => { e.stopPropagation(); onEditScore?.(lastIdx); }}
+                className="text-sm font-semibold text-muted-foreground leading-none cursor-pointer"
+              >
+                ({lastScore > 0 ? `+${lastScore}` : lastScore})
+              </motion.span>
+            )}
+            <AnimatedTotal value={total} color={player.color} />
+          </div>
 
           {/* Plus (±1) — hidden in bestof mode */}
           {!isBestOf && (

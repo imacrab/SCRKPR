@@ -167,10 +167,15 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             )}
           </button>
 
-          {/* Total (right) */}
-          <div className="flex-shrink-0" style={{ marginRight: 16 }}>
+          {/* Total (right) — tap to open score modal */}
+          <button
+            onClick={onAddScore}
+            className="flex-shrink-0"
+            style={{ marginRight: 16 }}
+            aria-label={`Add score for ${player.name}`}
+          >
             <AnimatedTotal value={total} color={player.color} />
-          </div>
+          </button>
 
           {/* Plus (±1) — hidden in bestof mode */}
           {!isBestOf && (

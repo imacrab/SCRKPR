@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { RotateCcw, UserPlus, FlagOff, RefreshCw } from "lucide-react";
+import { RotateCcw, UserPlus, FlagOff } from "lucide-react";
 
-export default function GameMenuModal({ isOpen, canAddPlayer, onAddPlayer, onResetScores, onReloadApp, onEndGame, onClose }) {
+export default function GameMenuModal({ isOpen, canAddPlayer, onAddPlayer, onResetScores, onEndGame, onClose }) {
   const items = [
     canAddPlayer && {
       key: "add",
@@ -14,13 +14,6 @@ export default function GameMenuModal({ isOpen, canAddPlayer, onAddPlayer, onRes
       label: "Reset Scores",
       icon: RotateCcw,
       onClick: onResetScores,
-    },
-    {
-      key: "reload",
-      label: "Reload App",
-      icon: RefreshCw,
-      onClick: onReloadApp,
-      muted: true,
     },
   ].filter(Boolean);
 

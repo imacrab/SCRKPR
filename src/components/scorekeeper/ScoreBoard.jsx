@@ -191,7 +191,6 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
         canAddPlayer={players.length < 20}
         onAddPlayer={onAddPlayer}
         onResetScores={onReset}
-        onReloadApp={() => window.location.reload()}
         onEndGame={() => setShowEndGame(true)}
         onClose={() => setMenuOpen(false)}
       />

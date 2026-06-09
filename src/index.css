@@ -138,17 +138,17 @@
     background-image: linear-gradient(
       110deg,
       transparent 0%,
-      transparent 18%,
-      #ff5d8f 28%,
-      #ffb84d 38%,
-      #ffe24d 46%,
-      #4dd97a 54%,
-      #ffffff 62%,
-      #8b5cf6 70%,
-      transparent 82%,
+      transparent 5%,
+      #ff5d8f 18%,
+      #ffb84d 31%,
+      #ffe24d 43%,
+      #4dd97a 55%,
+      #ffffff 67%,
+      #8b5cf6 80%,
+      transparent 95%,
       transparent 100%
     );
-    background-size: 250% 100%;
+    background-size: 200% 100%;
     animation: shimmer-rainbow 3s linear infinite;
   }
 

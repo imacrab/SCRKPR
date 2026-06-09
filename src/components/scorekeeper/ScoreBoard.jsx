@@ -142,7 +142,7 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
       <div className="flex-1 px-2 pb-2 overflow-hidden w-full relative">
         <div
           ref={scrollContainerRef}
-          className="flex flex-col h-full gap-2 w-full overflow-hidden"
+          className="flex flex-col h-full gap-2 w-full overflow-y-auto"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           <LayoutGroup>
@@ -151,7 +151,7 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
                 key={player.id}
                 layout
                 transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                className="w-full flex-1 min-h-0"
+                className="w-full flex-shrink-0"
               >
                 <PlayerColumn
                   player={player}

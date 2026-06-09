@@ -134,18 +134,19 @@
   }
 
   .shimmer-rainbow {
+    background-color: #2DC5F8;
     background-image: linear-gradient(
       110deg,
-      #ffffff 0%,
-      #ffffff 18%,
+      transparent 0%,
+      transparent 18%,
       #ff5d8f 28%,
       #ffb84d 38%,
       #ffe24d 46%,
       #4dd97a 54%,
-      #2DC5F8 62%,
+      #ffffff 62%,
       #8b5cf6 70%,
-      #ffffff 82%,
-      #ffffff 100%
+      transparent 82%,
+      transparent 100%
     );
     background-size: 250% 100%;
     animation: shimmer-rainbow 3s linear infinite;

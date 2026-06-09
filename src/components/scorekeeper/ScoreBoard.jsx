@@ -184,6 +184,7 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
                 isFirst={idx === 0}
                 isLast={idx === players.length - 1}
                 onAddScore={() => handleOpenScore(player)}
+                onQuickScore={(delta) => onAddScore(player.id, delta)}
                 onEditScore={(idx) => handleEditScore(player, idx)}
                 onEditPlayer={() => setEditingPlayer(player)}
               />

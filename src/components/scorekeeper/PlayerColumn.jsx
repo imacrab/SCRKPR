@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
-import { Plus } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 
 function AnimatedTotal({ value, color }) {
   const [displayValue, setDisplayValue] = useState(value);
@@ -54,7 +54,7 @@ function AnimatedTotal({ value, color }) {
   );
 }
 
-export default function PlayerColumn({ player, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, onAddScore, onEditScore, onEditPlayer }) {
+export default function PlayerColumn({ player, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, onAddScore, onQuickScore, onEditScore, onEditPlayer }) {
   const total = player.scores.reduce((s, n) => s + n, 0);
   const isBestOf = winsNeeded !== null;
   const lastIdx = player.scores.length - 1;
@@ -92,23 +92,56 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))",
         }}
       >
-        <button onClick={onEditPlayer} className="flex flex-col items-center gap-1.5 relative">
-          <div className="flex items-center gap-1 relative w-20">
+        <div className="flex items-center justify-between w-full gap-1">
+          {/* Minus (±1) — hidden in bestof mode */}
+          {!isBestOf && (
+            <motion.button
+              onClick={() => onQuickScore?.(-1)}
+              whileTap={{ scale: 0.85 }}
+              transition={{ type: "spring", stiffness: 600, damping: 14 }}
+              className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60"
+              aria-label={`Subtract 1 from ${player.name}`}
+            >
+              <Minus size={16} strokeWidth={2.5} />
+            </motion.button>
+          )}
+
+          {/* Name + total — tap to open score modal, long-press to edit player */}
+          <button
+            onClick={onAddScore}
+            onContextMenu={(e) => { e.preventDefault(); onEditPlayer?.(); }}
+            onPointerDown={(e) => {
+              const timer = setTimeout(() => onEditPlayer?.(), 500);
+              const cancel = () => clearTimeout(timer);
+              e.currentTarget.addEventListener("pointerup", cancel, { once: true });
+              e.currentTarget.addEventListener("pointerleave", cancel, { once: true });
+              e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
+            }}
+            className="flex-1 flex flex-col items-center gap-1 min-w-0">
             <span className="text-s font-bold text-foreground truncate text-center leading-tight w-full" title={player.name}>
               {player.name}
             </span>
-          </div>
-          <div>
             {streak >= 2 && (
               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 leading-none">
                 🔥{streak}
               </span>
             )}
-          </div>
-        </button>
+            <AnimatedTotal value={total} color={player.color} />
+          </button>
 
-        {/* Total */}
-        <AnimatedTotal value={total} color={player.color} />
+          {/* Plus (±1) — hidden in bestof mode */}
+          {!isBestOf && (
+            <motion.button
+              onClick={() => onQuickScore?.(1)}
+              whileTap={{ scale: 0.85 }}
+              transition={{ type: "spring", stiffness: 600, damping: 14 }}
+              className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60"
+              aria-label={`Add 1 to ${player.name}`}
+            >
+              <Plus size={16} strokeWidth={2.5} />
+            </motion.button>
+          )}
+        </div>
       </div>
 
       {/* Score history */}

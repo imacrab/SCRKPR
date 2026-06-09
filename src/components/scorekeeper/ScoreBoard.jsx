@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { RotateCcw, UserPlus, FlagOff, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { motion, LayoutGroup } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
 import EditPlayerModal from "./EditPlayerModal";
 import EndGameModal from "./EndGameModal";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import GameMenuModal from "./GameMenuModal";
 
 export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
@@ -15,7 +14,7 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
   const [gameStartTime] = useState(new Date());
   const [scrollPos, setScrollPos] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
-  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const scrollContainerRef = useRef(null);
 
   useEffect(() => {
@@ -123,51 +122,12 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
           <img src={isDarkMode ? "https://media.base44.com/images/public/69ea763700078809357a164a/87badac38_SCRKPR_dark_mode.png" : "https://media.base44.com/images/public/69ea763700078809357a164a/6de7dc994_SCRKPR_light_mode.png"} alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
         </button>
         <div className="flex items-center gap-1">
-        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-          <PopoverTrigger asChild>
-            <button className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-              <MoreHorizontal size={24} strokeWidth={2} />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-48 p-1.5 bg-card border-border">
-            {players.length < 20 && (
-              <button
-                onClick={onAddPlayer}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-foreground hover:bg-accent transition-colors"
-              >
-                <UserPlus size={24} strokeWidth={2} className="text-muted-foreground" />
-                Add Player
-              </button>
-            )}
-            <button
-              onClick={() => {
-                onReset();
-                setPopoverOpen(false);
-              }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-foreground hover:bg-accent transition-colors"
-            >
-              <RotateCcw size={24} strokeWidth={2} className="text-muted-foreground" />
-              Reset Scores
-            </button>
-            <div className="my-1 h-px bg-border" />
-            <button
-              onClick={() => window.location.reload()}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-accent transition-colors"
-            >
-              <RotateCcw size={24} strokeWidth={2} className="text-muted-foreground" />
-              Reload App
-            </button>
-            <div className="my-1 h-px bg-border" />
-            <button
-              onClick={() => { setPopoverOpen(false); setShowEndGame(true); }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              style={{ color: "#FF3A3A", backgroundColor: "rgba(255,58,58,0.08)" }}
-            >
-              <FlagOff size={24} strokeWidth={2} />
-              End Game
-            </button>
-          </PopoverContent>
-        </Popover>
+          <button
+            onClick={() => setMenuOpen(true)}
+            className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          >
+            <MoreHorizontal size={24} strokeWidth={2} />
+          </button>
         </div>
       </div>
 
@@ -217,6 +177,16 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
         isOpen={!!editingPlayer}
         onSave={handleSavePlayer}
         onClose={() => setEditingPlayer(null)}
+      />
+
+      <GameMenuModal
+        isOpen={menuOpen}
+        canAddPlayer={players.length < 20}
+        onAddPlayer={onAddPlayer}
+        onResetScores={onReset}
+        onReloadApp={() => window.location.reload()}
+        onEndGame={() => setShowEndGame(true)}
+        onClose={() => setMenuOpen(false)}
       />
 
       <EndGameModal

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Trash2, RefreshCw, Handshake, AlertTriangle } from "lucide-react";
+import { ArrowLeft, RefreshCw, Handshake, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
@@ -184,7 +184,7 @@ export default function History({ onBack, onModalChange }) {
                         onClick={() => deleteGame(game.id)}
                         className="text-muted-foreground hover:text-accent-red transition-colors p-1">
                         
-                      <Trash2 size={20} strokeWidth={2} />
+                      <FluentEmoji emoji="🗑️" size={20} />
                     </button>
                   </div>
 

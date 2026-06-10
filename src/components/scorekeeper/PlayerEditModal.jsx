@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
-import { Trash2, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import EmojiPicker from "./EmojiPicker";
@@ -138,7 +138,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
                   onClick={() => onDelete?.(player.id)}
                   className="h-11 bg-accent-red/15 hover:bg-accent-red/25 text-accent-red border-0 shadow-none"
                 >
-                  <Trash2 size={20} strokeWidth={2} />
+                  <FluentEmoji emoji="🗑️" size={20} />
                 </Button>
               )}
               <Button

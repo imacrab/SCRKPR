@@ -2,11 +2,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import FluentEmoji from "./FluentEmoji";
 
 const MODES = [
-  { value: "ginrummy", label: "Gin Rummy",  sub: "Game ends at 100",     emoji: "🎴" },
-  { value: "swish",    label: "Swish",      sub: "Lowest to 500 wins",   emoji: "⚡" },
+  { value: "ginrummy", label: "Gin Rummy",  sub: "Please don't go out",     emoji: "🎴" },
+  { value: "swish",    label: "Swish",      sub: "Crawl underneath that",   emoji: "⚡" },
   { value: "low",      label: "Low Score",  sub: "Lowest total wins",     emoji: "📉" },
   { value: "high",     label: "High Score", sub: "Highest total wins",    emoji: "📈" },
-  { value: "bestof",   label: "Best Of",    sub: "First to win N rounds", emoji: "🏆" },
+  { value: "bestof",   label: "Best Of",    sub: "First to win whatever rounds", emoji: "🏆" },
 ];
 
 export default function GameModeModal({ isOpen, winMode, onSelect, onClose }) {

@@ -108,10 +108,6 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
             />
 
             <div className="mb-3">
-              <EmojiPicker selected={emoji} onChange={setEmoji} />
-            </div>
-
-            <div className="border-t border-border">
               <div className="grid grid-cols-5 gap-3 p-3 justify-items-center">
                 {palette.map((c) => (
                   <button
@@ -124,6 +120,10 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="border-t border-border">
+              <EmojiPicker selected={emoji} onChange={setEmoji} />
             </div>
           </div>
 

@@ -178,7 +178,7 @@ export default function History({ onBack, onModalChange }) {
                           {modeMeta.label}
                         </span>
                       </p>
-                      <p className="font-medium text-foreground flex items-center gap-1.5 text-2xl">
+                      <p className="text-foreground flex items-center gap-1.5 text-xl [font-family:'Geist',_sans-serif] font-semibold">
                         {isTie ?
                           <Handshake size={20} strokeWidth={2} className="text-muted-foreground" /> :
                           <FluentEmoji emoji="🏆" size={20} />

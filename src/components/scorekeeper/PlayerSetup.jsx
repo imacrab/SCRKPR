@@ -28,16 +28,20 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const pullStartY = useRef(null);
   const PULL_THRESHOLD = 80;
 
+  const anyModalOpen = showAddPlayer || showBestOf || showGameMode || showCustomTarget;
+
   const handleTouchStart = (e) => {
+    if (anyModalOpen) return;
     const el = e.currentTarget;
     if (el.scrollTop === 0) pullStartY.current = e.touches[0].clientY;
   };
   const handleTouchMove = (e) => {
-    if (pullStartY.current === null) return;
+    if (anyModalOpen || pullStartY.current === null) return;
     const delta = e.touches[0].clientY - pullStartY.current;
     if (delta > 0) setPullY(Math.min(delta, PULL_THRESHOLD * 1.5));
   };
   const handleTouchEnd = () => {
+    if (anyModalOpen) { pullStartY.current = null; setPullY(0); return; }
     if (pullY >= PULL_THRESHOLD) window.location.reload();
     setPullY(0);
     pullStartY.current = null;

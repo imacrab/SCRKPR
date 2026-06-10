@@ -70,20 +70,31 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     });
   }, [players, sortDesc]);
 
+  // Track whether we've auto-triggered the end-game modal for the current game.
+  // Without this guard, the effect re-fires on every score change after the threshold
+  // is crossed, which can race with the user dismissing the modal.
+  const autoEndFiredRef = useRef(false);
+
+  // Reset the guard whenever the game is reset (all players have empty scores)
+  useEffect(() => {
+    const anyScores = players.some((p) => p.scores.length > 0);
+    if (!anyScores) autoEndFiredRef.current = false;
+  }, [players]);
+
   // Auto-end when someone reaches winsNeeded in bestof / phase10 mode
   useEffect(() => {
-    if (!circleMode || !winsNeeded) return;
+    if (!circleMode || !winsNeeded || autoEndFiredRef.current) return;
     const winner = players.find((p) => p.scores.reduce((s, n) => s + n, 0) >= winsNeeded);
     if (!winner) return;
-    const t = setTimeout(() => setShowEndGame(true), 400);
-    return () => clearTimeout(t);
+    autoEndFiredRef.current = true;
+    setShowEndGame(true);
   }, [players, circleMode, winsNeeded]);
 
   // Auto-end when any player reaches the target score (Gin Rummy, Swish, etc.)
   // For round-based modes, wait until all players have logged the same number of scores
   // (i.e. the current round is complete) before ending.
   useEffect(() => {
-    if (!targetScore || circleMode) return;
+    if (!targetScore || circleMode || autoEndFiredRef.current) return;
     const reached = players.some((p) => {
       const total = p.scores.reduce((s, n) => s + n, 0);
       return total >= targetScore;
@@ -95,8 +106,8 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     const roundComplete = counts.length > 0 && counts.every((c) => c === counts[0]);
     if (!roundComplete) return;
 
-    const t = setTimeout(() => setShowEndGame(true), 400);
-    return () => clearTimeout(t);
+    autoEndFiredRef.current = true;
+    setShowEndGame(true);
   }, [players, winMode, targetScore, circleMode]);
 
   const handleOpenScore = (player) => {

@@ -1,14 +1,11 @@
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
-import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isLowMode } from "@/lib/gameModes";
 import FluentEmoji from "./FluentEmoji";
 
 export default function EndGameModal({ isOpen, players, winMode, gameStartTime, onConfirm, onCancel }) {
-  const contentRef = useRef(null);
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const dragControls = useDragControls();
 
@@ -51,20 +48,9 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [isOpen, players, winMode]);
 
-  // Detect whether content would overflow the viewport — if so, switch to full-screen layout
-  useLayoutEffect(() => {
-    if (!isOpen) { setIsFullScreen(false); return; }
-    const check = () => {
-      const el = contentRef.current;
-      if (!el) return;
-      // Available height for the bottom-sheet (with 8px gap top/bottom)
-      const available = window.innerHeight - 16;
-      setIsFullScreen(el.scrollHeight > available);
-    };
-    const raf = requestAnimationFrame(check);
-    window.addEventListener("resize", check);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", check); };
-  }, [isOpen, players]);
+  // Always render the same bottom-sheet layout — it has a max-height and scrolls
+  // internally when content overflows. (Switching between two motion.divs based on
+  // content size caused the modal to appear to flicker / not appear at all.)
 
   // Don't early-return — let AnimatePresence handle the open/close so exit
   // animations play. We still guard the derived values below.
@@ -183,80 +169,42 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
             onClick={onCancel}
           />
 
-          {isFullScreen ? (
-            <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", stiffness: 400, damping: 35 }}
-              drag="y"
-              dragControls={dragControls}
-              dragListener={false}
-              dragConstraints={{ top: 0, bottom: 0 }}
-              dragElastic={{ top: 0, bottom: 0.6 }}
-              dragSnapToOrigin
-              onDragEnd={handleDragEnd}
-              className="fixed inset-0 z-50 bg-card flex flex-col"
+          <motion.div
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "100%", opacity: 0 }}
+            transition={{ type: "spring", stiffness: 400, damping: 35 }}
+            drag="y"
+            dragControls={dragControls}
+            dragListener={false}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.6 }}
+            dragSnapToOrigin
+            onDragEnd={handleDragEnd}
+            className="fixed inset-x-0 z-50 bg-card border border-border rounded-[44px] shadow-2xl flex flex-col"
+            style={{ bottom: "8px", left: "8px", right: "8px", maxHeight: "calc(100dvh - 16px)" }}
+          >
+            {/* Drag handle */}
+            <div
+              onPointerDown={(e) => dragControls.start(e)}
+              className="flex-shrink-0 pt-3 pb-2 touch-none select-none cursor-grab active:cursor-grabbing"
             >
-              {/* Sticky header — drag handle */}
-              <div
-                onPointerDown={(e) => dragControls.start(e)}
-                className="flex-shrink-0 flex items-center justify-between px-5 border-b border-border touch-none select-none cursor-grab active:cursor-grabbing"
-                style={{ paddingTop: "calc(env(safe-area-inset-top) + 12px)", paddingBottom: "12px" }}
-              >
-                <button
-                  onClick={onCancel}
-                  className="w-10 h-10 -ml-2 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                  aria-label="Close"
-                >
-                  <X size={22} strokeWidth={2} />
-                </button>
-                <div className="text-center pointer-events-none">
-                  <div className="w-10 h-1 bg-border rounded-full mx-auto mb-2" />
-                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">
-                    Game Over
-                  </p>
-                  <h2 className="font-display text-lg font-bold text-foreground leading-tight">
-                    {isTie ? "It's a Tie!" : `${winner?.name ?? ""} Wins`}
-                  </h2>
-                </div>
-                <div className="w-10" />
-              </div>
+              <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+            </div>
 
-              {/* Scrollable content */}
-              <div className="flex-1 overflow-y-auto px-5 pt-5">
-                {Body}
-              </div>
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto px-5 pt-3">
+              {Body}
+            </div>
 
-              {/* Sticky footer */}
-              <div
-                className="flex-shrink-0 px-5 pt-3 border-t border-border bg-card"
-                style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 12px)" }}
-              >
-                {Actions}
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ y: "100%", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: "100%", opacity: 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 35 }}
-              drag="y"
-              dragConstraints={{ top: 0, bottom: 0 }}
-              dragElastic={{ top: 0, bottom: 0.6 }}
-              dragSnapToOrigin
-              onDragEnd={handleDragEnd}
-              className="fixed inset-x-0 z-50 bg-card border border-border rounded-[44px] shadow-2xl"
-              style={{ bottom: "8px", left: "8px", right: "8px", paddingBottom: 0 }}
+            {/* Sticky footer */}
+            <div
+              className="flex-shrink-0 px-5 pt-3 pb-6"
+              style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
             >
-              <div ref={contentRef} className="px-5 pt-5 pb-6">
-                <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
-                {Body}
-                {Actions}
-              </div>
-            </motion.div>
-          )}
+              {Actions}
+            </div>
+          </motion.div>
         </>
       )}
     </AnimatePresence>

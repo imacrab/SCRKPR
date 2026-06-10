@@ -226,7 +226,11 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             )}
           </LayoutGroup>
 
-          {!circleMode && <ScoreHistoryPanel players={sortedPlayers} />}
+          {!circleMode && (
+            <div className="flex-shrink-0">
+              <ScoreHistoryPanel players={sortedPlayers} />
+            </div>
+          )}
         </div>
 
         {/* End Game — fixed at bottom of scoreboard, centered */}

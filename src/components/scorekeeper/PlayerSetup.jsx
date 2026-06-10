@@ -208,7 +208,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 }}>
                 
                     {draggable ?
-                <div className="flex-shrink-0 text-muted-foreground touch-none flex items-center justify-center w-6 h-7">
+                <div className="flex-shrink-0 touch-none flex items-center justify-center w-6 h-7 text-[hsl(var(--foreground))]">
                         <GripVertical size={18} strokeWidth={2} />
                       </div> :
 

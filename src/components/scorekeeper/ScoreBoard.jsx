@@ -229,29 +229,15 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           {!circleMode && <ScoreHistoryPanel players={sortedPlayers} />}
         </div>
 
-        {/* End Game — fixed at bottom of scoreboard, matches player card width */}
+        {/* End Game — fixed at bottom of scoreboard, centered */}
         <div
-          className="absolute inset-x-0 bottom-0 z-30 px-2"
-          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}>
+          className="absolute inset-x-0 bottom-0 z-30 flex justify-center"
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)", paddingLeft: 48, paddingRight: 48 }}>
           
           <button
             onClick={() => setShowEndGame(true)}
-            className="relative w-full flex items-center gap-2 py-4 px-6 rounded-xl bg-white hover:bg-white/90 text-background font-semibold text-sm shadow-lg transition-colors overflow-hidden">
+            className="relative flex items-center justify-center py-4 px-6 rounded-xl bg-white hover:bg-white/90 text-background font-semibold text-sm shadow-lg transition-colors overflow-hidden">
             
-            {/* Flourish — oversized tilted flag bleeding off the right edge */}
-            <div
-              className="absolute pointer-events-none select-none"
-              style={{
-                right: -50,
-                top: "50%",
-                transform: "translateY(-51%) rotate(-15deg) scaleX(-1)",
-                opacity: 0.95,
-                zIndex: 0
-              }}
-              aria-hidden="true">
-              
-              <FluentEmoji emoji="🏁" size={120} />
-            </div>
             <span className="relative z-10 text-xl">End Game</span>
           </button>
         </div>

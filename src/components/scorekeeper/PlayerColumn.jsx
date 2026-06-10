@@ -134,7 +134,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             whileTap={{ scale: 0.85 }}
             transition={{ type: "spring", stiffness: 600, damping: 14 }}
             className="flex items-center justify-center flex-shrink-0"
-            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor, backdropFilter: "blur(2.5px)", WebkitBackdropFilter: "blur(4px)" }}
+            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor, backdropFilter: "blur(2.5px)", WebkitBackdropFilter: "blur(2.5px)" }}
             aria-label={`Subtract 1 from ${player.name}`}>
             
               <Minus size={20} strokeWidth={2.5} />

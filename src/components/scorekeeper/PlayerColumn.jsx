@@ -127,20 +127,6 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
         }
 
         <div className="relative z-10 flex items-center justify-between w-full gap-3">
-          {/* Minus (±1) — hidden in bestof mode */}
-          {!isBestOf &&
-          <motion.button
-            onClick={() => handleQuickTap(-1)}
-            whileTap={{ scale: 0.85 }}
-            transition={{ type: "spring", stiffness: 600, damping: 14 }}
-            className="flex items-center justify-center flex-shrink-0"
-            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor, backdropFilter: "blur(2.5px)", WebkitBackdropFilter: "blur(2.5px)" }}
-            aria-label={`Subtract 1 from ${player.name}`}>
-            
-              <Minus size={20} strokeWidth={2.5} />
-            </motion.button>
-          }
-
           {/* Name (left) — tap to open score modal, long-press to edit player */}
           <button
             onClick={onAddScore}
@@ -153,7 +139,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
             }}
             className="flex-1 flex flex-col items-start gap-1 min-w-0 text-left"
-            style={{ marginLeft: 8 }}>
+            style={{ marginLeft: isBestOf ? 8 : 60 }}>
             
             <div className="flex items-center gap-2 w-full min-w-0">
               <span className="font-bold truncate leading-tight text-xl" title={player.name} style={{ color: textColor }}>
@@ -193,7 +179,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             }
           </button>
 
-          {/* Total (right) — tap to open score modal */}
+          {/* Total — tap to open score modal */}
           <button
             onClick={onAddScore}
             className="flex-shrink-0"
@@ -202,6 +188,20 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             
             <AnimatedTotal value={total} color="#FFFFFF" />
           </button>
+
+          {/* Minus (±1) — hidden in bestof mode */}
+          {!isBestOf &&
+          <motion.button
+            onClick={() => handleQuickTap(-1)}
+            whileTap={{ scale: 0.85 }}
+            transition={{ type: "spring", stiffness: 600, damping: 14 }}
+            className="flex items-center justify-center flex-shrink-0"
+            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor, backdropFilter: "blur(2.5px)", WebkitBackdropFilter: "blur(2.5px)" }}
+            aria-label={`Subtract 1 from ${player.name}`}>
+            
+              <Minus size={20} strokeWidth={2.5} />
+            </motion.button>
+          }
 
           {/* Plus (±1) — hidden in bestof mode */}
           {!isBestOf &&

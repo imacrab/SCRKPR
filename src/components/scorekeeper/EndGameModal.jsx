@@ -83,12 +83,17 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
   const winner = sorted[0];
 
   // Calculate stats
-  const totalRounds = players.reduce((sum, p) => sum + p.scores.length, 0) / players.length;
+  const totalRounds = hasPlayers
+    ? players.reduce((sum, p) => sum + p.scores.length, 0) / players.length
+    : 0;
   const roundsWon = {};
   players.forEach((p) => {
     roundsWon[p.id] = p.scores.length;
   });
-  const playerWithMostRounds = Object.entries(roundsWon).reduce((a, b) => b[1] > a[1] ? b : a)[0];
+  const roundsWonEntries = Object.entries(roundsWon);
+  const playerWithMostRounds = roundsWonEntries.length > 0
+    ? roundsWonEntries.reduce((a, b) => b[1] > a[1] ? b : a)[0]
+    : null;
   const mostRoundsPlayer = players.find((p) => p.id == playerWithMostRounds);
 
   const loserPlayer = sorted[sorted.length - 1];
@@ -114,9 +119,9 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
           {isTie ? "It's a Tie!" : "Winner"}
         </p>
         <h2 className="font-display text-2xl font-bold text-foreground">
-          {isTie ? tied.map((p) => p.name).join(" & ") : winner.name}
+          {isTie ? tied.map((p) => p.name).join(" & ") : winner?.name}
         </h2>
-        <p className="text-sm text-muted-foreground mt-0.5">{winner.total} pts · {isLowWin ? "lowest score" : "highest score"} wins</p>
+        <p className="text-sm text-muted-foreground mt-0.5">{winner?.total ?? 0} pts · {isLowWin ? "lowest score" : "highest score"} wins</p>
       </div>
 
       {/* Standings */}
@@ -212,7 +217,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
                     Game Over
                   </p>
                   <h2 className="font-display text-lg font-bold text-foreground leading-tight">
-                    {isTie ? "It's a Tie!" : `${winner.name} Wins`}
+                    {isTie ? "It's a Tie!" : `${winner?.name ?? ""} Wins`}
                   </h2>
                 </div>
                 <div className="w-10" />

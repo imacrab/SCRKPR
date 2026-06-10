@@ -233,7 +233,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           
           <button
             onClick={() => setShowEndGame(true)}
-            className="relative w-full flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-white hover:bg-white/90 text-background font-semibold text-sm shadow-lg transition-colors overflow-hidden">
+            className="relative w-full flex gap-2 h-12 px-6 rounded-xl bg-white hover:bg-white/90 text-background font-semibold text-sm shadow-lg transition-colors overflow-hidden">
             
             {/* Flourish — oversized tilted flag bleeding off the right edge */}
             <div

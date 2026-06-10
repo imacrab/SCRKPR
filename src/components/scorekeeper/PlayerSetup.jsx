@@ -144,7 +144,11 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const addPlayer = () => {
     if (players.length < 20) {
       const newIndex = players.length;
-      setPlayers([...players, { name: "", color: PLAYER_COLORS[newIndex % PLAYER_COLORS.length] }]);
+      const used = new Set(players.map((p) => p.color));
+      const available = PLAYER_COLORS.filter((c) => !used.has(c));
+      const pool = available.length > 0 ? available : PLAYER_COLORS;
+      const color = pool[Math.floor(Math.random() * pool.length)];
+      setPlayers([...players, { name: "", color }]);
       setTimeout(() => {
         scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
         inputRefs.current[newIndex]?.focus();

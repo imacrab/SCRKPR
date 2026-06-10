@@ -11,7 +11,14 @@ const PLAYER_COLORS = [
   "#9CA3AF", "#6B7280", "#374151", "#FFFFFF", "#000000",
 ];
 
-export default function AddPlayerModal({ isOpen, onAdd, onClose }) {
+function pickRandomColor(usedColors = []) {
+  const used = new Set(usedColors);
+  const available = PLAYER_COLORS.filter((c) => !used.has(c));
+  const pool = available.length > 0 ? available : PLAYER_COLORS;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+export default function AddPlayerModal({ isOpen, usedColors = [], onAdd, onClose }) {
   const [name, setName] = useState("");
   const [color, setColor] = useState(PLAYER_COLORS[0]);
   const inputRef = useRef(null);
@@ -19,17 +26,17 @@ export default function AddPlayerModal({ isOpen, onAdd, onClose }) {
   useEffect(() => {
     if (isOpen) {
       setName("");
-      setColor(PLAYER_COLORS[0]);
+      setColor(pickRandomColor(usedColors));
       setTimeout(() => inputRef.current?.focus(), 120);
     }
-  }, [isOpen]);
+  }, [isOpen, usedColors]);
 
   const handleSubmit = () => {
     const trimmed = name.trim();
     if (!trimmed) return;
     onAdd(trimmed, color);
     setName("");
-    setColor(PLAYER_COLORS[0]);
+    setColor(pickRandomColor([...usedColors, color]));
   };
 
   return (

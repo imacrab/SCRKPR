@@ -226,6 +226,7 @@ export default function ScoreKeeper() {
             />
             <AddPlayerModal
               isOpen={showAddPlayer}
+              usedColors={players.map((p) => p.color)}
               onAdd={handleAddPlayer}
               onClose={() => setShowAddPlayer(false)}
             />

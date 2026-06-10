@@ -238,7 +238,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             onClick={() => setShowEndGame(true)}
             className="relative flex items-center justify-center gap-2 py-4 px-6 rounded-xl bg-white hover:bg-white/90 text-background font-semibold text-sm shadow-lg transition-colors overflow-hidden">
             
-            <span className="relative z-10 text-xl">End Game</span>
+            <span className="relative z-10 text-base">End Game</span>
             <FluentEmoji emoji="🏁" size={24} />
           </button>
         </div>

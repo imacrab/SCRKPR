@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Plus, Users } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import PlayerEditModal from "@/components/scorekeeper/PlayerEditModal";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 
@@ -55,14 +55,11 @@ export default function Players({ onBack, onModalChange }) {
 
   return (
     <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
-      <div className="pt-10 pb-2 px-5 flex items-center gap-2 flex-shrink-0" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
-        <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft size={18} strokeWidth={2} />
-        </button>
-        <h1 className="font-sans font-medium text-lg text-foreground flex-1">Players</h1>
+      <div className="pt-10 pb-2 px-5 flex items-center flex-shrink-0 relative" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
+        <h1 className="font-sans font-medium text-lg text-foreground flex-1 text-center">Players</h1>
         <button
           onClick={() => setEditing({})}
-          className="text-sm font-medium text-foreground hover:text-foreground transition-colors px-2 py-1 flex items-center gap-1"
+          className="absolute right-5 top-10 text-sm font-medium text-foreground hover:text-foreground transition-colors px-2 py-1 flex items-center gap-1"
         >
           <Plus size={20} strokeWidth={2} />
         </button>

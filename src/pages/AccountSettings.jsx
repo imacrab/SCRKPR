@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -36,11 +36,8 @@ export default function AccountSettings({ onBack, onModalChange }) {
 
     >
       {/* Header */}
-      <div className="pt-10 pb-4 px-5 flex items-center gap-3 flex-shrink-0" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
-        <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors p-1">
-          <ArrowLeft size={20} strokeWidth={2} />
-        </button>
-        <h1 className="font-sans font-medium text-lg text-foreground">Account Settings</h1>
+      <div className="pt-10 pb-4 px-5 flex items-center flex-shrink-0" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
+        <h1 className="font-sans font-medium text-lg text-foreground flex-1 text-center">Account Settings</h1>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 pt-2 pb-6 space-y-4">

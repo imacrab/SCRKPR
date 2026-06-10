@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, RefreshCw, Handshake, AlertTriangle } from "lucide-react";
+import { RefreshCw, Handshake, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
@@ -96,20 +96,19 @@ export default function History({ onBack, onModalChange }) {
   return (
     <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* Header */}
-      <div className="pt-10 pb-2 px-5 flex items-center gap-2 flex-shrink-0" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
-        <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft size={18} strokeWidth={2} />
-        </button>
-        <h1 className="font-sans font-medium text-lg text-foreground flex-1">Past Rounds</h1>
-        {refreshing && <RefreshCw size={16} strokeWidth={2} className="text-muted-foreground animate-spin" />}
-        {games.length > 0 &&
-        <button
-          onClick={() => setShowConfirm(true)}
-          className="text-xs font-medium text-muted-foreground hover:text-accent-red transition-colors px-2 py-1">
-          
-            Clear All
-          </button>
-        }
+      <div className="pt-10 pb-2 px-5 flex items-center flex-shrink-0 relative" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
+        <h1 className="font-sans font-medium text-lg text-foreground flex-1 text-center">Past Rounds</h1>
+        <div className="absolute right-5 top-10 flex items-center gap-2">
+          {refreshing && <RefreshCw size={16} strokeWidth={2} className="text-muted-foreground animate-spin" />}
+          {games.length > 0 &&
+          <button
+            onClick={() => setShowConfirm(true)}
+            className="text-xs font-medium text-muted-foreground hover:text-accent-red transition-colors px-2 py-1">
+            
+              Clear All
+            </button>
+          }
+        </div>
       </div>
 
       {/* Pull indicator */}

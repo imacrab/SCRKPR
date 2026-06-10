@@ -200,7 +200,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         <div
           ref={scrollContainerRef}
           className="flex flex-col h-full gap-2 w-full overflow-y-auto relative z-0"
-          style={{ WebkitOverflowScrolling: "touch", paddingBottom: "140px" }}>
+          style={{ WebkitOverflowScrolling: "touch", paddingBottom: "200px" }}>
           
           <LayoutGroup>
             {sortedPlayers.map((player, idx) =>

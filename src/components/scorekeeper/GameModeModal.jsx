@@ -40,7 +40,7 @@ export default function GameModeModal({ isOpen, winMode, onSelect, onClose }) {
 
               <div className="text-center mb-5">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-0.5">Select</p>
-                <h2 className="font-display text-xl font-bold text-foreground">Game Mode</h2>
+                <h2 className="font-display text-2xl font-bold text-foreground">Game Mode</h2>
               </div>
 
               <div className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto">

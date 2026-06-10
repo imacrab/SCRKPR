@@ -57,7 +57,6 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
   const hasPlayers = isOpen && players.length > 0;
 
   const isLowWin = isLowMode(winMode);
-  if (isOpen) console.log("[EndGameModal] winMode:", winMode, "isLowWin:", isLowWin);
   const sorted = hasPlayers
     ? [...players]
         .map((p) => ({ ...p, total: p.scores.reduce((s, n) => s + n, 0) }))

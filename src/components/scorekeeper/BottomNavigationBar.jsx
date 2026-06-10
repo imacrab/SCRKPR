@@ -13,15 +13,20 @@ export default function BottomNavigationBar({ hidden = false }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  // Hide the nav bar during an active game
-  if (pathname === "/game") return null;
+  // Slide the nav bar down (and fade out) during an active game,
+  // slide back up (and fade in) when returning to any other route.
+  const isHidden = hidden || pathname === "/game";
 
   return (
     <motion.div
       className="fixed inset-x-0 bottom-0 z-30 flex"
-      animate={{ y: hidden ? 120 : 0 }}
-      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)", paddingLeft: "8px", paddingRight: "8px" }}
+      animate={{
+        y: isHidden ? 140 : 0,
+        opacity: isHidden ? 0 : 1,
+        filter: isHidden ? "blur(8px)" : "blur(2px)",
+      }}
+      transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)", paddingLeft: "8px", paddingRight: "8px", pointerEvents: isHidden ? "none" : "auto" }}
     >
     <div className="flex flex-1 border border-border rounded-full overflow-hidden" style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
       {TABS.map(({ label, icon: Icon, path }) => {

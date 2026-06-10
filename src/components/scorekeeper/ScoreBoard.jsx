@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { MoreHorizontal, Shuffle, FlagOff } from "lucide-react";
+import { MoreHorizontal, Shuffle, ArrowRightToLine } from "lucide-react";
 import { motion, LayoutGroup } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import PlayerColumn from "./PlayerColumn";
@@ -203,17 +203,17 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           </LayoutGroup>
         </div>
 
-        {/* End Game — fixed at bottom of scoreboard */}
+        {/* End Game — fixed at bottom-right of scoreboard */}
         <div
-          className="absolute inset-x-0 bottom-0 z-30 px-4 flex justify-center"
+          className="absolute inset-x-0 bottom-0 z-30 px-4 flex justify-end"
           style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
         >
           <button
             onClick={() => setShowEndGame(true)}
             className="flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-green-600 hover:bg-green-700 text-white font-semibold text-sm shadow-lg transition-colors"
           >
-            <FlagOff size={18} strokeWidth={2.5} />
             End Game
+            <ArrowRightToLine size={18} strokeWidth={2.5} />
           </button>
         </div>
       </div>

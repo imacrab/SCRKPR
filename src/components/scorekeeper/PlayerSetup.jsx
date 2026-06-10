@@ -16,7 +16,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [canScrollPlayers, setCanScrollPlayers] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
-  const [winMode, setWinMode] = useState("low");
+  const [winMode, setWinMode] = useState("ginrummy");
   const [showBestOf, setShowBestOf] = useState(false);
   const [showGameMode, setShowGameMode] = useState(false);
   const scrollRef = useRef(null);

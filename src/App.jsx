@@ -33,6 +33,7 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route path="/" element={<ScoreKeeper />} />
       <Route path="/game" element={<ScoreKeeper />} />
+      <Route path="/players" element={<ScoreKeeper />} />
       <Route path="/history" element={<ScoreKeeper />} />
       <Route path="/account" element={<ScoreKeeper />} />
       <Route path="*" element={<PageNotFound />} />

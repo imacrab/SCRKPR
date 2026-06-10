@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, X } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import EmojiPicker from "./EmojiPicker";
@@ -19,28 +19,31 @@ function pickRandomColor(usedColors = []) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-export default function AddPlayerModal({ isOpen, usedColors = [], onAdd, onClose }) {
+export default function PlayerEditModal({ isOpen, player, usedColors = [], onSave, onDelete, onClose }) {
   const [name, setName] = useState("");
   const [color, setColor] = useState(PLAYER_COLORS[0]);
   const [emoji, setEmoji] = useState("");
   const inputRef = useRef(null);
+  const isEditing = !!player?.id;
 
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return;
+    if (player?.id) {
+      setName(player.name || "");
+      setColor(player.color || PLAYER_COLORS[0]);
+      setEmoji(player.emoji || "");
+    } else {
       setName("");
       setColor(pickRandomColor(usedColors));
       setEmoji("");
-      setTimeout(() => inputRef.current?.focus(), 120);
     }
-  }, [isOpen, usedColors]);
+    setTimeout(() => inputRef.current?.focus(), 120);
+  }, [isOpen, player, usedColors]);
 
   const handleSubmit = () => {
     const trimmed = name.trim();
     if (!trimmed) return;
-    onAdd(trimmed, color, emoji);
-    setName("");
-    setColor(pickRandomColor([...usedColors, color]));
-    setEmoji("");
+    onSave({ id: player?.id, name: trimmed, color, emoji });
   };
 
   return (
@@ -67,8 +70,12 @@ export default function AddPlayerModal({ isOpen, usedColors = [], onAdd, onClose
               <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
 
               <div className="text-center mb-5">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-0.5">New Player</p>
-                <h2 className="font-display text-xl font-bold text-foreground">Add to Game</h2>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-0.5">
+                  {isEditing ? "Edit Player" : "New Player"}
+                </p>
+                <h2 className="font-display text-xl font-bold text-foreground">
+                  {isEditing ? "Update Details" : "Add Player"}
+                </h2>
               </div>
 
               <Input
@@ -80,7 +87,6 @@ export default function AddPlayerModal({ isOpen, usedColors = [], onAdd, onClose
                 placeholder="Player name"
                 maxLength={20}
                 className="mb-5 text-center text-base bg-secondary border-border"
-                aria-label="New player name"
               />
 
               <div className="mb-3">
@@ -103,15 +109,25 @@ export default function AddPlayerModal({ isOpen, usedColors = [], onAdd, onClose
               </div>
 
               <div className="flex gap-3">
+                {isEditing && (
+                  <Button
+                    onClick={() => onDelete?.(player.id)}
+                    variant="outline"
+                    className="h-11 text-accent-red border-accent-red/40"
+                  >
+                    <Trash2 size={20} strokeWidth={2} />
+                  </Button>
+                )}
                 <Button onClick={onClose} variant="outline" className="flex-1 h-11">
                   Cancel
                 </Button>
                 <Button
                   onClick={handleSubmit}
                   disabled={!name.trim()}
-                  className="flex-[2] h-11 bg-white hover:bg-white/90 font-semibold" style={{ color: "#111" }}
+                  className="flex-[2] h-11 bg-white hover:bg-white/90 font-semibold"
+                  style={{ color: "#111" }}
                 >
-                  Add Player
+                  {isEditing ? "Save" : "Add"}
                 </Button>
               </div>
             </div>

@@ -4,9 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import PlayerSetup from "@/components/scorekeeper/PlayerSetup";
 import ScoreBoard from "@/components/scorekeeper/ScoreBoard";
-import AddPlayerModal from "@/components/scorekeeper/AddPlayerModal";
+import PlayerEditModal from "@/components/scorekeeper/PlayerEditModal";
 import BottomNavigationBar from "@/components/scorekeeper/BottomNavigationBar";
 import History from "./History";
+import Players from "./Players";
 import AccountSettings from "./AccountSettings";
 
 // Game state is kept in module scope and localStorage so it survives route transitions and page refreshes
@@ -210,6 +211,12 @@ export default function ScoreKeeper() {
           </motion.div>
         )}
 
+        {view === "/players" && (
+          <motion.div key="players" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
+            <Players onBack={() => navigate(-1)} onModalChange={setNavHidden} />
+          </motion.div>
+        )}
+
         {view === "/account" && (
           <motion.div key="account" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
             <AccountSettings onBack={() => navigate(-1)} onModalChange={setNavHidden} />
@@ -244,10 +251,11 @@ export default function ScoreKeeper() {
               onEndGame={handleEndGame}
               onAddPlayer={() => setShowAddPlayer(true)}
             />
-            <AddPlayerModal
+            <PlayerEditModal
               isOpen={showAddPlayer}
+              player={null}
               usedColors={players.map((p) => p.color)}
-              onAdd={handleAddPlayer}
+              onSave={({ name, color, emoji }) => handleAddPlayer(name, color, emoji)}
               onClose={() => setShowAddPlayer(false)}
             />
           </motion.div>

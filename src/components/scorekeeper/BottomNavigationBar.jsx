@@ -1,11 +1,12 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Spade, History, Settings } from "lucide-react";
+import { Spade, Users, History, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 
 const TABS = [
-  { label: "New Game", icon: Spade, path: "/" },
+  { label: "New Game", icon: Spade,    path: "/" },
+  { label: "Players",  icon: Users,    path: "/players" },
   { label: "History",  icon: History,  path: "/history" },
-  { label: "Account",  icon: Settings,  path: "/account" },
+  { label: "Account",  icon: Settings, path: "/account" },
 ];
 
 export default function BottomNavigationBar({ hidden = false }) {

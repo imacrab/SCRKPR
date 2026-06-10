@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import { Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,9 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
   const inputRef = useRef(null);
   const isEditing = !!player?.id;
 
+  const y = useMotionValue(0);
+  const opacity = useTransform(y, [0, 400], [1, 0.4]);
+
   useEffect(() => {
     if (!isOpen) return;
     if (player?.id) {
@@ -37,8 +40,9 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
       setColor(pickRandomColor(usedColors));
       setEmoji("");
     }
+    y.set(0);
     setTimeout(() => inputRef.current?.focus(), 120);
-  }, [isOpen, player, usedColors]);
+  }, [isOpen, player, usedColors, y]);
 
   const handleSubmit = () => {
     const trimmed = name.trim();
@@ -46,19 +50,33 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
     onSave({ id: player?.id, name: trimmed, color, emoji });
   };
 
+  const handleDragEnd = (_, info) => {
+    if (info.offset.y > 120 || info.velocity.y > 500) {
+      onClose();
+    } else {
+      animate(y, 0, { type: "spring", stiffness: 400, damping: 35 });
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ y: "100%", opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: "100%", opacity: 0 }}
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          exit={{ y: "100%" }}
           transition={{ type: "spring", stiffness: 400, damping: 35 }}
+          style={{ y, opacity }}
           className="fixed inset-0 z-50 bg-card flex flex-col"
         >
-          {/* Sticky header */}
-          <div
-            className="flex-shrink-0 flex items-center justify-between px-5 border-b border-border"
+          {/* Sticky header — drag handle */}
+          <motion.div
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 1 }}
+            onDrag={(_, info) => { if (info.offset.y > 0) y.set(info.offset.y); }}
+            onDragEnd={handleDragEnd}
+            className="flex-shrink-0 flex items-center justify-between px-5 border-b border-border touch-none select-none cursor-grab active:cursor-grabbing"
             style={{ paddingTop: "calc(env(safe-area-inset-top) + 12px)", paddingBottom: "12px" }}
           >
             <button
@@ -68,7 +86,8 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
             >
               <X size={22} strokeWidth={2} />
             </button>
-            <div className="text-center">
+            <div className="text-center pointer-events-none">
+              <div className="w-10 h-1 bg-border rounded-full mx-auto mb-2" />
               <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">
                 {isEditing ? "Edit Player" : "New Player"}
               </p>
@@ -77,7 +96,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
               </h2>
             </div>
             <div className="w-10" />
-          </div>
+          </motion.div>
 
           {/* Scrollable content */}
           <div className="flex-1 overflow-y-auto px-5 pt-5 pb-5">

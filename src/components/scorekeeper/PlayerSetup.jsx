@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Play, Check } from "lucide-react";
+import { Plus, Play, Check, GripVertical } from "lucide-react";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import BestOfModal from "./BestOfModal";
@@ -78,6 +79,17 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     window.addEventListener("resize", checkScroll);
     return () => window.removeEventListener("resize", checkScroll);
   }, [allPlayers]);
+
+  const handleDragEnd = (result) => {
+    if (!result.destination || result.source.index === result.destination.index) return;
+    setAllPlayers((prev) => {
+      const next = Array.from(prev);
+      const [moved] = next.splice(result.source.index, 1);
+      next.splice(result.destination.index, 0, moved);
+      return next;
+    });
+    if (navigator.vibrate) navigator.vibrate(10);
+  };
 
   const toggleSelected = (id) => {
     setSelectedIds((prev) => {
@@ -167,40 +179,60 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 </div>
               )}
 
-              <AnimatePresence>
-                {allPlayers.map((player) => {
-                  const selected = selectedIds.has(player.id);
-                  return (
-                    <motion.button
-                      key={player.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0, x: -16, height: 0 }}
-                      transition={{ duration: 0.2 }}
-                      onClick={() => toggleSelected(player.id)}
-                      className="w-full rounded-lg border bg-card overflow-hidden flex items-center gap-3 px-3 py-2.5 text-left transition-colors"
-                      style={{ borderColor: selected ? player.color : "hsl(var(--border))" }}
+              <DragDropContext onDragEnd={handleDragEnd}>
+                <Droppable droppableId="players">
+                  {(dropProvided) => (
+                    <div
+                      ref={dropProvided.innerRef}
+                      {...dropProvided.droppableProps}
+                      className="space-y-2"
                     >
-                      <div
-                        className="w-7 h-7 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"
-                        style={{ backgroundColor: player.color }}
-                      >
-                        {player.emoji && <FluentEmoji emoji={player.emoji} size={18} />}
-                      </div>
-                      <span className="flex-1 text-foreground text-base">{player.name}</span>
-                      <div
-                        className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-                        style={{
-                          backgroundColor: selected ? player.color : "transparent",
-                          border: selected ? "none" : "2px solid hsl(var(--border))",
-                        }}
-                      >
-                        {selected && <Check size={16} strokeWidth={3} className="text-white" />}
-                      </div>
-                    </motion.button>
-                  );
-                })}
-              </AnimatePresence>
+                      {allPlayers.map((player, index) => {
+                        const selected = selectedIds.has(player.id);
+                        return (
+                          <Draggable key={player.id} draggableId={player.id} index={index}>
+                            {(dragProvided, snapshot) => (
+                              <div
+                                ref={dragProvided.innerRef}
+                                {...dragProvided.draggableProps}
+                                {...dragProvided.dragHandleProps}
+                                onClick={() => toggleSelected(player.id)}
+                                className="w-full rounded-lg border bg-card overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left transition-colors cursor-pointer"
+                                style={{
+                                  borderColor: selected ? player.color : "hsl(var(--border))",
+                                  boxShadow: snapshot.isDragging ? "0 10px 20px -5px rgba(0,0,0,0.25)" : "none",
+                                  ...dragProvided.draggableProps.style,
+                                }}
+                              >
+                                <div className="flex-shrink-0 text-muted-foreground touch-none flex items-center justify-center w-6 h-7">
+                                  <GripVertical size={18} strokeWidth={2} />
+                                </div>
+                                <div
+                                  className="w-7 h-7 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"
+                                  style={{ backgroundColor: player.color }}
+                                >
+                                  {player.emoji && <FluentEmoji emoji={player.emoji} size={18} />}
+                                </div>
+                                <span className="flex-1 text-foreground text-base">{player.name}</span>
+                                <div
+                                  className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
+                                  style={{
+                                    backgroundColor: selected ? player.color : "transparent",
+                                    border: selected ? "none" : "2px solid hsl(var(--border))",
+                                  }}
+                                >
+                                  {selected && <Check size={16} strokeWidth={3} className="text-white" />}
+                                </div>
+                              </div>
+                            )}
+                          </Draggable>
+                        );
+                      })}
+                      {dropProvided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
 
               <button
                 onClick={() => setShowAddPlayerWithNav(true)}

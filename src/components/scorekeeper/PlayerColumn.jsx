@@ -127,12 +127,12 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           style={{
             left: -58,
             top: "50%",
-            transform: "translateY(-50%) rotate(-15deg) scaleX(-1)",
+            transform: "translateY(-50%) scaleX(-1)",
             opacity: 0.95,
             zIndex: 0
           }}
           aria-hidden="true">
-            <FluentEmoji emoji={player.emoji} size={120} />
+            <FluentEmoji emoji={player.emoji} size={84} />
           </div>
         }
 

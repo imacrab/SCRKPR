@@ -115,9 +115,9 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
         <div
           className="absolute pointer-events-none select-none"
           style={{
-            left: -18,
+            left: -38,
             top: "50%",
-            transform: "translateY(-50%) rotate(-5deg)",
+            transform: "translateY(-50%) rotate(-15deg)",
             opacity: 0.95,
             zIndex: 0
           }}

@@ -233,10 +233,23 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         >
           <button
             onClick={() => setShowEndGame(true)}
-            className="w-full flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold text-sm shadow-lg transition-colors"
+            className="relative w-full flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold text-sm shadow-lg transition-colors overflow-hidden"
           >
-            End Game
-            <FluentEmoji emoji="🏳️" size={20} />
+            {/* Flourish — oversized tilted flag bleeding off the right edge */}
+            <div
+              className="absolute pointer-events-none select-none"
+              style={{
+                right: -50,
+                top: "50%",
+                transform: "translateY(-50%) rotate(-15deg) scaleX(-1)",
+                opacity: 0.95,
+                zIndex: 0,
+              }}
+              aria-hidden="true"
+            >
+              <FluentEmoji emoji="🏳️" size={120} />
+            </div>
+            <span className="relative z-10">End Game</span>
           </button>
         </div>
       </div>

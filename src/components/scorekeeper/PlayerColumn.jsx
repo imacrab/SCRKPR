@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Plus, Minus, Flame } from "lucide-react";
 import { readableTextColor } from "@/lib/contrast";
+import FluentEmoji from "./FluentEmoji";
 
 function AnimatedTotal({ value, color }) {
   const [displayValue, setDisplayValue] = useState(value);
@@ -140,8 +141,8 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             
             <div className="flex items-center gap-2 w-full min-w-0">
               {player.emoji &&
-              <span className="text-base leading-none flex-shrink-0" aria-hidden="true">
-                  {player.emoji}
+              <span className="leading-none flex-shrink-0 flex items-center" aria-hidden="true">
+                  <FluentEmoji emoji={player.emoji} size={20} />
                 </span>
               }
               <span className="font-bold truncate leading-tight text-xl" title={player.name} style={{ color: textColor }}>

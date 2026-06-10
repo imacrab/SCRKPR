@@ -6,6 +6,7 @@ import { base44 } from "@/api/base44Client";
 import BestOfModal from "./BestOfModal";
 import GameModeModal from "./GameModeModal";
 import PlayerEditModal from "./PlayerEditModal";
+import FluentEmoji from "./FluentEmoji";
 import { getModeMeta } from "@/lib/gameModes";
 
 const DEFAULT_SELECTED_NAMES = ["Adrian", "Jayne"];
@@ -182,10 +183,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                       style={{ borderColor: selected ? player.color : "hsl(var(--border))" }}
                     >
                       <div
-                        className="w-7 h-7 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center text-sm leading-none"
+                        className="w-7 h-7 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"
                         style={{ backgroundColor: player.color }}
                       >
-                        {player.emoji}
+                        {player.emoji && <FluentEmoji emoji={player.emoji} size={18} />}
                       </div>
                       <span className="flex-1 text-foreground text-base">{player.name}</span>
                       <div

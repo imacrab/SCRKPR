@@ -1,3 +1,5 @@
+import FluentEmoji from "./FluentEmoji";
+
 export const PLAYER_EMOJIS = [
   "😀", "😎", "🤓", "🥳", "😈", "🤡", "👻", "🤖", "👽", "🦄",
   "🐶", "🐱", "🦊", "🐻", "🐼", "🐯", "🦁", "🐸", "🐵", "🐲",
@@ -23,10 +25,10 @@ export default function EmojiPicker({ selected, onChange }) {
           key={emoji}
           type="button"
           onPointerDown={(e) => { e.preventDefault(); onChange(emoji); }}
-          className="w-10 h-10 rounded-full flex items-center justify-center text-2xl transition-transform active:scale-90"
+          className="w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-90"
           style={{ outline: selected === emoji ? "2px solid white" : "none", outlineOffset: "2px" }}
         >
-          {emoji}
+          <FluentEmoji emoji={emoji} size={28} />
         </button>
       ))}
     </div>

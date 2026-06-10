@@ -4,6 +4,7 @@ import { Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import EmojiPicker from "./EmojiPicker";
+import FluentEmoji from "./FluentEmoji";
 import { getPaletteForTone, readableTextColor } from "@/lib/contrast";
 import { usePlayerTone } from "@/lib/usePlayerTone";
 
@@ -116,10 +117,10 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
                   <button
                     key={c}
                     onPointerDown={(e) => { e.preventDefault(); setColor(c); }}
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-xl transition-transform active:scale-90"
+                    className="w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-90"
                     style={{ backgroundColor: c, color: readableTextColor(c), outline: color === c ? "2px solid hsl(var(--foreground))" : "none", outlineOffset: "2px" }}
                   >
-                    {color === c ? emoji : ""}
+                    {color === c && emoji ? <FluentEmoji emoji={emoji} size={24} /> : ""}
                   </button>
                 ))}
               </div>

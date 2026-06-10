@@ -41,18 +41,20 @@ function AnimatedTotal({ value, color }) {
   }, [value]);
 
   return (
-    <AnimatePresence mode="popLayout">
-      <motion.span
-        key={animKey}
-        initial={{ scale: 0.6, opacity: 0, y: -10 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 500, damping: 22 }}
-        className="font-bold leading-none block text-3xl"
-        style={{ color, opacity: isResetting ? 0.7 : 1 }}>
-        
-        {displayValue}
-      </motion.span>
-    </AnimatePresence>);
+    <span className="font-bold leading-none block text-3xl relative overflow-hidden" style={{ color, opacity: isResetting ? 0.7 : 1, height: "1em", minWidth: "1ch" }}>
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.span
+          key={animKey}
+          initial={{ y: "-100%", opacity: 0 }}
+          animate={{ y: "0%", opacity: 1 }}
+          exit={{ y: "100%", opacity: 0 }}
+          transition={{ type: "spring", stiffness: 500, damping: 18, mass: 0.8 }}
+          className="block">
+          
+          {displayValue}
+        </motion.span>
+      </AnimatePresence>
+    </span>);
 
 }
 

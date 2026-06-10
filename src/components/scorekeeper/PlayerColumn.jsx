@@ -70,6 +70,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
   }, []);
 
   const handleQuickTap = (delta) => {
+    if (navigator.vibrate) navigator.vibrate(10);
     if (isBestOf) {
       onQuickScore?.(delta);
       return;

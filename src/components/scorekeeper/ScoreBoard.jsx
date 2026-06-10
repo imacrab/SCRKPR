@@ -78,18 +78,24 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     }
   }, [players, circleMode, winsNeeded]);
 
-  // Auto-end when any player reaches the target score (Gin Rummy, etc.)
+  // Auto-end when any player reaches the target score (Gin Rummy, Swish, etc.)
+  // For round-based modes, wait until all players have logged the same number of scores
+  // (i.e. the current round is complete) before ending.
   useEffect(() => {
     if (!targetScore || circleMode) return;
-    const low = isLowMode(winMode);
     const reached = players.some((p) => {
       const total = p.scores.reduce((s, n) => s + n, 0);
-      return low ? total <= -targetScore : total >= targetScore;
+      return total >= targetScore;
     });
-    if (reached) {
-      setTimeout(() => setShowEndGame(true), 400);
-    }
-  }, [players, winMode, targetScore]);
+    if (!reached) return;
+
+    // Round complete = every player has the same number of scores logged
+    const counts = players.map((p) => p.scores.length);
+    const roundComplete = counts.every((c) => c === counts[0]);
+    if (!roundComplete) return;
+
+    setTimeout(() => setShowEndGame(true), 400);
+  }, [players, winMode, targetScore, circleMode]);
 
   const handleOpenScore = (player) => {
     if (circleMode) {

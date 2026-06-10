@@ -3,7 +3,7 @@ import { TrendingUp, TrendingDown, Trophy, Spade, Zap } from "lucide-react";
 
 const MODES = [
   { value: "ginrummy", label: "Gin Rummy",  sub: "Game ends at 100.",     Icon: Spade },
-  { value: "swish",    label: "Swish",      sub: "Game ends at 500.",     Icon: Zap },
+  { value: "swish",    label: "Swish",      sub: "Lowest to 500 wins.",   Icon: Zap },
   { value: "low",      label: "Low Score",  sub: "Lowest total wins",     Icon: TrendingDown },
   { value: "high",     label: "High Score", sub: "Highest total wins",    Icon: TrendingUp },
   { value: "bestof",   label: "Best Of",    sub: "First to win N rounds", Icon: Trophy },

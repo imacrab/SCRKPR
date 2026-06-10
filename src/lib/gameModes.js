@@ -5,7 +5,7 @@ import { TrendingUp, TrendingDown, Trophy, Spade, Zap } from "lucide-react";
 // targetScore: number | null            (when set, reaching it auto-ends the game)
 export const GAME_MODES = {
   ginrummy: { label: "Gin Rummy",  Icon: Spade,        direction: "high",   targetScore: 100 },
-  swish:    { label: "Swish",      Icon: Zap,          direction: "high",   targetScore: 500 },
+  swish:    { label: "Swish",      Icon: Zap,          direction: "low",    targetScore: 500 },
   low:      { label: "Low Score",  Icon: TrendingDown, direction: "low",    targetScore: null },
   high:     { label: "High Score", Icon: TrendingUp,   direction: "high",   targetScore: null },
   bestof:   { label: "Best Of",    Icon: Trophy,       direction: "bestof", targetScore: null },

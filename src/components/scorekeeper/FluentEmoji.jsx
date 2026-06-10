@@ -22,7 +22,7 @@ export function getFluentEmojiUrl(emoji) {
   return `${ASSET_BASE}/${cp}.webp`;
 }
 
-export default function FluentEmoji({ emoji, size = 18, className = "", style = {} }) {
+export default function FluentEmoji({ emoji, size = 10, className = "", style = {} }) {
   if (!emoji) return null;
   return (
     <img

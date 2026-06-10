@@ -186,12 +186,12 @@ export default function History({ onBack, onModalChange }) {
                         {isTie ? "Tie" : winner.name}
                       </p>
                     </div>
-                    <button
-                        onClick={() => deleteGame(game.id)}
-                        className="text-muted-foreground hover:text-accent-red transition-colors p-1">
-                        
-                      <FluentEmoji emoji="🗑️" size={20} />
-                    </button>
+                    //<button
+                      //  onClick={() => deleteGame(game.id)}
+                      //  className="text-muted-foreground hover:text-accent-red transition-colors p-1">
+                      //  
+                      //  <FluentEmoji emoji="🗑️" size={20} />
+                    //</button>
                   </div>
 
                   {/* Player scores */}

@@ -17,10 +17,11 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
     if (isOpen) setIsExiting(false);
   }, [isOpen]);
 
-  // Play slide-down exit, then trigger the parent's confirm (which navigates home).
+  // Start slide-down exit and trigger navigation in parallel so the page
+  // transition overlaps with the modal slide for a smoother feel.
   const handleConfirm = () => {
     setIsExiting(true);
-    setTimeout(() => onConfirm(), 420);
+    setTimeout(() => onConfirm(), 120);
   };
 
   useEffect(() => {

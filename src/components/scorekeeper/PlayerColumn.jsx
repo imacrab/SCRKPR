@@ -219,7 +219,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             onClick={() => handleQuickTap(1)}
             whileTap={{ scale: 0.85 }}
             transition={{ type: "spring", stiffness: 600, damping: 14 }}
-            className="flex items-center justify-center flex-shrink-0"
+            className="flex items-center justify-center flex-shrink-0 bg-[#ffffff]/20"
             style={{ width: 44, height: 44, borderRadius: 9999, backgroundColor: buttonBg, color: textColor, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
             aria-label={`Add 1 to ${player.name}`}>
             

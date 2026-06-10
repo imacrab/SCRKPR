@@ -113,7 +113,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
       {/* Standings */}
       <div className="space-y-1 mb-6">
         {sorted.map((p, i) => (
-          <div key={p.id} className="flex items-center gap-3 py-2 px-3 rounded-xl" style={{ backgroundColor: i === 0 ? `${p.color}12` : undefined }}>
+          <div key={p.id} className="flex items-center gap-3 py-2 px-3 rounded-xl" style={{ backgroundColor: `${p.color}12` }}>
             <span className="text-xs text-muted-foreground w-4 text-right">{i + 1}</span>
             <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} />
             <span className="text-sm text-foreground flex-1 truncate font-medium">{p.name}</span>

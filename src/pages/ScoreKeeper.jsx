@@ -10,7 +10,7 @@ import History from "./History";
 import Players from "./Players";
 import AccountSettings from "./AccountSettings";
 
-// Game state is kept in module scope and localStorage so it survives route transitions and page refreshes
+// Game state persists across route transitions and page refreshes via module scope + localStorage
 let _players = [];
 let _winMode = "high";
 let _bestOf = null; // only set when winMode === "bestof"

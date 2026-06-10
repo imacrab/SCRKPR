@@ -93,13 +93,11 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
 
   return (
     <div className="flex flex-col rounded-xl border border-border overflow-hidden">
-      {/* Header — frosted glass */}
+      {/* Header — player color background */}
       <div
         className="px-2 py-3 rounded-sm flex flex-col items-center z-10 transition-all"
         style={{
-          backgroundColor: isHighlighted ? `hsl(var(--primary) / 0.1)` : "hsl(var(--card) / 0.9)",
-          backdropFilter: "blur(1px)",
-          WebkitBackdropFilter: "blur(1px)",
+          backgroundColor: player.color,
           borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))",
         }}
       >
@@ -110,8 +108,8 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               onClick={() => handleQuickTap(-1)}
               whileTap={{ scale: 0.85 }}
               transition={{ type: "spring", stiffness: 600, damping: 14 }}
-              className="flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60 border border-border"
-              style={{ width: 44, height: 44, borderRadius: 12 }}
+              className="flex items-center justify-center flex-shrink-0 text-white"
+              style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: "rgba(0,0,0,0.18)" }}
               aria-label={`Subtract 1 from ${player.name}`}
             >
               <Minus size={20} strokeWidth={2.5} />
@@ -133,11 +131,11 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             style={{ marginLeft: 16 }}
           >
             <div className="flex items-center gap-2 w-full min-w-0">
-              <span className="text-s font-bold text-foreground truncate leading-tight" title={player.name}>
+              <span className="text-s font-bold text-white truncate leading-tight" title={player.name}>
                 {player.name}
               </span>
               {streak >= 2 && (
-                <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-500/20 text-orange-400 px-2 py-0.5 flex-shrink-0">
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-white/25 text-white px-2 py-0.5 flex-shrink-0">
                   <Flame size={12} strokeWidth={2.5} />
                   <span className="text-[10px] font-semibold leading-none">{streak}</span>
                 </span>
@@ -149,8 +147,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: "spring", stiffness: 400, damping: 24 }}
-                className="text-sm font-semibold leading-none"
-                style={{ color: player.color }}
+                className="text-sm font-semibold leading-none text-white"
               >
                 ({pendingDelta > 0 ? `+${pendingDelta}` : pendingDelta})
               </motion.span>
@@ -162,7 +159,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: "spring", stiffness: 400, damping: 24 }}
                 onClick={(e) => { e.stopPropagation(); onEditScore?.(lastIdx); }}
-                className="text-sm font-semibold text-muted-foreground leading-none cursor-pointer"
+                className="text-sm font-semibold text-white/75 leading-none cursor-pointer"
               >
                 ({lastScore > 0 ? `+${lastScore}` : lastScore})
               </motion.span>
@@ -176,7 +173,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             style={{ marginRight: 16 }}
             aria-label={`Add score for ${player.name}`}
           >
-            <AnimatedTotal value={total} color={player.color} />
+            <AnimatedTotal value={total} color="#ffffff" />
           </button>
 
           {/* Plus (±1) — hidden in bestof mode */}
@@ -185,8 +182,8 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               onClick={() => handleQuickTap(1)}
               whileTap={{ scale: 0.85 }}
               transition={{ type: "spring", stiffness: 600, damping: 14 }}
-              className="flex items-center justify-center flex-shrink-0 text-muted-foreground hover:text-foreground active:bg-muted/60 border border-border"
-              style={{ width: 44, height: 44, borderRadius: 12 }}
+              className="flex items-center justify-center flex-shrink-0 text-white"
+              style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: "rgba(0,0,0,0.18)" }}
               aria-label={`Add 1 to ${player.name}`}
             >
               <Plus size={20} strokeWidth={2.5} />

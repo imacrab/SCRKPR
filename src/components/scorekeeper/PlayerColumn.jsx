@@ -106,7 +106,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
   // WCAG 2.2 — pick text color that contrasts with the player's background
   const textColor = useMemo(() => readableTextColor(player.color || "#000000"), [player.color]);
   const isDarkText = textColor === "#111111";
-  const buttonBg = isDarkText ? "rgba(0,0,0,0.10)" : "rgba(0,0,0,0.18)";
+  const buttonBg = "rgba(255,255,255,0.08)";
   const streakBg = isDarkText ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.25)";
   const subtleText = isDarkText ? "rgba(17,17,17,0.65)" : "rgba(255,255,255,0.75)";
 

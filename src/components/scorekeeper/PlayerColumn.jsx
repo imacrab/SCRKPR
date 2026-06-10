@@ -142,7 +142,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             <div className="flex items-center gap-2 w-full min-w-0">
               {player.emoji &&
               <span className="leading-none flex-shrink-0 flex items-center" aria-hidden="true">
-                  <FluentEmoji emoji={player.emoji} size={20} />
+                  <FluentEmoji emoji={player.emoji} size={30} />
                 </span>
               }
               <span className="font-bold truncate leading-tight text-xl" title={player.name} style={{ color: textColor }}>

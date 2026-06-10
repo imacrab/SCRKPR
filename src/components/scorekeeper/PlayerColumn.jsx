@@ -45,13 +45,13 @@ function AnimatedTotal({ value, color }) {
         initial={{ scale: 0.6, opacity: 0, y: -10 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 500, damping: 22 }}
-        className="text-4xl font-bold leading-none block"
-        style={{ color, opacity: isResetting ? 0.7 : 1 }}
-      >
+        className="font-bold leading-none block text-3xl"
+        style={{ color, opacity: isResetting ? 0.7 : 1 }}>
+        
         {displayValue}
       </motion.span>
-    </AnimatePresence>
-  );
+    </AnimatePresence>);
+
 }
 
 export default function PlayerColumn({ player, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, onAddScore, onQuickScore, onEditScore, onEditPlayer }) {
@@ -98,28 +98,28 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
         className="px-2 py-3 rounded-sm flex flex-col items-center z-10 transition-all"
         style={{
           backgroundColor: player.color,
-          borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))",
-        }}
-      >
+          borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))"
+        }}>
+        
         <div className="flex items-center justify-between w-full gap-3">
           {/* Minus (±1) — hidden in bestof mode */}
-          {!isBestOf && (
-            <motion.button
-              onClick={() => handleQuickTap(-1)}
-              whileTap={{ scale: 0.85 }}
-              transition={{ type: "spring", stiffness: 600, damping: 14 }}
-              className="flex items-center justify-center flex-shrink-0 text-white"
-              style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: "rgba(0,0,0,0.18)" }}
-              aria-label={`Subtract 1 from ${player.name}`}
-            >
+          {!isBestOf &&
+          <motion.button
+            onClick={() => handleQuickTap(-1)}
+            whileTap={{ scale: 0.85 }}
+            transition={{ type: "spring", stiffness: 600, damping: 14 }}
+            className="flex items-center justify-center flex-shrink-0 text-white"
+            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: "rgba(0,0,0,0.18)" }}
+            aria-label={`Subtract 1 from ${player.name}`}>
+            
               <Minus size={20} strokeWidth={2.5} />
             </motion.button>
-          )}
+          }
 
           {/* Name (left) — tap to open score modal, long-press to edit player */}
           <button
             onClick={onAddScore}
-            onContextMenu={(e) => { e.preventDefault(); onEditPlayer?.(); }}
+            onContextMenu={(e) => {e.preventDefault();onEditPlayer?.();}}
             onPointerDown={(e) => {
               const timer = setTimeout(() => onEditPlayer?.(), 500);
               const cancel = () => clearTimeout(timer);
@@ -128,47 +128,47 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
             }}
             className="flex-1 flex flex-col items-start gap-1 min-w-0 text-left"
-            style={{ marginLeft: 8 }}
-          >
+            style={{ marginLeft: 8 }}>
+            
             <div className="flex items-center gap-2 w-full min-w-0">
-              {player.emoji && (
-                <span className="text-base leading-none flex-shrink-0" aria-hidden="true">
+              {player.emoji &&
+              <span className="text-base leading-none flex-shrink-0" aria-hidden="true">
                   {player.emoji}
                 </span>
-              )}
-              <span className="text-s font-bold text-white truncate leading-tight" title={player.name}>
+              }
+              <span className="font-bold text-white truncate leading-tight text-xl" title={player.name}>
                 {player.name}
               </span>
-              {streak >= 2 && (
-                <span className="inline-flex items-center gap-0.5 rounded-full bg-white/25 text-white px-2 py-0.5 flex-shrink-0">
+              {streak >= 2 &&
+              <span className="inline-flex items-center gap-0.5 rounded-full bg-white/25 text-white px-2 py-0.5 flex-shrink-0">
                   <Flame size={12} strokeWidth={2.5} />
                   <span className="text-[10px] font-semibold leading-none">{streak}</span>
                 </span>
-              )}
+              }
             </div>
-            {!isBestOf && showPending && (
-              <motion.span
-                key="pending"
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 400, damping: 24 }}
-                className="text-sm font-semibold leading-none text-white"
-              >
+            {!isBestOf && showPending &&
+            <motion.span
+              key="pending"
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 24 }}
+              className="text-sm font-semibold leading-none text-white">
+              
                 ({pendingDelta > 0 ? `+${pendingDelta}` : pendingDelta})
               </motion.span>
-            )}
-            {!isBestOf && !showPending && lastScore !== null && (
-              <motion.span
-                key={lastIdx}
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 400, damping: 24 }}
-                onClick={(e) => { e.stopPropagation(); onEditScore?.(lastIdx); }}
-                className="text-sm font-semibold text-white/75 leading-none cursor-pointer"
-              >
+            }
+            {!isBestOf && !showPending && lastScore !== null &&
+            <motion.span
+              key={lastIdx}
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 24 }}
+              onClick={(e) => {e.stopPropagation();onEditScore?.(lastIdx);}}
+              className="text-sm font-semibold text-white/75 leading-none cursor-pointer">
+              
                 ({lastScore > 0 ? `+${lastScore}` : lastScore})
               </motion.span>
-            )}
+            }
           </button>
 
           {/* Total (right) — tap to open score modal */}
@@ -176,48 +176,48 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             onClick={onAddScore}
             className="flex-shrink-0"
             style={{ marginRight: 8 }}
-            aria-label={`Add score for ${player.name}`}
-          >
+            aria-label={`Add score for ${player.name}`}>
+            
             <AnimatedTotal value={total} color="#ffffff" />
           </button>
 
           {/* Plus (±1) — hidden in bestof mode */}
-          {!isBestOf && (
-            <motion.button
-              onClick={() => handleQuickTap(1)}
-              whileTap={{ scale: 0.85 }}
-              transition={{ type: "spring", stiffness: 600, damping: 14 }}
-              className="flex items-center justify-center flex-shrink-0 text-white"
-              style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: "rgba(0,0,0,0.18)" }}
-              aria-label={`Add 1 to ${player.name}`}
-            >
+          {!isBestOf &&
+          <motion.button
+            onClick={() => handleQuickTap(1)}
+            whileTap={{ scale: 0.85 }}
+            transition={{ type: "spring", stiffness: 600, damping: 14 }}
+            className="flex items-center justify-center flex-shrink-0 text-white"
+            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: "rgba(0,0,0,0.18)" }}
+            aria-label={`Add 1 to ${player.name}`}>
+            
               <Plus size={20} strokeWidth={2.5} />
             </motion.button>
-          )}
+          }
         </div>
       </div>
 
       {/* Best Of win dots (only in bestof mode) */}
-      {isBestOf && (
-        <div className="bg-background flex items-center justify-center gap-2 px-2 py-3">
+      {isBestOf &&
+      <div className="bg-background flex items-center justify-center gap-2 px-2 py-3">
           {Array.from({ length: winsNeeded }).map((_, idx) => {
-            const won = idx < total;
-            return (
-              <motion.div
-                key={idx}
-                initial={won ? { scale: 0 } : false}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 500, damping: 25 }}
-                className="w-3 h-3 rounded-full border-2 flex-shrink-0"
-                style={{
-                  backgroundColor: won ? player.color : "transparent",
-                  borderColor: won ? player.color : "hsl(var(--border))",
-                }}
-              />
-            );
-          })}
+          const won = idx < total;
+          return (
+            <motion.div
+              key={idx}
+              initial={won ? { scale: 0 } : false}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 500, damping: 25 }}
+              className="w-3 h-3 rounded-full border-2 flex-shrink-0"
+              style={{
+                backgroundColor: won ? player.color : "transparent",
+                borderColor: won ? player.color : "hsl(var(--border))"
+              }} />);
+
+
+        })}
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }

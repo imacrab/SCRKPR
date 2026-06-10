@@ -9,7 +9,19 @@ import FluentEmoji from "./FluentEmoji";
 export default function EndGameModal({ isOpen, players, winMode, gameStartTime, onConfirm, onCancel }) {
   const contentRef = useRef(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
   const dragControls = useDragControls();
+
+  // Reset exit state whenever the modal opens
+  useEffect(() => {
+    if (isOpen) setIsExiting(false);
+  }, [isOpen]);
+
+  // Play slide-down exit, then trigger the parent's confirm (which navigates home).
+  const handleConfirm = () => {
+    setIsExiting(true);
+    setTimeout(() => onConfirm(), 420);
+  };
 
   useEffect(() => {
     if (!isOpen || players.length === 0) return;
@@ -142,7 +154,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
         Keep Playing
       </Button>
       <Button
-        onClick={onConfirm}
+        onClick={handleConfirm}
         className="flex-1 h-11 font-semibold bg-green-600 hover:bg-green-700 text-white"
         style={{ boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
       >
@@ -153,7 +165,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isOpen && !isExiting && (
         <>
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

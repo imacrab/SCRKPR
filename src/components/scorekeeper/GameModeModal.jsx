@@ -50,7 +50,7 @@ export default function GameModeModal({ isOpen, winMode, onSelect, onClose }) {
                   <button
                     key={value}
                     onClick={() => handleSelect(value)}
-                    className="w-full flex items-center gap-3 px-4 h-14 rounded-xl transition-colors text-left border flex-shrink-0"
+                    className="w-full flex items-center gap-3 px-4 h-14 rounded-full transition-colors text-left border flex-shrink-0"
                     style={{
                       borderColor: active ? "hsl(199 94% 40% / 0.4)" : "hsl(var(--border))",
                       backgroundColor: active ? "hsl(199 94% 40% / 0.12)" : "hsl(var(--secondary))"

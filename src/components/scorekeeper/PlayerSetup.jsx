@@ -199,7 +199,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 {...dragProvided?.draggableProps || {}}
                 {...dragProvided?.dragHandleProps || {}}
                 onClick={() => toggleSelected(player.id)}
-                className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left transition-colors cursor-pointer"
+                className="w-full rounded-full border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left transition-colors cursor-pointer"
                 style={{
                   backgroundColor: selected ? hexToRgba(player.color, 0.7) : "hsl(var(--card))",
                   borderColor: selected ? "transparent" : "hsl(var(--border))",
@@ -222,7 +222,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                     </div>
                     <span className="flex-1 text-foreground text-base [font-family:'Geist',_sans-serif] font-semibold">{player.name}</span>
                     <div
-                  className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
+                  className="w-6 h-6 rounded-full flex items-center justify-center transition-colors"
                   style={{
                     backgroundColor: selected ? "#FFFFFF" : "transparent",
                     border: selected ? "none" : "2px solid hsl(var(--border))"
@@ -271,7 +271,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
               <button
               onClick={() => setShowAddPlayerWithNav(true)}
-              className="w-full mt-1 h-11 rounded-lg flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50">
+              className="w-full mt-1 h-11 rounded-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50">
               
                 <Plus size={24} strokeWidth={2} />
                 Add Player
@@ -285,7 +285,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       <div className="px-5 pt-2 pb-2">
         <button
           onClick={() => {setShowGameMode(true);onModalChange?.(true);}}
-          className="w-full flex items-center justify-between gap-3 px-4 h-11 rounded-xl border border-border bg-card hover:bg-accent transition-colors">
+          className="w-full flex items-center justify-between gap-3 px-4 h-11 rounded-full border border-border bg-card hover:bg-accent transition-colors">
           
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Game mode</span>
           <span className="flex items-center gap-1.5">

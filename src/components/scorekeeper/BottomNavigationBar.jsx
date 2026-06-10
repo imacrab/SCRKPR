@@ -26,7 +26,7 @@ export default function BottomNavigationBar({ hidden = false }) {
         filter: isHidden ? "blur(8px)" : "blur(0px)",
       }}
       transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-      style={{ paddingBottom: "calc(env(safe-area-inset-bottom))", paddingLeft: "24px", paddingRight: "24px", pointerEvents: isHidden ? "none" : "auto" }}
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom))", paddingLeft: "32px", paddingRight: "32px", pointerEvents: isHidden ? "none" : "auto" }}
     >
     <div className="flex flex-1 border border-border rounded-tl-3xl rounded-tr-3xl rounded-bl-sm rounded-br-sm overflow-hidden" style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
       {TABS.map(({ label, icon: Icon, path }) => {

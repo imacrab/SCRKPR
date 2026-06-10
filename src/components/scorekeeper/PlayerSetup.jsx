@@ -199,7 +199,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 {...dragProvided?.draggableProps || {}}
                 {...dragProvided?.dragHandleProps || {}}
                 onClick={() => toggleSelected(player.id)}
-                className="w-full rounded-full border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left transition-colors cursor-pointer"
+                className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left transition-colors cursor-pointer"
                 style={{
                   backgroundColor: selected ? hexToRgba(player.color, 0.7) : "hsl(var(--card))",
                   borderColor: selected ? "transparent" : "hsl(var(--border))",

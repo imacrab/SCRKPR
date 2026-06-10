@@ -56,6 +56,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
+  useEffect(() => () => {
+    if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
+  }, []);
+
   useEffect(() => {
     base44.entities.Player.list("-created_date", 100).then((data) => {
       // Pin Adrian & Jayne to the top of the list
@@ -107,10 +111,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       return next;
     });
   };
-
-  useEffect(() => () => {
-    if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
-  }, []);
 
   const handleAddPlayer = async ({ name, color, emoji }) => {
     const created = await base44.entities.Player.create({ name, color, emoji });

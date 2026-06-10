@@ -193,20 +193,39 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 return `rgba(${r}, ${g}, ${b}, ${alpha})`;
               };
 
-              const renderRow = (player, { dragProvided, snapshot, selected, draggable }) =>
-              <div
+              const renderRow = (player, { dragProvided, snapshot, selected, draggable }) => {
+                const baseStyle = dragProvided?.draggableProps?.style || {};
+                const isDragging = snapshot?.isDragging;
+
+                // Derive tilt from the dnd transform's Y offset so the card leans into its drag direction
+                let tiltDeg = 0;
+                if (isDragging && baseStyle.transform) {
+                  const m = /translate\(([-\d.]+)px,\s*([-\d.]+)px\)/.exec(baseStyle.transform);
+                  if (m) {
+                    const dy = parseFloat(m[2]);
+                    tiltDeg = Math.max(-5, Math.min(5, dy / 14));
+                  }
+                }
+
+                const composedTransform = `${baseStyle.transform || ""} ${isDragging ? `scale(1.04) rotate(${tiltDeg}deg)` : "scale(1)"}`.trim();
+
+                return (
+                <div
                 ref={dragProvided?.innerRef}
                 {...dragProvided?.draggableProps || {}}
                 {...dragProvided?.dragHandleProps || {}}
                 onClick={() => toggleSelected(player.id)}
-                className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left transition-[background-color,border-color,transform,box-shadow] duration-200 ease-out cursor-pointer"
+                className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left transition-[background-color,border-color] duration-200 ease-out cursor-pointer"
                 style={{
                   backgroundColor: selected ? hexToRgba(player.color, 0.7) : "hsl(var(--card))",
                   borderColor: selected ? "transparent" : "hsl(var(--border))",
-                  boxShadow: snapshot?.isDragging ? "0 20px 35px -8px rgba(0,0,0,0.45)" : "none",
-                  ...(dragProvided?.draggableProps?.style || {}),
-                  transform: `${dragProvided?.draggableProps?.style?.transform || ""} ${snapshot?.isDragging ? "scale(1.04)" : "scale(1)"}`.trim(),
-                  transitionTimingFunction: snapshot?.isDragging ? "cubic-bezier(0.34, 1.56, 0.64, 1)" : "ease-out"
+                  boxShadow: isDragging ? "0 20px 35px -8px rgba(0,0,0,0.45)" : "none",
+                  ...baseStyle,
+                  transform: composedTransform,
+                  transformOrigin: "center center",
+                  transition: isDragging
+                    ? "transform 60ms linear, box-shadow 150ms ease-out"
+                    : "transform 180ms ease-out, box-shadow 180ms ease-out, background-color 200ms ease-out, border-color 200ms ease-out"
                 }}>
                 
                     {draggable ?
@@ -232,7 +251,9 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   
                       {selected && <Check size={16} strokeWidth={3} style={{ color: player.color }} />}
                     </div>
-                  </div>;
+                  </div>
+                );
+              };
 
 
               return (

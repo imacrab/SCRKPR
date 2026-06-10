@@ -97,7 +97,7 @@ export default function History({ onBack, onModalChange }) {
     <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* Header */}
       <div className="pt-10 pb-2 px-5 flex items-center flex-shrink-0 relative" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
-        <h1 className="font-sans font-medium text-lg text-foreground flex-1 text-center">Past Rounds</h1>
+        <h1 className="font-sans font-medium text-lg text-foreground flex-1 text-center items-baseline">Past Rounds</h1>
         <div className="absolute right-5 top-10 flex items-center gap-2">
           {refreshing && <RefreshCw size={16} strokeWidth={2} className="text-muted-foreground animate-spin" />}
           {games.length > 0 &&

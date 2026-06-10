@@ -200,7 +200,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             style={{ marginRight: 8 }}
             aria-label={`Add score for ${player.name}`}>
             
-            <AnimatedTotal value={total} color={textColor} />
+            <AnimatedTotal value={total} color="#FFFFFF" />
           </button>
 
           {/* Plus (±1) — hidden in bestof mode */}

@@ -4,6 +4,7 @@ import confetti from "canvas-confetti";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isLowMode } from "@/lib/gameModes";
+import FluentEmoji from "./FluentEmoji";
 
 export default function EndGameModal({ isOpen, players, winMode, gameStartTime, onConfirm, onCancel }) {
   const contentRef = useRef(null);
@@ -89,8 +90,8 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
     <>
       {/* Winner / Tie */}
       <div className="flex flex-col items-center text-center mb-6">
-        <div className="w-12 h-12 rounded-full mb-3 flex items-center justify-center text-2xl font-bold bg-muted">
-          {isTie ? "🤝" : "🏆"}
+        <div className="w-12 h-12 rounded-full mb-3 flex items-center justify-center bg-muted">
+          <FluentEmoji emoji={isTie ? "🤝" : "🏆"} size={32} />
         </div>
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">
           {isTie ? "It's a Tie!" : "Winner"}

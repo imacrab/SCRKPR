@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Plus, Users } from "lucide-react";
 import PlayerEditModal from "@/components/scorekeeper/PlayerEditModal";
+import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 
 export default function Players({ onBack, onModalChange }) {
   const [players, setPlayers] = useState([]);
@@ -98,10 +99,10 @@ export default function Players({ onBack, onModalChange }) {
                   className="w-full rounded-lg border border-border bg-card overflow-hidden flex items-center gap-3 px-3 py-2.5 text-left active:scale-[0.99] transition-transform"
                 >
                   <div
-                    className="w-9 h-9 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center text-base leading-none"
+                    className="w-9 h-9 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"
                     style={{ backgroundColor: p.color }}
                   >
-                    {p.emoji}
+                    {p.emoji && <FluentEmoji emoji={p.emoji} size={22} />}
                   </div>
                   <span className="flex-1 text-foreground text-base">{p.name}</span>
                 </motion.button>

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, AlertTriangle, LogOut, Moon, Sun, Smartphone } from "lucide-react";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
+import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 
 export default function AccountSettings({ onBack, onModalChange }) {
   const [showConfirm, setShowConfirm] = useState(false);
@@ -78,19 +79,16 @@ export default function AccountSettings({ onBack, onModalChange }) {
          {/* Theme */}
          <div className="rounded-xl border border-border bg-card overflow-hidden">
             <div className="px-4 py-4 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <Sun size={20} strokeWidth={2} className="text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium text-foreground">Theme</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Choose your preferred appearance.</p>
-                </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">Theme</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Choose your preferred appearance.</p>
               </div>
             </div>
             <div className="flex gap-2 px-4 pb-4">
               {[
-                { value: "system", label: "System", Icon: Smartphone },
-                { value: "light", label: "Light", Icon: Sun },
-                { value: "dark", label: "Dark", Icon: Moon },
+                { value: "system", label: "System", emoji: "📱" },
+                { value: "light", label: "Light", emoji: "☀️" },
+                { value: "dark", label: "Dark", emoji: "🌙" },
               ].map((opt) => {
                 const active = theme === opt.value;
                 return (
@@ -104,7 +102,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
                       color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))",
                     }}
                   >
-                    <opt.Icon size={16} strokeWidth={2} />
+                    <FluentEmoji emoji={opt.emoji} size={18} />
                     {opt.label}
                   </button>
                 );
@@ -115,12 +113,9 @@ export default function AccountSettings({ onBack, onModalChange }) {
          {/* Sign Out */}
          <div className="rounded-xl border border-border bg-card overflow-hidden">
            <div className="px-4 py-4 flex items-center justify-between gap-4">
-             <div className="flex items-center gap-3">
-               <LogOut size={20} strokeWidth={2} className="text-muted-foreground" />
-               <div>
-                 <p className="text-sm font-medium text-foreground">Sign Out</p>
-                 <p className="text-xs text-muted-foreground mt-0.5">End your session and return to login.</p>
-               </div>
+             <div>
+               <p className="text-sm font-medium text-foreground">Sign Out</p>
+               <p className="text-xs text-muted-foreground mt-0.5">End your session and return to login.</p>
              </div>
              <button
                onClick={() => base44.auth.logout("/")}

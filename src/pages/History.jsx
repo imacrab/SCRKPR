@@ -138,10 +138,13 @@ export default function History({ onBack, onModalChange }) {
             <div className="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
           </div> :
           games.length === 0 ?
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <FluentEmoji emoji="🙀" size={100} />
-            <p className="text-muted-foreground text-2xl [font-family:'Geist',_sans-serif] font-medium mt-3">No rounds saved yet.</p>
-            <p className="text-muted-foreground/60 mt-1 [font-family:'Geist',_sans-serif] font-normal text-base">Finish a game to see it here.</p>
+          <div
+            className="fixed inset-x-0 flex flex-col items-center text-center pointer-events-none"
+            style={{ bottom: "calc(56px + env(safe-area-inset-bottom))" }}
+          >
+            <p className="text-muted-foreground text-2xl [font-family:'Geist',_sans-serif] font-medium">No rounds saved yet.</p>
+            <p className="text-muted-foreground/60 mt-1 mb-4 [font-family:'Geist',_sans-serif] font-normal text-base">Finish a game to see it here.</p>
+            <FluentEmoji emoji="🙀" size={140} style={{ display: "block" }} />
           </div> :
 
           <>

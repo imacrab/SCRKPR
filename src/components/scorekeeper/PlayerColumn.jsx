@@ -93,6 +93,16 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
   const total = baseTotal + pendingDelta;
   const showPending = pendingDelta !== 0;
 
+  // Convert player color to rgba(...,0.2) for the card background tint
+  const bgTint = useMemo(() => {
+    const hex = (player.color || "#000000").replace("#", "");
+    const full = hex.length === 3 ? hex.split("").map((c) => c + c).join("") : hex;
+    const r = parseInt(full.slice(0, 2), 16);
+    const g = parseInt(full.slice(2, 4), 16);
+    const b = parseInt(full.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.2)`;
+  }, [player.color]);
+
   // WCAG 2.2 — pick text color that contrasts with the player's background
   const textColor = useMemo(() => readableTextColor(player.color || "#000000"), [player.color]);
   const isDarkText = textColor === "#111111";
@@ -106,7 +116,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
       <div
         className="relative px-2 py-2 rounded-sm flex flex-col items-center z-10 transition-all overflow-hidden"
         style={{
-          backgroundColor: player.color,
+          backgroundColor: bgTint,
           borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))"
         }}>
 

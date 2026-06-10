@@ -101,22 +101,22 @@ export default function History({ onBack, onModalChange }) {
         </button>
         <h1 className="font-sans font-medium text-lg text-foreground flex-1">Past Rounds</h1>
         {refreshing && <RefreshCw size={16} strokeWidth={2} className="text-muted-foreground animate-spin" />}
-        {games.length > 0 && (
-          <button
-            onClick={() => setShowConfirm(true)}
-            className="text-xs font-medium text-muted-foreground hover:text-accent-red transition-colors px-2 py-1"
-          >
+        {games.length > 0 &&
+        <button
+          onClick={() => setShowConfirm(true)}
+          className="text-xs font-medium text-muted-foreground hover:text-accent-red transition-colors px-2 py-1">
+          
             Clear All
           </button>
-        )}
+        }
       </div>
 
       {/* Pull indicator */}
-      {pullDistance > 0 && (
-        <div className="flex justify-center py-2 text-muted-foreground" style={{ height: pullDistance }}>
+      {pullDistance > 0 &&
+      <div className="flex justify-center py-2 text-muted-foreground" style={{ height: pullDistance }}>
           <RefreshCw size={16} strokeWidth={2} className={pullDistance >= PULL_THRESHOLD ? "text-foreground" : ""} style={{ transform: `rotate(${pullDistance * 4}deg)` }} />
         </div>
-      )}
+      }
 
       <div className="flex-1 relative overflow-hidden">
         {/* Top fade */}
@@ -130,36 +130,36 @@ export default function History({ onBack, onModalChange }) {
           style={{ paddingBottom: "calc(56px + 16px + 16px + env(safe-area-inset-bottom))" }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-        {loading ? (
+          onTouchEnd={handleTouchEnd}>
+          
+        {loading ?
           <div className="flex items-center justify-center py-20">
             <div className="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
-          </div>
-        ) : games.length === 0 ? (
+          </div> :
+          games.length === 0 ?
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Trophy size={36} strokeWidth={2} className="text-muted-foreground mb-3" />
-            <p className="text-muted-foreground text-sm">No rounds saved yet.</p>
-            <p className="text-muted-foreground/60 text-xs mt-1">Finish a game to see it here.</p>
-          </div>
-        ) : (
+            <p className="text-muted-foreground text-2xl [font-family:'Geist',_sans-serif] font-medium">No rounds saved yet.</p>
+            <p className="text-muted-foreground/60 text-xs mt-1 [font-family:'Geist',_sans-serif]">Finish a game to see it here.</p>
+          </div> :
+
           <>
             <HistoryStats games={games} />
             <AnimatePresence>
             {games.map((game) => {
-              const isLowWin = isLowMode(game.win_mode);
-              const modeMeta = getModeMeta(game.win_mode);
-              const sorted = [...game.players].sort((a, b) => isLowWin ? a.total - b.total : b.total - a.total);
-              const winner = sorted[0];
-              const isTie = sorted.length > 1 && sorted[0].total === sorted[1].total;
-              return (
-                <motion.div
-                  key={game.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mb-3 rounded-xl border border-border bg-card overflow-hidden"
-                >
+                const isLowWin = isLowMode(game.win_mode);
+                const modeMeta = getModeMeta(game.win_mode);
+                const sorted = [...game.players].sort((a, b) => isLowWin ? a.total - b.total : b.total - a.total);
+                const winner = sorted[0];
+                const isTie = sorted.length > 1 && sorted[0].total === sorted[1].total;
+                return (
+                  <motion.div
+                    key={game.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mb-3 rounded-xl border border-border bg-card overflow-hidden">
+                    
                   {/* Game header */}
                   <div className="px-4 py-3 flex items-center justify-between border-b border-border">
                     <div className="flex flex-col gap-2">
@@ -172,65 +172,65 @@ export default function History({ onBack, onModalChange }) {
                         </span>
                       </p>
                       <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
-                        {isTie
-                          ? <Handshake size={20} strokeWidth={2} className="text-muted-foreground" />
-                          : <Trophy size={20} strokeWidth={2} className="text-yellow-500" />
-                        }
+                        {isTie ?
+                          <Handshake size={20} strokeWidth={2} className="text-muted-foreground" /> :
+                          <Trophy size={20} strokeWidth={2} className="text-yellow-500" />
+                          }
                         {isTie ? "Tie" : winner.name}
                       </p>
                     </div>
                     <button
-                      onClick={() => deleteGame(game.id)}
-                      className="text-muted-foreground hover:text-accent-red transition-colors p-1"
-                    >
+                        onClick={() => deleteGame(game.id)}
+                        className="text-muted-foreground hover:text-accent-red transition-colors p-1">
+                        
                       <Trash2 size={20} strokeWidth={2} />
                     </button>
                   </div>
 
                   {/* Player scores */}
                   <div className="px-4 py-3 space-y-1">
-                    {sorted.map((p, i) => (
+                    {sorted.map((p, i) =>
                       <div key={p.name} className="flex items-center gap-3 py-1.5 min-h-[44px]">
                         <span className="text-xs text-muted-foreground w-4 text-right">{i + 1}</span>
                         <div
                           className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: p.color }}
-                        />
+                          style={{ backgroundColor: p.color }} />
+                        
                         <span className="text-sm text-foreground flex-1 truncate">{p.name}</span>
                         <span className="text-sm font-semibold" style={{ color: p.color }}>
                           {p.total}
                         </span>
                       </div>
-                    ))}
+                      )}
                   </div>
-                </motion.div>
-              );
-            })}
+                </motion.div>);
+
+              })}
           </AnimatePresence>
           </>
-        )}
+          }
         </div>
       </div>
 
       {/* Confirm modal */}
       <AnimatePresence>
-        {showConfirm && (
-          <>
+        {showConfirm &&
+        <>
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-              onClick={() => !clearing && setShowConfirm(false)}
-            />
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            onClick={() => !clearing && setShowConfirm(false)} />
+          
             <motion.div
-              initial={{ y: 120, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 120, opacity: 0 }}
-              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-              className="fixed inset-x-0 z-50 bg-card border border-border rounded-[44px] shadow-2xl"
-              style={{ bottom: "8px", left: "8px", right: "8px", paddingBottom: "env(safe-area-inset-bottom)" }}
-            >
+            initial={{ y: 120, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 120, opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            className="fixed inset-x-0 z-50 bg-card border border-border rounded-[44px] shadow-2xl"
+            style={{ bottom: "8px", left: "8px", right: "8px", paddingBottom: "env(safe-area-inset-bottom)" }}>
+            
               <div className="px-5 pt-5 pb-16">
                 <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
                 <div className="flex flex-col items-center text-center mb-6">
@@ -243,19 +243,19 @@ export default function History({ onBack, onModalChange }) {
                     Cancel
                   </Button>
                   <Button
-                    onClick={clearAllGames}
-                    disabled={clearing}
-                    className="flex-1 h-11 font-semibold"
-                    style={{ backgroundColor: "#FF3A3A", color: "white" }}
-                  >
+                  onClick={clearAllGames}
+                  disabled={clearing}
+                  className="flex-1 h-11 font-semibold"
+                  style={{ backgroundColor: "#FF3A3A", color: "white" }}>
+                  
                     {clearing ? "Clearing..." : "Yes, Clear All"}
                   </Button>
                 </div>
               </div>
             </motion.div>
           </>
-        )}
+        }
       </AnimatePresence>
-    </div>
-  );
+    </div>);
+
 }

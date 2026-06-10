@@ -37,7 +37,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         for (const game of games) {
           const isLowWin = isLowMode(game.win_mode);
           const sorted = [...game.players].sort((a, b) =>
-            isLowWin ? a.total - b.total : b.total - a.total
+          isLowWin ? a.total - b.total : b.total - a.total
           );
           const winner = sorted[0];
           if (winner?.name === player.name) {
@@ -56,9 +56,9 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [showEndGame, setShowEndGame] = useState(false);
 
   // For bestof: first to ceil(N/2) wins. For phase10: complete all 10 phases.
-  const winsNeeded = bestOf
-    ? (winMode === "phase10" ? bestOf : Math.ceil(bestOf / 2))
-    : null;
+  const winsNeeded = bestOf ?
+  winMode === "phase10" ? bestOf : Math.ceil(bestOf / 2) :
+  null;
   const circleMode = isCircleMode(winMode);
 
   // Sort players by total score — direction toggled by user
@@ -155,7 +155,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   return (
     <div className="w-screen flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 pt-10 pb-3 flex-shrink-0" style={{backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
+      <div className="flex items-center justify-between px-4 pt-10 pb-3 flex-shrink-0" style={{ backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <button onClick={() => setShowEndGame(true)} className="hover:opacity-75 transition-opacity">
           <img src={isDarkMode ? "https://media.base44.com/images/public/69ea763700078809357a164a/87badac38_SCRKPR_dark_mode.png" : "https://media.base44.com/images/public/69ea763700078809357a164a/6de7dc994_SCRKPR_light_mode.png"} alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
         </button>
@@ -163,24 +163,24 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           <button
             onClick={() => setSortDesc((v) => !v)}
             className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            aria-label={sortDesc ? "Sort lowest to highest" : "Sort highest to lowest"}
-          >
+            aria-label={sortDesc ? "Sort lowest to highest" : "Sort highest to lowest"}>
+            
             <Shuffle size={22} strokeWidth={2} />
           </button>
-          {players.length < 20 && (
-            <button
-              onClick={onAddPlayer}
-              className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-              aria-label="Add player"
-            >
+          {players.length < 20 &&
+          <button
+            onClick={onAddPlayer}
+            className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            aria-label="Add player">
+            
               <UserPlus size={22} strokeWidth={2} />
             </button>
-          )}
+          }
           <button
             onClick={() => setShowResetConfirm(true)}
             className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            aria-label="Reset scores"
-          >
+            aria-label="Reset scores">
+            
             <RotateCcw size={22} strokeWidth={2} />
           </button>
         </div>
@@ -193,48 +193,48 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           className="pointer-events-none absolute inset-x-0 bottom-0 z-20"
           style={{
             height: "120px",
-            background: "linear-gradient(to top, hsl(var(--background)) 30%, hsl(var(--background) / 0) 100%)",
-          }}
-        />
+            background: "linear-gradient(to top, hsl(var(--background)) 30%, hsl(var(--background) / 0) 100%)"
+          }} />
+        
         <div
           ref={scrollContainerRef}
           className="flex flex-col h-full gap-2 w-full overflow-y-auto"
-          style={{ WebkitOverflowScrolling: "touch", paddingBottom: "96px" }}
-        >
+          style={{ WebkitOverflowScrolling: "touch", paddingBottom: "96px" }}>
+          
           <LayoutGroup>
-            {sortedPlayers.map((player, idx) => (
-              <motion.div
-                key={player.id}
-                layout
-                transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                className="w-full flex-shrink-0"
-              >
+            {sortedPlayers.map((player, idx) =>
+            <motion.div
+              key={player.id}
+              layout
+              transition={{ type: "spring", stiffness: 400, damping: 32 }}
+              className="w-full flex-shrink-0">
+              
                 <PlayerColumn
-                  player={player}
-                  isHighlighted={player.id === lastAddedPlayerId}
-                  streak={streakMap[player.name] || 0}
-                  winsNeeded={winsNeeded}
-                  isFirst={idx === 0}
-                  isLast={idx === sortedPlayers.length - 1}
-                  onAddScore={() => handleOpenScore(player)}
-                  onQuickScore={(delta) => onAddScore(player.id, delta)}
-                  onEditScore={(i) => handleEditScore(player, i)}
-                  onEditPlayer={() => setEditingPlayer(player)}
-                />
+                player={player}
+                isHighlighted={player.id === lastAddedPlayerId}
+                streak={streakMap[player.name] || 0}
+                winsNeeded={winsNeeded}
+                isFirst={idx === 0}
+                isLast={idx === sortedPlayers.length - 1}
+                onAddScore={() => handleOpenScore(player)}
+                onQuickScore={(delta) => onAddScore(player.id, delta)}
+                onEditScore={(i) => handleEditScore(player, i)}
+                onEditPlayer={() => setEditingPlayer(player)} />
+              
               </motion.div>
-            ))}
+            )}
           </LayoutGroup>
         </div>
 
         {/* End Game — fixed at bottom of scoreboard, matches player card width */}
         <div
           className="absolute inset-x-0 bottom-0 z-30 px-2"
-          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
-        >
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}>
+          
           <button
             onClick={() => setShowEndGame(true)}
-            className="relative w-full flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold text-sm shadow-lg transition-colors overflow-hidden"
-          >
+            className="relative w-full flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold text-sm shadow-lg transition-colors overflow-hidden">
+            
             {/* Flourish — oversized tilted flag bleeding off the right edge */}
             <div
               className="absolute pointer-events-none select-none"
@@ -243,13 +243,13 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
                 top: "50%",
                 transform: "translateY(-50%) rotate(-15deg) scaleX(-1)",
                 opacity: 0.95,
-                zIndex: 0,
+                zIndex: 0
               }}
-              aria-hidden="true"
-            >
+              aria-hidden="true">
+              
               <FluentEmoji emoji="🏁" size={120} />
             </div>
-            <span className="relative z-10">End Game</span>
+            <span className="relative z-10 text-xl">End Game</span>
           </button>
         </div>
       </div>
@@ -259,30 +259,30 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         editingIndex={editingScore?.scoreIndex ?? null}
         isOpen={!!activePlayer}
         onSubmit={handleSubmit}
-        onClose={handleClose}
-      />
+        onClose={handleClose} />
+      
 
       <EditPlayerModal
         player={editingPlayer}
         isOpen={!!editingPlayer}
         onSave={handleSavePlayer}
-        onClose={() => setEditingPlayer(null)}
-      />
+        onClose={() => setEditingPlayer(null)} />
+      
 
       <ResetConfirmModal
         isOpen={showResetConfirm}
         onConfirm={onReset}
-        onClose={() => setShowResetConfirm(false)}
-      />
+        onClose={() => setShowResetConfirm(false)} />
+      
 
       <EndGameModal
         isOpen={showEndGame}
         players={players}
         winMode={winMode}
         gameStartTime={gameStartTime}
-        onConfirm={() => { setShowEndGame(false); onEndGame(); }}
-        onCancel={() => setShowEndGame(false)}
-      />
-    </div>
-  );
+        onConfirm={() => {setShowEndGame(false);onEndGame();}}
+        onCancel={() => setShowEndGame(false)} />
+      
+    </div>);
+
 }

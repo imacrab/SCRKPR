@@ -54,14 +54,16 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
   useEffect(() => {
     base44.entities.Player.list("-created_date", 100).then((data) => {
-      setAllPlayers(data);
-      // Default-select Adrian & Jayne if present
-      const defaults = new Set(
-        data
-          .filter((p) => DEFAULT_SELECTED_NAMES.includes(p.name))
-          .map((p) => p.id)
-      );
-      setSelectedIds(defaults);
+      // Pin Adrian & Jayne to the top of the list
+      const pinned = DEFAULT_SELECTED_NAMES
+        .map((n) => data.find((p) => p.name === n))
+        .filter(Boolean);
+      const pinnedIds = new Set(pinned.map((p) => p.id));
+      const rest = data.filter((p) => !pinnedIds.has(p.id));
+      const ordered = [...pinned, ...rest];
+
+      setAllPlayers(ordered);
+      setSelectedIds(new Set(pinned.map((p) => p.id)));
     }).catch(() => setAllPlayers([]));
   }, []);
 
@@ -87,7 +89,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
   const handleAddPlayer = async ({ name, color, emoji }) => {
     const created = await base44.entities.Player.create({ name, color, emoji });
-    setAllPlayers((prev) => [created, ...(prev || [])]);
+    setAllPlayers((prev) => [...(prev || []), created]);
     setSelectedIds((prev) => new Set([...prev, created.id]));
     setShowAddPlayer(false);
     onModalChange?.(false);

@@ -114,7 +114,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
     <div className="flex flex-col rounded-xl overflow-hidden">
       {/* Header — player color background */}
       <div
-        className="relative px-2 py-2 rounded-md flex flex-col items-center z-10 transition-all overflow-hidden"
+        className="relative px-2 py-2 rounded-lg flex flex-col items-center z-10 transition-all overflow-hidden"
         style={{
           backgroundColor: bgTint,
           borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))"

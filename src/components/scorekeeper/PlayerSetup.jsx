@@ -8,6 +8,7 @@ import SaveGroupModal from "./SaveGroupModal";
 import EditGroupModal from "./EditGroupModal";
 import BestOfModal from "./BestOfModal";
 import GameModeModal from "./GameModeModal";
+import EmojiPicker from "./EmojiPicker";
 
 const MODE_META = {
   low:    { label: "Low Score",  Icon: TrendingDown },
@@ -39,8 +40,8 @@ function ColorPicker({ selected, onChange }) {
 
 export default function PlayerSetup({ onStart, onModalChange }) {
   const [players, setPlayers] = useState([
-    { name: "", color: PLAYER_COLORS[0] },
-    { name: "", color: PLAYER_COLORS[1] },
+    { name: "", color: PLAYER_COLORS[0], emoji: "" },
+    { name: "", color: PLAYER_COLORS[1], emoji: "" },
   ]);
   const [expandedColor, setExpandedColor] = useState(null);
   const [groups, setGroups] = useState(null); // null = loading, [] = no groups
@@ -121,7 +122,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
           const untouched = current.every((p) => !p.name.trim());
           if (untouched) {
             setActiveGroup(sorted[0]);
-            return sorted[0].players.map((p) => ({ name: p.name, color: p.color }));
+            return sorted[0].players.map((p) => ({ name: p.name, color: p.color, emoji: p.emoji || "" }));
           }
           return current;
         });
@@ -148,7 +149,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       const available = PLAYER_COLORS.filter((c) => !used.has(c));
       const pool = available.length > 0 ? available : PLAYER_COLORS;
       const color = pool[Math.floor(Math.random() * pool.length)];
-      setPlayers([...players, { name: "", color }]);
+      setPlayers([...players, { name: "", color, emoji: "" }]);
       setTimeout(() => {
         scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
         inputRefs.current[newIndex]?.focus();
@@ -173,7 +174,12 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     const updated = [...players];
     updated[i] = { ...updated[i], color };
     setPlayers(updated);
-    setExpandedColor(null);
+  };
+
+  const updateEmoji = (i, emoji) => {
+    const updated = [...players];
+    updated[i] = { ...updated[i], emoji };
+    setPlayers(updated);
   };
 
   const handleSaveGroup = async (groupName, pinned) => {
@@ -199,7 +205,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   };
 
   const loadGroup = (group) => {
-    setPlayers(group.players.map((p) => ({ name: p.name, color: p.color })));
+    setPlayers(group.players.map((p) => ({ name: p.name, color: p.color, emoji: p.emoji || "" })));
     setExpandedColor(null);
     setActiveGroup(group);
   };
@@ -235,7 +241,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   // Detect unsaved changes vs the active group (or vs "no group at all" for save-as)
   const validPlayers = players.filter((p) => p.name.trim());
   const normalize = (list) =>
-    list.map((p) => `${(p.name || "").trim()}::${p.color}`).join("|");
+    list.map((p) => `${(p.name || "").trim()}::${p.color}::${p.emoji || ""}`).join("|");
   const hasUnsavedChanges = activeGroup
     ? normalize(validPlayers) !== normalize(activeGroup.players)
     : hasValidPlayers;
@@ -321,9 +327,11 @@ export default function PlayerSetup({ onStart, onModalChange }) {
             <div className="flex items-center gap-3 px-3 py-2.5">
               <button
                 onPointerDown={(e) => { e.preventDefault(); setExpandedColor(expandedColor === i ? null : i); }}
-                className="w-7 h-7 rounded-full flex-shrink-0 transition-transform active:scale-90 border-2 border-white/20"
+                className="w-7 h-7 rounded-full flex-shrink-0 transition-transform active:scale-90 border-2 border-white/20 flex items-center justify-center text-sm leading-none"
                 style={{ backgroundColor: player.color }}
-              />
+              >
+                {player.emoji}
+              </button>
               <Input
                 ref={(el) => (inputRefs.current[i] = el)}
                 value={player.name}
@@ -349,6 +357,9 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   className="overflow-hidden border-t border-border px-3 pb-3"
                 >
                   <ColorPicker selected={player.color} onChange={(c) => updateColor(i, c)} />
+                  <div className="border-t border-border mt-1 pt-1">
+                    <EmojiPicker selected={player.emoji} onChange={(e) => updateEmoji(i, e)} />
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

@@ -8,7 +8,7 @@ import EditPlayerModal from "./EditPlayerModal";
 import EndGameModal from "./EndGameModal";
 import GameMenuModal from "./GameMenuModal";
 
-export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onReset, onAddPlayer, onEndGame }) {
+export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [streakMap, setStreakMap] = useState({});
   const [gameStartTime] = useState(new Date());
@@ -105,10 +105,11 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
     setEditingScore(null);
   };
 
-  const handleSavePlayer = ({ name, color }) => {
+  const handleSavePlayer = ({ name, color, emoji }) => {
     if (!editingPlayer) return;
     onEditName(editingPlayer.id, name);
     onEditColor(editingPlayer.id, color);
+    onEditEmoji?.(editingPlayer.id, emoji || "");
     setEditingPlayer(null);
   };
 

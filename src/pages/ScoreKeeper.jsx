@@ -84,6 +84,7 @@ export default function ScoreKeeper() {
       id: i + 1,
       name: p.name || p,
       color: p.color || "#2DC5F8",
+      emoji: p.emoji || "",
       scores: [],
     }));
     saveGameState(initialPlayers, mode || "high", bestOfCount);
@@ -111,6 +112,7 @@ export default function ScoreKeeper() {
         players: players.map((p) => ({
           name: p.name,
           color: p.color,
+          emoji: p.emoji || "",
           total: p.scores.reduce((s, n) => s + n, 0),
           scores: p.scores,
         })),
@@ -160,12 +162,20 @@ export default function ScoreKeeper() {
     });
   }, []);
 
-  const handleAddPlayer = useCallback((name, color) => {
+  const handleEditEmoji = useCallback((playerId, emoji) => {
+    setPlayers((prev) => {
+      const next = prev.map((p) => (p.id === playerId ? { ...p, emoji } : p));
+      saveGameState(next, _winMode);
+      return next;
+    });
+  }, []);
+
+  const handleAddPlayer = useCallback((name, color, emoji = "") => {
     setPlayers((prev) => {
       if (prev.length >= 20) return prev;
       const maxId = prev.reduce((m, p) => Math.max(m, p.id), 0);
       const newId = maxId + 1;
-      const next = [...prev, { id: newId, name, color: color || "#2DC5F8", scores: [] }];
+      const next = [...prev, { id: newId, name, color: color || "#2DC5F8", emoji, scores: [] }];
       saveGameState(next, _winMode);
       setLastAddedPlayerId(newId);
       return next;
@@ -220,6 +230,7 @@ export default function ScoreKeeper() {
               onEditScore={handleEditScore}
               onEditName={handleEditName}
               onEditColor={handleEditColor}
+              onEditEmoji={handleEditEmoji}
               onReset={handleReset}
               onEndGame={handleEndGame}
               onAddPlayer={() => setShowAddPlayer(true)}

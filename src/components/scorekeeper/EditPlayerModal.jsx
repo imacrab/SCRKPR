@@ -4,16 +4,19 @@ import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PLAYER_COLORS } from "./PlayerSetup";
+import EmojiPicker from "./EmojiPicker";
 
 export default function EditPlayerModal({ player, isOpen, onSave, onClose }) {
   const [name, setName] = useState("");
   const [color, setColor] = useState("");
+  const [emoji, setEmoji] = useState("");
   const inputRef = useRef(null);
 
   useEffect(() => {
     if (isOpen && player) {
       setName(player.name);
       setColor(player.color);
+      setEmoji(player.emoji || "");
       setTimeout(() => { inputRef.current?.select(); }, 120);
     }
   }, [isOpen, player]);
@@ -21,7 +24,7 @@ export default function EditPlayerModal({ player, isOpen, onSave, onClose }) {
   const handleSave = () => {
     const trimmed = name.trim();
     if (!trimmed) return;
-    onSave({ name: trimmed, color });
+    onSave({ name: trimmed, color, emoji });
   };
 
   return (
@@ -53,9 +56,11 @@ export default function EditPlayerModal({ player, isOpen, onSave, onClose }) {
               {/* Name input with color dot */}
               <div className="flex items-center gap-3 mb-5">
                 <div
-                  className="w-8 h-8 rounded-full flex-shrink-0 border-2 border-white/20"
+                  className="w-8 h-8 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center text-base leading-none"
                   style={{ backgroundColor: color }}
-                />
+                >
+                  {emoji}
+                </div>
                 <Input
                   ref={inputRef}
                   value={name}
@@ -68,19 +73,25 @@ export default function EditPlayerModal({ player, isOpen, onSave, onClose }) {
               </div>
 
               {/* Color picker */}
-              <div className="grid grid-cols-5 gap-3 p-3 mb-3 justify-items-center">
+              <div className="grid grid-cols-5 gap-3 p-3 mb-1 justify-items-center">
                 {PLAYER_COLORS.map((c) => (
                   <button
                     key={c}
                     onPointerDown={(e) => { e.preventDefault(); setColor(c); }}
-                    className="w-10 h-10 rounded-full transition-transform active:scale-90"
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-xl transition-transform active:scale-90"
                     style={{
                       backgroundColor: c,
                       outline: color === c ? "2.5px solid white" : "none",
                       outlineOffset: "2px",
                     }}
-                  />
+                  >
+                    {color === c ? emoji : ""}
+                  </button>
                 ))}
+              </div>
+
+              <div className="border-t border-border mb-3">
+                <EmojiPicker selected={emoji} onChange={setEmoji} />
               </div>
 
               <div className="flex gap-3">

@@ -131,6 +131,11 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             style={{ marginLeft: 16 }}
           >
             <div className="flex items-center gap-2 w-full min-w-0">
+              {player.emoji && (
+                <span className="text-base leading-none flex-shrink-0" aria-hidden="true">
+                  {player.emoji}
+                </span>
+              )}
               <span className="text-s font-bold text-white truncate leading-tight" title={player.name}>
                 {player.name}
               </span>

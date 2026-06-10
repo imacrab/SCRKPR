@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import EmojiPicker from "./EmojiPicker";
 
 const PLAYER_COLORS = [
   "#FF3A3A", "#F97316", "#F59E0B", "#EAB308", "#84CC16",
@@ -21,12 +22,14 @@ function pickRandomColor(usedColors = []) {
 export default function AddPlayerModal({ isOpen, usedColors = [], onAdd, onClose }) {
   const [name, setName] = useState("");
   const [color, setColor] = useState(PLAYER_COLORS[0]);
+  const [emoji, setEmoji] = useState("");
   const inputRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
       setName("");
       setColor(pickRandomColor(usedColors));
+      setEmoji("");
       setTimeout(() => inputRef.current?.focus(), 120);
     }
   }, [isOpen, usedColors]);
@@ -34,9 +37,10 @@ export default function AddPlayerModal({ isOpen, usedColors = [], onAdd, onClose
   const handleSubmit = () => {
     const trimmed = name.trim();
     if (!trimmed) return;
-    onAdd(trimmed, color);
+    onAdd(trimmed, color, emoji);
     setName("");
     setColor(pickRandomColor([...usedColors, color]));
+    setEmoji("");
   };
 
   return (
@@ -79,17 +83,23 @@ export default function AddPlayerModal({ isOpen, usedColors = [], onAdd, onClose
                 aria-label="New player name"
               />
 
-              <div className="mb-5">
+              <div className="mb-3">
                 <div className="grid grid-cols-5 gap-3 p-3 justify-items-center">
                   {PLAYER_COLORS.map((c) => (
                     <button
                       key={c}
                       onPointerDown={(e) => { e.preventDefault(); setColor(c); }}
-                      className="w-10 h-10 rounded-full transition-transform active:scale-90"
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-xl transition-transform active:scale-90"
                       style={{ backgroundColor: c, outline: color === c ? "2px solid white" : "none", outlineOffset: "2px" }}
-                    />
+                    >
+                      {color === c ? emoji : ""}
+                    </button>
                   ))}
                 </div>
+              </div>
+
+              <div className="mb-5 border-t border-border">
+                <EmojiPicker selected={emoji} onChange={setEmoji} />
               </div>
 
               <div className="flex gap-3">

@@ -25,6 +25,9 @@
           "color": {
             "type": "string"
           },
+          "emoji": {
+            "type": "string"
+          },
           "total": {
             "type": "number"
           },

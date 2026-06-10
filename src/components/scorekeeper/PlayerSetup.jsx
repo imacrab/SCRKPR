@@ -21,6 +21,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [winMode, setWinMode] = useState("ginrummy");
   const [showBestOf, setShowBestOf] = useState(false);
   const [showGameMode, setShowGameMode] = useState(false);
+  const [tappedId, setTappedId] = useState(null);
+  const tapTimerRef = useRef(null);
   const scrollRef = useRef(null);
 
   // Pull-to-refresh
@@ -93,6 +95,11 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   };
 
   const toggleSelected = (id) => {
+    // Trigger bouncy tap feedback
+    if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
+    setTappedId(id);
+    tapTimerRef.current = setTimeout(() => setTappedId(null), 260);
+
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);else
@@ -100,6 +107,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       return next;
     });
   };
+
+  useEffect(() => () => {
+    if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
+  }, []);
 
   const handleAddPlayer = async ({ name, color, emoji }) => {
     const created = await base44.entities.Player.create({ name, color, emoji });
@@ -207,7 +218,9 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   }
                 }
 
-                const composedTransform = `${baseStyle.transform || ""} ${isDragging ? `scale(1.04) rotate(${tiltDeg}deg)` : "scale(1)"}`.trim();
+                const isTapped = tappedId === player.id;
+                const idleScale = isTapped ? "scale(0.92)" : "scale(1)";
+                const composedTransform = `${baseStyle.transform || ""} ${isDragging ? `scale(1.04) rotate(${tiltDeg}deg)` : idleScale}`.trim();
 
                 return (
                 <div
@@ -225,7 +238,9 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   transformOrigin: "center center",
                   transition: isDragging
                     ? "transform 60ms linear, box-shadow 150ms ease-out"
-                    : "transform 180ms ease-out, box-shadow 180ms ease-out, background-color 200ms ease-out, border-color 200ms ease-out"
+                    : isTapped
+                      ? "transform 90ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms ease-out, border-color 200ms ease-out"
+                      : "transform 260ms cubic-bezier(0.34, 1.8, 0.5, 1), box-shadow 180ms ease-out, background-color 200ms ease-out, border-color 200ms ease-out"
                 }}>
                 
                     {draggable ?

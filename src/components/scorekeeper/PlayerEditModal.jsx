@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import EmojiPicker from "./EmojiPicker";
 import FluentEmoji from "./FluentEmoji";
+import DeletePlayerConfirmModal from "./DeletePlayerConfirmModal";
 import { getPaletteForTone, readableTextColor } from "@/lib/contrast";
 import { usePlayerTone } from "@/lib/usePlayerTone";
 
@@ -21,6 +22,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
   const [name, setName] = useState("");
   const [color, setColor] = useState(palette[0]);
   const [emoji, setEmoji] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const inputRef = useRef(null);
   const isEditing = !!player?.id;
 
@@ -135,7 +137,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
             <div className="flex gap-3">
               {isEditing && (
                 <Button
-                  onClick={() => onDelete?.(player.id)}
+                  onClick={() => setShowDeleteConfirm(true)}
                   className="h-11 bg-accent-red/15 hover:bg-accent-red/25 text-accent-red border-0 shadow-none"
                 >
                   <FluentEmoji emoji="🗑️" size={20} />
@@ -151,6 +153,16 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
               </Button>
             </div>
           </div>
+
+          <DeletePlayerConfirmModal
+            isOpen={showDeleteConfirm}
+            playerName={player?.name}
+            onConfirm={() => {
+              setShowDeleteConfirm(false);
+              onDelete?.(player.id);
+            }}
+            onClose={() => setShowDeleteConfirm(false)}
+          />
         </motion.div>
       )}
     </AnimatePresence>

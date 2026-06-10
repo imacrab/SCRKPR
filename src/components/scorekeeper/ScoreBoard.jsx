@@ -7,7 +7,7 @@ import ScoreInputModal from "./ScoreInputModal";
 import EditPlayerModal from "./EditPlayerModal";
 import EndGameModal from "./EndGameModal";
 import GameMenuModal from "./GameMenuModal";
-import { isLowMode } from "@/lib/gameModes";
+import { isLowMode, isCircleMode } from "@/lib/gameModes";
 
 export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
@@ -54,7 +54,11 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [showEndGame, setShowEndGame] = useState(false);
 
-  const winsNeeded = bestOf ? Math.ceil(bestOf / 2) : null;
+  // For bestof: first to ceil(N/2) wins. For phase10: complete all 10 phases.
+  const winsNeeded = bestOf
+    ? (winMode === "phase10" ? bestOf : Math.ceil(bestOf / 2))
+    : null;
+  const circleMode = isCircleMode(winMode);
 
   // Sort players by total score — direction toggled by user
   const sortedPlayers = useMemo(() => {
@@ -65,18 +69,18 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     });
   }, [players, sortDesc]);
 
-  // Auto-end when someone reaches winsNeeded in bestof mode
+  // Auto-end when someone reaches winsNeeded in bestof / phase10 mode
   useEffect(() => {
-    if (winMode !== "bestof" || !winsNeeded) return;
+    if (!circleMode || !winsNeeded) return;
     const winner = players.find((p) => p.scores.reduce((s, n) => s + n, 0) >= winsNeeded);
     if (winner) {
       setTimeout(() => setShowEndGame(true), 400);
     }
-  }, [players, winMode, winsNeeded]);
+  }, [players, circleMode, winsNeeded]);
 
-  // Auto-end when any player reaches the target score (Gin, Rummy, Skip-Bo, Custom)
+  // Auto-end when any player reaches the target score (Gin Rummy, etc.)
   useEffect(() => {
-    if (!targetScore || winMode === "bestof") return;
+    if (!targetScore || circleMode) return;
     const low = isLowMode(winMode);
     const reached = players.some((p) => {
       const total = p.scores.reduce((s, n) => s + n, 0);
@@ -88,8 +92,8 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   }, [players, winMode, targetScore]);
 
   const handleOpenScore = (player) => {
-    if (winMode === "bestof") {
-      // In bestof mode, just add 1 win directly
+    if (circleMode) {
+      // Circle modes (bestof, phase10): just add 1 completion directly
       onAddScore(player.id, 1);
       return;
     }
@@ -98,7 +102,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   };
 
   const handleEditScore = (player, scoreIndex) => {
-    if (winMode === "bestof") return; // no editing in bestof mode
+    if (circleMode) return; // no numeric editing in circle modes
     setActivePlayer(player);
     setEditingScore({ playerId: player.id, scoreIndex });
   };

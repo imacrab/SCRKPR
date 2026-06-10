@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import BestOfModal from "./BestOfModal";
 import GameModeModal from "./GameModeModal";
-import CustomTargetModal from "./CustomTargetModal";
 import PlayerEditModal from "./PlayerEditModal";
 import { getModeMeta } from "@/lib/gameModes";
 
@@ -20,7 +19,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [winMode, setWinMode] = useState("low");
   const [showBestOf, setShowBestOf] = useState(false);
   const [showGameMode, setShowGameMode] = useState(false);
-  const [showCustomTarget, setShowCustomTarget] = useState(false);
   const scrollRef = useRef(null);
 
   // Pull-to-refresh
@@ -28,7 +26,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const pullStartY = useRef(null);
   const PULL_THRESHOLD = 80;
 
-  const anyModalOpen = showAddPlayer || showBestOf || showGameMode || showCustomTarget;
+  const anyModalOpen = showAddPlayer || showBestOf || showGameMode;
 
   const handleTouchStart = (e) => {
     if (anyModalOpen) return;
@@ -108,9 +106,9 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     if (winMode === "bestof") {
       setShowBestOf(true);
       onModalChange?.(true);
-    } else if (winMode === "custom") {
-      setShowCustomTarget(true);
-      onModalChange?.(true);
+    } else if (winMode === "phase10") {
+      // Phase 10 uses 10 circle indicators, like best-of-10
+      onStart(selectedPlayers, "phase10", 10, null);
     } else {
       const meta = getModeMeta(winMode);
       onStart(selectedPlayers, winMode, null, meta.targetScore);
@@ -121,12 +119,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     setShowBestOf(false);
     onModalChange?.(false);
     onStart(selectedPlayers, "bestof", bestOf);
-  };
-
-  const handleCustomConfirm = (direction, target) => {
-    setShowCustomTarget(false);
-    onModalChange?.(false);
-    onStart(selectedPlayers, direction === "low" ? "low" : "high", null, target);
   };
 
   const pullProgress = Math.min(pullY / PULL_THRESHOLD, 1);
@@ -278,11 +270,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         onClose={() => { setShowGameMode(false); onModalChange?.(false); }}
       />
 
-      <CustomTargetModal
-        isOpen={showCustomTarget}
-        onConfirm={handleCustomConfirm}
-        onClose={() => { setShowCustomTarget(false); onModalChange?.(false); }}
-      />
     </div>
   );
 }

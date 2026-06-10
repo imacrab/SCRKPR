@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { Shuffle, UserPlus, RotateCcw } from "lucide-react";
+import { Shuffle, UserPlus, RotateCcw, Lock, Unlock } from "lucide-react";
 import { motion, LayoutGroup } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import FluentEmoji from "./FluentEmoji";
@@ -19,6 +19,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [isDarkMode, setIsDarkMode] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [sortDesc, setSortDesc] = useState(true);
+  const [sortLocked, setSortLocked] = useState(false);
   const scrollContainerRef = useRef(null);
 
   useEffect(() => {
@@ -62,14 +63,15 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   null;
   const circleMode = isCircleMode(winMode);
 
-  // Sort players by total score — direction toggled by user
+  // Sort players by total score — direction toggled by user; locking preserves setup order
   const sortedPlayers = useMemo(() => {
+    if (sortLocked) return players;
     return [...players].sort((a, b) => {
       const totalA = a.scores.reduce((s, n) => s + n, 0);
       const totalB = b.scores.reduce((s, n) => s + n, 0);
       return sortDesc ? totalB - totalA : totalA - totalB;
     });
-  }, [players, sortDesc]);
+  }, [players, sortDesc, sortLocked]);
 
   // Track whether we've auto-triggered the end-game modal for the current game.
   // Without this guard, the effect re-fires on every score change after the threshold
@@ -162,8 +164,17 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         </button>
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setSortLocked((v) => !v)}
+            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-accent transition-colors"
+            style={{ color: sortLocked ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
+            aria-label={sortLocked ? "Unlock sort order" : "Lock sort order"}>
+            
+            {sortLocked ? <Lock size={22} strokeWidth={2} /> : <Unlock size={22} strokeWidth={2} />}
+          </button>
+          <button
             onClick={() => setSortDesc((v) => !v)}
-            className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            disabled={sortLocked}
+            className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
             aria-label={sortDesc ? "Sort lowest to highest" : "Sort highest to lowest"}>
             
             <Shuffle size={22} strokeWidth={2} />

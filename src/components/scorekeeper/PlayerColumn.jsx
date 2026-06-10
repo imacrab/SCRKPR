@@ -203,8 +203,8 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           {!isBestOf &&
           <motion.button
             onClick={() => handleQuickTap(-1)}
-            whileTap={{ scale: 0.85 }}
-            transition={{ type: "spring", stiffness: 600, damping: 14 }}
+            whileTap={{ scale: 0.75 }}
+            transition={{ type: "spring", stiffness: 800, damping: 8, mass: 0.5 }}
             className="flex items-center justify-center flex-shrink-0"
             style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor, backdropFilter: "blur(2.5px)", WebkitBackdropFilter: "blur(2.5px)" }}
             aria-label={`Subtract 1 from ${player.name}`}>
@@ -217,8 +217,8 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           {!isBestOf &&
           <motion.button
             onClick={() => handleQuickTap(1)}
-            whileTap={{ scale: 0.85 }}
-            transition={{ type: "spring", stiffness: 600, damping: 14 }}
+            whileTap={{ scale: 0.75 }}
+            transition={{ type: "spring", stiffness: 800, damping: 8, mass: 0.5 }}
             className="flex items-center justify-center flex-shrink-0 bg-[#ffffff]/20"
             style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
             aria-label={`Add 1 to ${player.name}`}>

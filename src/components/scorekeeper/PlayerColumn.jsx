@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Plus, Minus, Flame } from "lucide-react";
+import { readableTextColor } from "@/lib/contrast";
 
 function AnimatedTotal({ value, color }) {
   const [displayValue, setDisplayValue] = useState(value);
@@ -91,6 +92,13 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
   const total = baseTotal + pendingDelta;
   const showPending = pendingDelta !== 0;
 
+  // WCAG 2.2 — pick text color that contrasts with the player's background
+  const textColor = useMemo(() => readableTextColor(player.color || "#000000"), [player.color]);
+  const isDarkText = textColor === "#111111";
+  const buttonBg = isDarkText ? "rgba(0,0,0,0.10)" : "rgba(0,0,0,0.18)";
+  const streakBg = isDarkText ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.25)";
+  const subtleText = isDarkText ? "rgba(17,17,17,0.65)" : "rgba(255,255,255,0.75)";
+
   return (
     <div className="flex flex-col rounded-xl border border-border overflow-hidden">
       {/* Header — player color background */}
@@ -108,8 +116,8 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             onClick={() => handleQuickTap(-1)}
             whileTap={{ scale: 0.85 }}
             transition={{ type: "spring", stiffness: 600, damping: 14 }}
-            className="flex items-center justify-center flex-shrink-0 text-white"
-            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: "rgba(0,0,0,0.18)" }}
+            className="flex items-center justify-center flex-shrink-0"
+            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor }}
             aria-label={`Subtract 1 from ${player.name}`}>
             
               <Minus size={20} strokeWidth={2.5} />
@@ -136,11 +144,11 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
                   {player.emoji}
                 </span>
               }
-              <span className="font-bold text-white truncate leading-tight text-xl" title={player.name}>
+              <span className="font-bold truncate leading-tight text-xl" title={player.name} style={{ color: textColor }}>
                 {player.name}
               </span>
               {streak >= 2 &&
-              <span className="inline-flex items-center gap-0.5 rounded-full bg-white/25 text-white px-2 py-0.5 flex-shrink-0">
+              <span className="inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 flex-shrink-0" style={{ backgroundColor: streakBg, color: textColor }}>
                   <Flame size={12} strokeWidth={2.5} />
                   <span className="text-[10px] font-semibold leading-none">{streak}</span>
                 </span>
@@ -152,7 +160,8 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 24 }}
-              className="text-sm font-semibold leading-none text-white">
+              className="text-sm font-semibold leading-none"
+              style={{ color: textColor }}>
               
                 ({pendingDelta > 0 ? `+${pendingDelta}` : pendingDelta})
               </motion.span>
@@ -164,7 +173,8 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 24 }}
               onClick={(e) => {e.stopPropagation();onEditScore?.(lastIdx);}}
-              className="text-sm font-semibold text-white/75 leading-none cursor-pointer">
+              className="text-sm font-semibold leading-none cursor-pointer"
+              style={{ color: subtleText }}>
               
                 ({lastScore > 0 ? `+${lastScore}` : lastScore})
               </motion.span>
@@ -178,7 +188,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             style={{ marginRight: 8 }}
             aria-label={`Add score for ${player.name}`}>
             
-            <AnimatedTotal value={total} color="#ffffff" />
+            <AnimatedTotal value={total} color={textColor} />
           </button>
 
           {/* Plus (±1) — hidden in bestof mode */}
@@ -187,8 +197,8 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             onClick={() => handleQuickTap(1)}
             whileTap={{ scale: 0.85 }}
             transition={{ type: "spring", stiffness: 600, damping: 14 }}
-            className="flex items-center justify-center flex-shrink-0 text-white"
-            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: "rgba(0,0,0,0.18)" }}
+            className="flex items-center justify-center flex-shrink-0"
+            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor }}
             aria-label={`Add 1 to ${player.name}`}>
             
               <Plus size={20} strokeWidth={2.5} />

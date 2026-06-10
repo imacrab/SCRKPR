@@ -1,27 +1,24 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import { Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import EmojiPicker from "./EmojiPicker";
+import { getPaletteForTone, readableTextColor } from "@/lib/contrast";
+import { usePlayerTone } from "@/lib/usePlayerTone";
 
-const PLAYER_COLORS = [
-  "#FF3A3A", "#F97316", "#F59E0B", "#EAB308", "#84CC16",
-  "#22C55E", "#10B981", "#14B8A6", "#06B6D4", "#0EA5E9",
-  "#2DC5F8", "#3B82F6", "#6366F1", "#8B5CF6", "#EC4899",
-  "#9CA3AF", "#6B7280", "#374151", "#FFFFFF", "#000000",
-];
-
-function pickRandomColor(usedColors = []) {
+function pickRandomColor(palette, usedColors = []) {
   const used = new Set(usedColors);
-  const available = PLAYER_COLORS.filter((c) => !used.has(c));
-  const pool = available.length > 0 ? available : PLAYER_COLORS;
+  const available = palette.filter((c) => !used.has(c));
+  const pool = available.length > 0 ? available : palette;
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
 export default function PlayerEditModal({ isOpen, player, usedColors = [], onSave, onDelete, onClose }) {
+  const [tone] = usePlayerTone();
+  const palette = useMemo(() => getPaletteForTone(tone), [tone]);
   const [name, setName] = useState("");
-  const [color, setColor] = useState(PLAYER_COLORS[0]);
+  const [color, setColor] = useState(palette[0]);
   const [emoji, setEmoji] = useState("");
   const inputRef = useRef(null);
   const isEditing = !!player?.id;
@@ -32,15 +29,15 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
     if (!isOpen) return;
     if (player?.id) {
       setName(player.name || "");
-      setColor(player.color || PLAYER_COLORS[0]);
+      setColor(player.color || palette[0]);
       setEmoji(player.emoji || "");
     } else {
       setName("");
-      setColor(pickRandomColor(usedColors));
+      setColor(pickRandomColor(palette, usedColors));
       setEmoji("");
     }
     setTimeout(() => inputRef.current?.focus(), 120);
-  }, [isOpen, player, usedColors]);
+  }, [isOpen, player, usedColors, palette]);
 
   const handleSubmit = () => {
     const trimmed = name.trim();
@@ -115,12 +112,12 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
 
             <div className="border-t border-border">
               <div className="grid grid-cols-5 gap-3 p-3 justify-items-center">
-                {PLAYER_COLORS.map((c) => (
+                {palette.map((c) => (
                   <button
                     key={c}
                     onPointerDown={(e) => { e.preventDefault(); setColor(c); }}
                     className="w-10 h-10 rounded-full flex items-center justify-center text-xl transition-transform active:scale-90"
-                    style={{ backgroundColor: c, outline: color === c ? "2px solid white" : "none", outlineOffset: "2px" }}
+                    style={{ backgroundColor: c, color: readableTextColor(c), outline: color === c ? "2px solid hsl(var(--foreground))" : "none", outlineOffset: "2px" }}
                   >
                     {color === c ? emoji : ""}
                   </button>

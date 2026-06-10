@@ -1,7 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { RotateCcw, UserPlus, FlagOff } from "lucide-react";
+import { RotateCcw, UserPlus, FlagOff, Sun, Moon } from "lucide-react";
+import { usePlayerTone } from "@/lib/usePlayerTone";
 
 export default function GameMenuModal({ isOpen, canAddPlayer, onAddPlayer, onResetScores, onEndGame, onClose }) {
+  const [tone, setTone] = usePlayerTone();
   const items = [
     canAddPlayer && {
       key: "add",
@@ -43,6 +45,29 @@ export default function GameMenuModal({ isOpen, canAddPlayer, onAddPlayer, onRes
               <div className="text-center mb-5">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-0.5">Game</p>
                 <h2 className="font-display text-xl font-bold text-foreground">Menu</h2>
+              </div>
+
+              {/* Player background tone — WCAG AA contrast */}
+              <div className="mb-3">
+                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-2 px-1">
+                  Player Background
+                </p>
+                <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-secondary">
+                  <button
+                    onClick={() => setTone("dark")}
+                    className={`flex items-center justify-center gap-2 h-10 rounded-lg text-sm font-medium transition-colors ${tone === "dark" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+                  >
+                    <Moon size={16} strokeWidth={2} />
+                    Dark
+                  </button>
+                  <button
+                    onClick={() => setTone("light")}
+                    className={`flex items-center justify-center gap-2 h-10 rounded-lg text-sm font-medium transition-colors ${tone === "light" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+                  >
+                    <Sun size={16} strokeWidth={2} />
+                    Light
+                  </button>
+                </div>
               </div>
 
               <div className="flex flex-col gap-2 mb-3">

@@ -128,7 +128,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
             }}
             className="flex-1 flex flex-col items-start gap-1 min-w-0 text-left"
-            style={{ marginLeft: 16 }}
+            style={{ marginLeft: 8 }}
           >
             <div className="flex items-center gap-2 w-full min-w-0">
               {player.emoji && (
@@ -175,7 +175,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           <button
             onClick={onAddScore}
             className="flex-shrink-0"
-            style={{ marginRight: 16 }}
+            style={{ marginRight: 8 }}
             aria-label={`Add score for ${player.name}`}
           >
             <AnimatedTotal value={total} color="#ffffff" />

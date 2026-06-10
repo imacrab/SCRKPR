@@ -241,7 +241,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
               style={{
                 right: -50,
                 top: "50%",
-                transform: "translateY(-50%) rotate(-15deg) scaleX(-1)",
+                transform: "translateY(-51%) rotate(-15deg) scaleX(-1)",
                 opacity: 0.95,
                 zIndex: 0
               }}

@@ -74,9 +74,9 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   useEffect(() => {
     if (!circleMode || !winsNeeded) return;
     const winner = players.find((p) => p.scores.reduce((s, n) => s + n, 0) >= winsNeeded);
-    if (winner) {
-      setTimeout(() => setShowEndGame(true), 400);
-    }
+    if (!winner) return;
+    const t = setTimeout(() => setShowEndGame(true), 400);
+    return () => clearTimeout(t);
   }, [players, circleMode, winsNeeded]);
 
   // Auto-end when any player reaches the target score (Gin Rummy, Swish, etc.)
@@ -92,10 +92,11 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
 
     // Round complete = every player has the same number of scores logged
     const counts = players.map((p) => p.scores.length);
-    const roundComplete = counts.every((c) => c === counts[0]);
+    const roundComplete = counts.length > 0 && counts.every((c) => c === counts[0]);
     if (!roundComplete) return;
 
-    setTimeout(() => setShowEndGame(true), 400);
+    const t = setTimeout(() => setShowEndGame(true), 400);
+    return () => clearTimeout(t);
   }, [players, winMode, targetScore, circleMode]);
 
   const handleOpenScore = (player) => {

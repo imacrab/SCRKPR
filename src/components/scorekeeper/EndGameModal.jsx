@@ -66,14 +66,18 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
     return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", check); };
   }, [isOpen, players]);
 
-  if (!isOpen || players.length === 0) return null;
+  // Don't early-return — let AnimatePresence handle the open/close so exit
+  // animations play. We still guard the derived values below.
+  const hasPlayers = isOpen && players.length > 0;
 
   const isLowWin = isLowMode(winMode);
-  const sorted = [...players]
-    .map((p) => ({ ...p, total: p.scores.reduce((s, n) => s + n, 0) }))
-    .sort((a, b) => isLowWin ? a.total - b.total : b.total - a.total);
+  const sorted = hasPlayers
+    ? [...players]
+        .map((p) => ({ ...p, total: p.scores.reduce((s, n) => s + n, 0) }))
+        .sort((a, b) => isLowWin ? a.total - b.total : b.total - a.total)
+    : [];
 
-  const topScore = sorted[0].total;
+  const topScore = sorted[0]?.total ?? 0;
   const tied = sorted.filter((p) => p.total === topScore);
   const isTie = tied.length > 1;
   const winner = sorted[0];
@@ -166,7 +170,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
 
   return (
     <AnimatePresence>
-      {isOpen && !isExiting && (
+      {hasPlayers && !isExiting && (
         <>
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

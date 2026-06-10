@@ -214,7 +214,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             className="flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-green-600 hover:bg-green-700 text-white font-semibold text-sm shadow-lg transition-colors"
           >
             End Game
-            <FluentEmoji emoji="🏁" size={20} />
+            <FluentEmoji emoji="🏳️" size={20} />
           </button>
         </div>
       </div>

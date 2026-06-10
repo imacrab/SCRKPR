@@ -104,13 +104,29 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
     <div className="flex flex-col rounded-xl border border-border overflow-hidden">
       {/* Header — player color background */}
       <div
-        className="px-2 py-3 rounded-sm flex flex-col items-center z-10 transition-all"
+        className="relative px-2 py-3 rounded-sm flex flex-col items-center z-10 transition-all overflow-hidden"
         style={{
           backgroundColor: player.color,
           borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))"
         }}>
-        
-        <div className="flex items-center justify-between w-full gap-3">
+
+        {/* Flourish — oversized tilted player emoji bleeding off the left edge */}
+        {player.emoji &&
+        <div
+          className="absolute pointer-events-none select-none"
+          style={{
+            left: -18,
+            top: "50%",
+            transform: "translateY(-50%) rotate(-5deg)",
+            opacity: 0.95,
+            zIndex: 0
+          }}
+          aria-hidden="true">
+            <FluentEmoji emoji={player.emoji} size={60} />
+          </div>
+        }
+
+        <div className="relative z-10 flex items-center justify-between w-full gap-3">
           {/* Minus (±1) — hidden in bestof mode */}
           {!isBestOf &&
           <motion.button
@@ -140,11 +156,6 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             style={{ marginLeft: 8 }}>
             
             <div className="flex items-center gap-2 w-full min-w-0">
-              {player.emoji &&
-              <span className="leading-none flex-shrink-0 flex items-center" aria-hidden="true">
-                  <FluentEmoji emoji={player.emoji} size={30} />
-                </span>
-              }
               <span className="font-bold truncate leading-tight text-xl" title={player.name} style={{ color: textColor }}>
                 {player.name}
               </span>

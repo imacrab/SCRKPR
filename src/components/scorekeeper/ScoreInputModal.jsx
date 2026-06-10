@@ -77,7 +77,7 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
                     exit={{ opacity: 0, y: 14, scale: 0.8 }}
                     transition={{ type: "spring", stiffness: 500, damping: 24 }}
                     className="text-5xl font-bold inline-block"
-                    style={{ color: value === "" ? "rgba(150,150,150,0.3)" : player.color }}
+                    style={{ color: value === "" ? "rgba(150,150,150,0.3)" : "#FFFFFF" }}
                   >
                     {value === "" ? "0" : value}
                   </motion.span>

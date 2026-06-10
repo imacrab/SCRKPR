@@ -1,10 +1,16 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { TrendingUp, TrendingDown, Trophy } from "lucide-react";
+import { TrendingUp, TrendingDown, Trophy, Spade, Club, Diamond, Heart, Sparkles, Sliders } from "lucide-react";
 
 const MODES = [
-  { value: "low",    label: "Low Score",  Icon: TrendingDown },
-  { value: "high",   label: "High Score", Icon: TrendingUp },
-  { value: "bestof", label: "Best Of",    Icon: Trophy },
+  { value: "low",        label: "Low Score",   sub: "Lowest total wins",         Icon: TrendingDown },
+  { value: "high",       label: "High Score",  sub: "Highest total wins",        Icon: TrendingUp },
+  { value: "bestof",     label: "Best Of",     sub: "First to win N rounds",     Icon: Trophy },
+  { value: "gin",        label: "Gin",         sub: "First to 100 points",       Icon: Spade },
+  { value: "rummy",      label: "Rummy",       sub: "First to 500 points",       Icon: Club },
+  { value: "skipbo",     label: "Skip-Bo",     sub: "First to 500 points",       Icon: Diamond },
+  { value: "fivecrowns", label: "Five Crowns", sub: "Lowest after 11 rounds",    Icon: Heart },
+  { value: "phase10",    label: "Phase 10",    sub: "Finish all phases · low",   Icon: Sparkles },
+  { value: "custom",     label: "Custom",      sub: "Pick your own target",      Icon: Sliders },
 ];
 
 export default function GameModeModal({ isOpen, winMode, onSelect, onClose }) {
@@ -41,14 +47,14 @@ export default function GameModeModal({ isOpen, winMode, onSelect, onClose }) {
                 <h2 className="font-display text-xl font-bold text-foreground">Game Mode</h2>
               </div>
 
-              <div className="flex flex-col gap-2">
-                {MODES.map(({ value, label, Icon }) => {
+              <div className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto">
+                {MODES.map(({ value, label, sub, Icon }) => {
                   const active = winMode === value;
                   return (
                     <button
                       key={value}
                       onClick={() => handleSelect(value)}
-                      className="w-full flex items-center gap-3 px-4 h-12 rounded-xl transition-colors text-left border"
+                      className="w-full flex items-center gap-3 px-4 h-14 rounded-xl transition-colors text-left border flex-shrink-0"
                       style={{
                         borderColor: active ? "hsl(199 94% 40% / 0.4)" : "hsl(var(--border))",
                         backgroundColor: active ? "hsl(199 94% 40% / 0.12)" : "hsl(var(--secondary))",
@@ -59,11 +65,9 @@ export default function GameModeModal({ isOpen, winMode, onSelect, onClose }) {
                         strokeWidth={2}
                         style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
                       />
-                      <span
-                        className="text-sm font-medium"
-                        style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--foreground))" }}
-                      >
-                        {label}
+                      <span className="flex flex-col">
+                        <span className="text-sm font-medium text-foreground leading-tight">{label}</span>
+                        <span className="text-xs text-muted-foreground leading-tight mt-0.5">{sub}</span>
                       </span>
                     </button>
                   );

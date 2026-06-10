@@ -13,24 +13,27 @@ import AccountSettings from "./AccountSettings";
 let _players = [];
 let _winMode = "high";
 let _bestOf = null; // only set when winMode === "bestof"
+let _targetScore = null; // when set, reaching it auto-ends the game
 
 const STORAGE_KEY = "scorekeeper_game_state";
 
-function saveGameState(players, winMode, bestOf = null) {
+function saveGameState(players, winMode, bestOf = null, targetScore = null) {
   _players = players;
   _winMode = winMode;
   _bestOf = bestOf;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ players, winMode, bestOf }));
+  _targetScore = targetScore;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ players, winMode, bestOf, targetScore }));
 }
 
 function loadGameState() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      const { players, winMode, bestOf } = JSON.parse(saved);
+      const { players, winMode, bestOf, targetScore } = JSON.parse(saved);
       _players = players;
       _winMode = winMode;
       _bestOf = bestOf || null;
+      _targetScore = targetScore || null;
       return true;
     }
   } catch (e) {
@@ -43,11 +46,12 @@ function clearGameState() {
   _players = [];
   _winMode = "high";
   _bestOf = null;
+  _targetScore = null;
   localStorage.removeItem(STORAGE_KEY);
 }
 
-export function getGameState() { return { players: _players, winMode: _winMode, bestOf: _bestOf }; }
-export function setGameState(players, winMode, bestOf) { saveGameState(players, winMode, bestOf); }
+export function getGameState() { return { players: _players, winMode: _winMode, bestOf: _bestOf, targetScore: _targetScore }; }
+export function setGameState(players, winMode, bestOf, targetScore) { saveGameState(players, winMode, bestOf, targetScore); }
 
 export default function ScoreKeeper() {
   const navigate = useNavigate();
@@ -59,6 +63,7 @@ export default function ScoreKeeper() {
   const [players, setPlayers] = useState(_players);
   const [winMode, setWinMode] = useState(_winMode);
   const [bestOf, setBestOf] = useState(_bestOf);
+  const [targetScore, setTargetScore] = useState(_targetScore);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
   const [lastAddedPlayerId, setLastAddedPlayerId] = useState(null);
@@ -70,6 +75,7 @@ export default function ScoreKeeper() {
       setPlayers(_players);
       setWinMode(_winMode);
       setBestOf(_bestOf);
+      setTargetScore(_targetScore);
       setInitialized(true);
       
       // If game was restored and we're on home, go to game screen
@@ -79,7 +85,7 @@ export default function ScoreKeeper() {
     }
   }, [initialized, navigate, view]);
 
-  const handleStartGame = useCallback((playerData, mode, bestOfCount = null) => {
+  const handleStartGame = useCallback((playerData, mode, bestOfCount = null, target = null) => {
     const initialPlayers = playerData.map((p, i) => ({
       id: i + 1,
       name: p.name || p,
@@ -87,17 +93,18 @@ export default function ScoreKeeper() {
       emoji: p.emoji || "",
       scores: [],
     }));
-    saveGameState(initialPlayers, mode || "high", bestOfCount);
+    saveGameState(initialPlayers, mode || "high", bestOfCount, target);
     setPlayers(initialPlayers);
     setWinMode(mode || "high");
     setBestOf(bestOfCount);
+    setTargetScore(target);
     navigate("/game");
   }, [navigate]);
 
   const handleReset = useCallback(() => {
     setPlayers((prev) => {
       const reset = prev.map((p) => ({ ...p, scores: [] }));
-      saveGameState(reset, _winMode, _bestOf);
+      saveGameState(reset, _winMode, _bestOf, _targetScore);
       return reset;
     });
   }, []);
@@ -120,6 +127,7 @@ export default function ScoreKeeper() {
     }
     clearGameState();
     setPlayers([]);
+    setTargetScore(null);
     navigate("/");
   }, [players, navigate, winMode]);
 
@@ -128,7 +136,7 @@ export default function ScoreKeeper() {
       const next = prev.map((p) =>
         p.id === playerId ? { ...p, scores: [...p.scores, score] } : p
       );
-      saveGameState(next, _winMode, _bestOf);
+      saveGameState(next, _winMode, _bestOf, _targetScore);
       return next;
     });
   }, []);
@@ -141,7 +149,7 @@ export default function ScoreKeeper() {
         newScores[scoreIndex] = newScore;
         return { ...p, scores: newScores };
       });
-      saveGameState(next, _winMode);
+      saveGameState(next, _winMode, _bestOf, _targetScore);
       return next;
     });
   }, []);
@@ -149,7 +157,7 @@ export default function ScoreKeeper() {
   const handleEditName = useCallback((playerId, newName) => {
     setPlayers((prev) => {
       const next = prev.map((p) => (p.id === playerId ? { ...p, name: newName } : p));
-      saveGameState(next, _winMode);
+      saveGameState(next, _winMode, _bestOf, _targetScore);
       return next;
     });
   }, []);
@@ -157,7 +165,7 @@ export default function ScoreKeeper() {
   const handleEditColor = useCallback((playerId, color) => {
     setPlayers((prev) => {
       const next = prev.map((p) => (p.id === playerId ? { ...p, color } : p));
-      saveGameState(next, _winMode);
+      saveGameState(next, _winMode, _bestOf, _targetScore);
       return next;
     });
   }, []);
@@ -165,7 +173,7 @@ export default function ScoreKeeper() {
   const handleEditEmoji = useCallback((playerId, emoji) => {
     setPlayers((prev) => {
       const next = prev.map((p) => (p.id === playerId ? { ...p, emoji } : p));
-      saveGameState(next, _winMode);
+      saveGameState(next, _winMode, _bestOf, _targetScore);
       return next;
     });
   }, []);
@@ -176,7 +184,7 @@ export default function ScoreKeeper() {
       const maxId = prev.reduce((m, p) => Math.max(m, p.id), 0);
       const newId = maxId + 1;
       const next = [...prev, { id: newId, name, color: color || "#2DC5F8", emoji, scores: [] }];
-      saveGameState(next, _winMode);
+      saveGameState(next, _winMode, _bestOf, _targetScore);
       setLastAddedPlayerId(newId);
       return next;
     });
@@ -225,6 +233,7 @@ export default function ScoreKeeper() {
               players={players}
               winMode={winMode}
               bestOf={bestOf}
+              targetScore={targetScore}
               lastAddedPlayerId={lastAddedPlayerId}
               onAddScore={handleAddScore}
               onEditScore={handleEditScore}

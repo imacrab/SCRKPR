@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
+import { isLowMode } from "@/lib/gameModes";
 
 export default function EndGameModal({ isOpen, players, winMode, gameStartTime, onConfirm, onCancel }) {
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
 
   if (!isOpen || players.length === 0) return null;
 
-  const isLowWin = winMode === "low";
+  const isLowWin = isLowMode(winMode);
   const sorted = [...players]
     .map((p) => ({ ...p, total: p.scores.reduce((s, n) => s + n, 0) }))
     .sort((a, b) => isLowWin ? a.total - b.total : b.total - a.total);

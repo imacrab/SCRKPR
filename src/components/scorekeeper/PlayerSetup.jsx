@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Play, Save, TrendingUp, TrendingDown, Trophy } from "lucide-react";
+import { Plus, Trash2, Play, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
@@ -8,13 +8,9 @@ import SaveGroupModal from "./SaveGroupModal";
 import EditGroupModal from "./EditGroupModal";
 import BestOfModal from "./BestOfModal";
 import GameModeModal from "./GameModeModal";
+import CustomTargetModal from "./CustomTargetModal";
 import EmojiPicker from "./EmojiPicker";
-
-const MODE_META = {
-  low:    { label: "Low Score",  Icon: TrendingDown },
-  high:   { label: "High Score", Icon: TrendingUp },
-  bestof: { label: "Best Of",    Icon: Trophy },
-};
+import { GAME_MODES, getModeMeta } from "@/lib/gameModes";
 
 export const PLAYER_COLORS = [
   "#FF3A3A", "#F97316", "#F59E0B", "#EAB308", "#84CC16",
@@ -89,9 +85,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     onModalChange?.(!!val);
   };
   const [activeGroup, setActiveGroup] = useState(null); // the loaded group, if any
-  const [winMode, setWinMode] = useState("low"); // "high" | "low" | "bestof"
+  const [winMode, setWinMode] = useState("low");
   const [showBestOf, setShowBestOf] = useState(false);
   const [showGameMode, setShowGameMode] = useState(false);
+  const [showCustomTarget, setShowCustomTarget] = useState(false);
   const scrollRef = useRef(null);
   const inputRefs = useRef([]);
 
@@ -252,8 +249,12 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     if (winMode === "bestof") {
       setShowBestOf(true);
       onModalChange?.(true);
+    } else if (winMode === "custom") {
+      setShowCustomTarget(true);
+      onModalChange?.(true);
     } else {
-      onStart(valid, winMode);
+      const meta = getModeMeta(winMode);
+      onStart(valid, winMode, null, meta.targetScore);
     }
   };
 
@@ -262,6 +263,14 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     setShowBestOf(false);
     onModalChange?.(false);
     onStart(valid, "bestof", bestOf);
+  };
+
+  const handleCustomConfirm = (direction, target) => {
+    const valid = players.filter((p) => p.name.trim());
+    setShowCustomTarget(false);
+    onModalChange?.(false);
+    // Custom maps onto plain high/low mode with a target score
+    onStart(valid, direction === "low" ? "low" : "high", null, target);
   };
 
   const pullProgress = Math.min(pullY / PULL_THRESHOLD, 1);
@@ -387,7 +396,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Game mode</span>
           <span className="flex items-center gap-1.5">
             {(() => {
-              const { Icon, label } = MODE_META[winMode];
+              const { Icon, label } = getModeMeta(winMode);
               return (
                 <>
                   <Icon size={16} strokeWidth={2} className="text-foreground" />
@@ -459,6 +468,12 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         winMode={winMode}
         onSelect={setWinMode}
         onClose={() => { setShowGameMode(false); onModalChange?.(false); }}
+      />
+
+      <CustomTargetModal
+        isOpen={showCustomTarget}
+        onConfirm={handleCustomConfirm}
+        onClose={() => { setShowCustomTarget(false); onModalChange?.(false); }}
       />
     </div>
   );

@@ -7,8 +7,9 @@ import ScoreInputModal from "./ScoreInputModal";
 import EditPlayerModal from "./EditPlayerModal";
 import EndGameModal from "./EndGameModal";
 import GameMenuModal from "./GameMenuModal";
+import { isLowMode } from "@/lib/gameModes";
 
-export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
+export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [streakMap, setStreakMap] = useState({});
   const [gameStartTime] = useState(new Date());
@@ -33,7 +34,7 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
       players.forEach((player) => {
         let streak = 0;
         for (const game of games) {
-          const isLowWin = game.win_mode === "low";
+          const isLowWin = isLowMode(game.win_mode);
           const sorted = [...game.players].sort((a, b) =>
             isLowWin ? a.total - b.total : b.total - a.total
           );
@@ -72,6 +73,19 @@ export default function ScoreBoard({ players, winMode, bestOf, lastAddedPlayerId
       setTimeout(() => setShowEndGame(true), 400);
     }
   }, [players, winMode, winsNeeded]);
+
+  // Auto-end when any player reaches the target score (Gin, Rummy, Skip-Bo, Custom)
+  useEffect(() => {
+    if (!targetScore || winMode === "bestof") return;
+    const low = isLowMode(winMode);
+    const reached = players.some((p) => {
+      const total = p.scores.reduce((s, n) => s + n, 0);
+      return low ? total <= -targetScore : total >= targetScore;
+    });
+    if (reached) {
+      setTimeout(() => setShowEndGame(true), 400);
+    }
+  }, [players, winMode, targetScore]);
 
   const handleOpenScore = (player) => {
     if (winMode === "bestof") {

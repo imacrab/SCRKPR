@@ -68,12 +68,12 @@ export default function EditPlayerModal({ player, isOpen, onSave, onClose }) {
               </div>
 
               {/* Color picker */}
-              <div className="flex flex-wrap gap-2.5 mb-6">
+              <div className="grid grid-cols-5 gap-3 p-3 mb-3 justify-items-center">
                 {PLAYER_COLORS.map((c) => (
                   <button
                     key={c}
                     onPointerDown={(e) => { e.preventDefault(); setColor(c); }}
-                    className="w-8 h-8 rounded-full transition-transform active:scale-90"
+                    className="w-10 h-10 rounded-full transition-transform active:scale-90"
                     style={{
                       backgroundColor: c,
                       outline: color === c ? "2.5px solid white" : "none",

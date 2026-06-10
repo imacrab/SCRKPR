@@ -24,7 +24,7 @@ export const PLAYER_COLORS = [
 
 function ColorPicker({ selected, onChange }) {
   return (
-    <div className="grid grid-cols-5 gap-2 mt-2 justify-items-center">
+    <div className="grid grid-cols-5 gap-3 p-3 justify-items-center">
       {PLAYER_COLORS.map((color) => (
         <button
           key={color}

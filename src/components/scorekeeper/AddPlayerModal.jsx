@@ -73,12 +73,12 @@ export default function AddPlayerModal({ isOpen, onAdd, onClose }) {
               />
 
               <div className="mb-5">
-                <div className="flex flex-wrap gap-2 justify-center">
+                <div className="grid grid-cols-5 gap-3 p-3 justify-items-center">
                   {PLAYER_COLORS.map((c) => (
                     <button
                       key={c}
                       onPointerDown={(e) => { e.preventDefault(); setColor(c); }}
-                      className="w-7 h-7 rounded-full transition-transform active:scale-90"
+                      className="w-10 h-10 rounded-full transition-transform active:scale-90"
                       style={{ backgroundColor: c, outline: color === c ? "2px solid white" : "none", outlineOffset: "2px" }}
                     />
                   ))}

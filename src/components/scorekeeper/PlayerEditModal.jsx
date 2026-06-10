@@ -136,8 +136,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
               {isEditing && (
                 <Button
                   onClick={() => onDelete?.(player.id)}
-                  variant="outline"
-                  className="h-11 text-accent-red border-accent-red/40"
+                  className="h-11 bg-accent-red/15 hover:bg-accent-red/25 text-accent-red border-0 shadow-none"
                 >
                   <Trash2 size={20} strokeWidth={2} />
                 </Button>

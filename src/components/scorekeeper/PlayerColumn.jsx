@@ -104,7 +104,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
     <div className="flex flex-col rounded-xl border border-border overflow-hidden">
       {/* Header — player color background */}
       <div
-        className="relative px-2 py-3 rounded-sm flex flex-col items-center z-10 transition-all overflow-hidden"
+        className="relative px-2 py-2 rounded-sm flex flex-col items-center z-10 transition-all overflow-hidden"
         style={{
           backgroundColor: player.color,
           borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))"
@@ -115,7 +115,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
         <div
           className="absolute pointer-events-none select-none"
           style={{
-            left: -50,
+            left: -58,
             top: "50%",
             transform: "translateY(-50%) rotate(-15deg) scaleX(-1)",
             opacity: 0.95,
@@ -126,7 +126,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           </div>
         }
 
-        <div className="relative z-10 flex items-center justify-between w-full gap-3">
+        <div className="relative z-10 flex items-center justify-between w-full gap-1">
           {/* Name (left) — tap to open score modal, long-press to edit player */}
           <button
             onClick={onAddScore}

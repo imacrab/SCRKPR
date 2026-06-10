@@ -1,13 +1,12 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { TrendingUp, TrendingDown, Trophy, Spade, Heart, Sparkles } from "lucide-react";
+import { TrendingUp, TrendingDown, Trophy, Spade, Zap } from "lucide-react";
 
 const MODES = [
-  { value: "low",        label: "Low Score",   sub: "Lowest total wins",         Icon: TrendingDown },
-  { value: "high",       label: "High Score",  sub: "Highest total wins",        Icon: TrendingUp },
-  { value: "bestof",     label: "Best Of",     sub: "First to win N rounds",     Icon: Trophy },
-  { value: "ginrummy",   label: "Gin Rummy",   sub: "First to 100 points",       Icon: Spade },
-  { value: "fivecrowns", label: "Five Crowns", sub: "Lowest after 11 rounds",    Icon: Heart },
-  { value: "phase10",    label: "Phase 10",    sub: "First to finish 10 phases", Icon: Sparkles },
+  { value: "ginrummy", label: "Gin Rummy",  sub: "Game ends at 100.",     Icon: Spade },
+  { value: "swish",    label: "Swish",      sub: "Game ends at 500.",     Icon: Zap },
+  { value: "low",      label: "Low Score",  sub: "Lowest total wins",     Icon: TrendingDown },
+  { value: "high",     label: "High Score", sub: "Highest total wins",    Icon: TrendingUp },
+  { value: "bestof",   label: "Best Of",    sub: "First to win N rounds", Icon: Trophy },
 ];
 
 export default function GameModeModal({ isOpen, winMode, onSelect, onClose }) {

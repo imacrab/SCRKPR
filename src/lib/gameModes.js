@@ -1,15 +1,14 @@
-import { TrendingUp, TrendingDown, Trophy, Spade, Heart, Sparkles } from "lucide-react";
+import { TrendingUp, TrendingDown, Trophy, Spade, Zap } from "lucide-react";
 
 // All supported game modes with their UI metadata, scoring direction, and target score.
-// direction: "high" | "low" | "bestof" | "phases"  (drives sort/winner logic)
+// direction: "high" | "low" | "bestof"  (drives sort/winner logic)
 // targetScore: number | null            (when set, reaching it auto-ends the game)
 export const GAME_MODES = {
-  low:        { label: "Low Score",   Icon: TrendingDown, direction: "low",    targetScore: null },
-  high:       { label: "High Score",  Icon: TrendingUp,   direction: "high",   targetScore: null },
-  bestof:     { label: "Best Of",     Icon: Trophy,       direction: "bestof", targetScore: null },
-  ginrummy:   { label: "Gin Rummy",   Icon: Spade,        direction: "high",   targetScore: 100 },
-  fivecrowns: { label: "Five Crowns", Icon: Heart,        direction: "low",    targetScore: null },
-  phase10:    { label: "Phase 10",    Icon: Sparkles,     direction: "phases", targetScore: null },
+  ginrummy: { label: "Gin Rummy",  Icon: Spade,        direction: "high",   targetScore: 100 },
+  swish:    { label: "Swish",      Icon: Zap,          direction: "high",   targetScore: 500 },
+  low:      { label: "Low Score",  Icon: TrendingDown, direction: "low",    targetScore: null },
+  high:     { label: "High Score", Icon: TrendingUp,   direction: "high",   targetScore: null },
+  bestof:   { label: "Best Of",    Icon: Trophy,       direction: "bestof", targetScore: null },
 };
 
 export function getModeMeta(winMode) {
@@ -24,5 +23,5 @@ export function isLowMode(winMode) {
 // Whether the mode uses circle indicators instead of numeric score input
 export function isCircleMode(winMode) {
   const dir = getModeMeta(winMode).direction;
-  return dir === "bestof" || dir === "phases";
+  return dir === "bestof";
 }

@@ -106,9 +106,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     if (winMode === "bestof") {
       setShowBestOf(true);
       onModalChange?.(true);
-    } else if (winMode === "phase10") {
-      // Phase 10 uses 10 circle indicators, like best-of-10
-      onStart(selectedPlayers, "phase10", 10, null);
     } else {
       const meta = getModeMeta(winMode);
       onStart(selectedPlayers, winMode, null, meta.targetScore);

@@ -84,6 +84,10 @@ export default function AddPlayerModal({ isOpen, usedColors = [], onAdd, onClose
               />
 
               <div className="mb-3">
+                <EmojiPicker selected={emoji} onChange={setEmoji} />
+              </div>
+
+              <div className="mb-5 border-t border-border">
                 <div className="grid grid-cols-5 gap-3 p-3 justify-items-center">
                   {PLAYER_COLORS.map((c) => (
                     <button
@@ -96,10 +100,6 @@ export default function AddPlayerModal({ isOpen, usedColors = [], onAdd, onClose
                     </button>
                   ))}
                 </div>
-              </div>
-
-              <div className="mb-5 border-t border-border">
-                <EmojiPicker selected={emoji} onChange={setEmoji} />
               </div>
 
               <div className="flex gap-3">

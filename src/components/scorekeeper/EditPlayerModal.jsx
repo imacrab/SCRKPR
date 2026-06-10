@@ -72,8 +72,13 @@ export default function EditPlayerModal({ player, isOpen, onSave, onClose }) {
                 />
               </div>
 
+              {/* Emoji picker */}
+              <div className="mb-1">
+                <EmojiPicker selected={emoji} onChange={setEmoji} />
+              </div>
+
               {/* Color picker */}
-              <div className="grid grid-cols-5 gap-3 p-3 mb-1 justify-items-center">
+              <div className="border-t border-border grid grid-cols-5 gap-3 p-3 mb-3 justify-items-center">
                 {PLAYER_COLORS.map((c) => (
                   <button
                     key={c}
@@ -88,10 +93,6 @@ export default function EditPlayerModal({ player, isOpen, onSave, onClose }) {
                     {color === c ? emoji : ""}
                   </button>
                 ))}
-              </div>
-
-              <div className="border-t border-border mb-3">
-                <EmojiPicker selected={emoji} onChange={setEmoji} />
               </div>
 
               <div className="flex gap-3">

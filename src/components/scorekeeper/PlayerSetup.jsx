@@ -356,9 +356,9 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden border-t border-border px-3 pb-3"
                 >
-                  <ColorPicker selected={player.color} onChange={(c) => updateColor(i, c)} />
+                  <EmojiPicker selected={player.emoji} onChange={(e) => updateEmoji(i, e)} />
                   <div className="border-t border-border mt-1 pt-1">
-                    <EmojiPicker selected={player.emoji} onChange={(e) => updateEmoji(i, e)} />
+                    <ColorPicker selected={player.color} onChange={(c) => updateColor(i, c)} />
                   </div>
                 </motion.div>
               )}

@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { MoreHorizontal, Shuffle, ArrowRightToLine } from "lucide-react";
+import { MoreHorizontal, Shuffle } from "lucide-react";
 import { motion, LayoutGroup } from "framer-motion";
 import { base44 } from "@/api/base44Client";
+import FluentEmoji from "./FluentEmoji";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
 import EditPlayerModal from "./EditPlayerModal";
@@ -213,7 +214,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             className="flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-green-600 hover:bg-green-700 text-white font-semibold text-sm shadow-lg transition-colors"
           >
             End Game
-            <ArrowRightToLine size={18} strokeWidth={2.5} />
+            <FluentEmoji emoji="🏁" size={20} />
           </button>
         </div>
       </div>

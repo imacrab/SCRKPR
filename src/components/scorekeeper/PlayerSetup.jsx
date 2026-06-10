@@ -184,15 +184,25 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 const selectedList = allPlayers.filter((p) => selectedIds.has(p.id));
                 const unselectedList = allPlayers.filter((p) => !selectedIds.has(p.id));
 
+                const hexToRgba = (hex, alpha) => {
+                  const h = (hex || "#000000").replace("#", "");
+                  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+                  const r = parseInt(full.slice(0, 2), 16);
+                  const g = parseInt(full.slice(2, 4), 16);
+                  const b = parseInt(full.slice(4, 6), 16);
+                  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                };
+
                 const renderRow = (player, { dragProvided, snapshot, selected, draggable }) => (
                   <div
                     ref={dragProvided?.innerRef}
                     {...(dragProvided?.draggableProps || {})}
                     {...(dragProvided?.dragHandleProps || {})}
                     onClick={() => toggleSelected(player.id)}
-                    className="w-full rounded-lg border bg-card overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left transition-colors cursor-pointer"
+                    className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left transition-colors cursor-pointer"
                     style={{
-                      borderColor: selected ? player.color : "hsl(var(--border))",
+                      backgroundColor: selected ? hexToRgba(player.color, 0.7) : "hsl(var(--card))",
+                      borderColor: selected ? "transparent" : "hsl(var(--border))",
                       boxShadow: snapshot?.isDragging ? "0 10px 20px -5px rgba(0,0,0,0.25)" : "none",
                       ...(dragProvided?.draggableProps?.style || {}),
                     }}
@@ -214,11 +224,11 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                     <div
                       className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
                       style={{
-                        backgroundColor: selected ? player.color : "transparent",
+                        backgroundColor: selected ? "#FFFFFF" : "transparent",
                         border: selected ? "none" : "2px solid hsl(var(--border))",
                       }}
                     >
-                      {selected && <Check size={16} strokeWidth={3} className="text-white" />}
+                      {selected && <Check size={16} strokeWidth={3} style={{ color: player.color }} />}
                     </div>
                   </div>
                 );

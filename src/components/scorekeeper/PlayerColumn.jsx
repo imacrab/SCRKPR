@@ -185,7 +185,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 24 }}
               onClick={(e) => {e.stopPropagation();onEditScore?.(lastIdx);}}
-              className="text-sm font-semibold leading-none cursor-pointer"
+              className="text-sm leading-none cursor-pointer [font-family:'Geist',_sans-serif] font-normal"
               style={{ color: subtleText }}>
               
                 ({lastScore > 0 ? `+${lastScore}` : lastScore})

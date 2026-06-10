@@ -117,7 +117,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           style={{
             left: -50,
             top: "50%",
-            transform: "translateY(-50%) rotate(-15deg)",
+            transform: "translateY(-50%) rotate(-15deg) scaleX(-1)",
             opacity: 0.95,
             zIndex: 0
           }}

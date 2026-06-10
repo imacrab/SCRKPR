@@ -203,9 +203,9 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           </LayoutGroup>
         </div>
 
-        {/* End Game — fixed at bottom-right of scoreboard */}
+        {/* End Game — fixed at bottom-center of scoreboard */}
         <div
-          className="absolute inset-x-0 bottom-0 z-30 px-4 flex justify-end"
+          className="absolute inset-x-0 bottom-0 z-30 px-4 flex justify-center"
           style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
         >
           <button

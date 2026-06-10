@@ -247,7 +247,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
               }}
               aria-hidden="true"
             >
-              <FluentEmoji emoji="🏳️" size={120} />
+              <FluentEmoji emoji="🏁" size={120} />
             </div>
             <span className="relative z-10">End Game</span>
           </button>

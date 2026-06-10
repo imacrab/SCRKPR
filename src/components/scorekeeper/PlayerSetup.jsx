@@ -290,10 +290,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Game mode</span>
           <span className="flex items-center gap-1.5">
             {(() => {
-              const { Icon, label } = getModeMeta(winMode);
+              const { emoji, label } = getModeMeta(winMode);
               return (
                 <>
-                  <Icon size={16} strokeWidth={2} className="text-foreground" />
+                  <FluentEmoji emoji={emoji} size={18} />
                   <span className="text-sm font-medium text-foreground">{label}</span>
                 </>
               );

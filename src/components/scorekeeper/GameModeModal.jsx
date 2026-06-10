@@ -1,12 +1,12 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { TrendingUp, TrendingDown, Trophy, Spade, Zap } from "lucide-react";
+import FluentEmoji from "./FluentEmoji";
 
 const MODES = [
-  { value: "ginrummy", label: "Gin Rummy",  sub: "Game ends at 100.",     Icon: Spade },
-  { value: "swish",    label: "Swish",      sub: "Lowest to 500 wins.",   Icon: Zap },
-  { value: "low",      label: "Low Score",  sub: "Lowest total wins",     Icon: TrendingDown },
-  { value: "high",     label: "High Score", sub: "Highest total wins",    Icon: TrendingUp },
-  { value: "bestof",   label: "Best Of",    sub: "First to win N rounds", Icon: Trophy },
+  { value: "ginrummy", label: "Gin Rummy",  sub: "Game ends at 100.",     emoji: "🎴" },
+  { value: "swish",    label: "Swish",      sub: "Lowest to 500 wins.",   emoji: "⚡" },
+  { value: "low",      label: "Low Score",  sub: "Lowest total wins",     emoji: "📉" },
+  { value: "high",     label: "High Score", sub: "Highest total wins",    emoji: "📈" },
+  { value: "bestof",   label: "Best Of",    sub: "First to win N rounds", emoji: "🏆" },
 ];
 
 export default function GameModeModal({ isOpen, winMode, onSelect, onClose }) {
@@ -44,7 +44,7 @@ export default function GameModeModal({ isOpen, winMode, onSelect, onClose }) {
               </div>
 
               <div className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto">
-                {MODES.map(({ value, label, sub, Icon }) => {
+                {MODES.map(({ value, label, sub, emoji }) => {
                   const active = winMode === value;
                   return (
                     <button
@@ -56,11 +56,7 @@ export default function GameModeModal({ isOpen, winMode, onSelect, onClose }) {
                         backgroundColor: active ? "hsl(199 94% 40% / 0.12)" : "hsl(var(--secondary))",
                       }}
                     >
-                      <Icon
-                        size={20}
-                        strokeWidth={2}
-                        style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
-                      />
+                      <FluentEmoji emoji={emoji} size={24} />
                       <span className="flex flex-col">
                         <span className="text-sm font-medium text-foreground leading-tight">{label}</span>
                         <span className="text-xs text-muted-foreground leading-tight mt-0.5">{sub}</span>

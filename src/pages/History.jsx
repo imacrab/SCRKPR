@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Trophy, Trash2, RefreshCw, Handshake, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Trash2, RefreshCw, Handshake, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
@@ -168,14 +168,14 @@ export default function History({ onBack, onModalChange }) {
                         <span>{format(new Date(game.played_at), "MMM d, yyyy · h:mm a")}</span>
                         <span>·</span>
                         <span className="inline-flex items-center gap-1">
-                          <modeMeta.Icon size={12} strokeWidth={2} />
+                          <FluentEmoji emoji={modeMeta.emoji} size={14} />
                           {modeMeta.label}
                         </span>
                       </p>
                       <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
                         {isTie ?
                           <Handshake size={20} strokeWidth={2} className="text-muted-foreground" /> :
-                          <Trophy size={20} strokeWidth={2} className="text-yellow-500" />
+                          <FluentEmoji emoji="🏆" size={20} />
                           }
                         {isTie ? "Tie" : winner.name}
                       </p>

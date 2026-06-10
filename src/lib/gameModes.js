@@ -1,14 +1,13 @@
-import { TrendingUp, TrendingDown, Trophy, Spade, Zap } from "lucide-react";
-
 // All supported game modes with their UI metadata, scoring direction, and target score.
 // direction: "high" | "low" | "bestof"  (drives sort/winner logic)
 // targetScore: number | null            (when set, reaching it auto-ends the game)
+// emoji: string                         (rendered via FluentEmoji in the UI)
 export const GAME_MODES = {
-  ginrummy: { label: "Gin Rummy",  Icon: Spade,        direction: "high",   targetScore: 100 },
-  swish:    { label: "Swish",      Icon: Zap,          direction: "low",    targetScore: 500 },
-  low:      { label: "Low Score",  Icon: TrendingDown, direction: "low",    targetScore: null },
-  high:     { label: "High Score", Icon: TrendingUp,   direction: "high",   targetScore: null },
-  bestof:   { label: "Best Of",    Icon: Trophy,       direction: "bestof", targetScore: null },
+  ginrummy: { label: "Gin Rummy",  emoji: "🎴", direction: "high",   targetScore: 100 },
+  swish:    { label: "Swish",      emoji: "⚡", direction: "low",    targetScore: 500 },
+  low:      { label: "Low Score",  emoji: "📉", direction: "low",    targetScore: null },
+  high:     { label: "High Score", emoji: "📈", direction: "high",   targetScore: null },
+  bestof:   { label: "Best Of",    emoji: "🏆", direction: "bestof", targetScore: null },
 };
 
 export function getModeMeta(winMode) {

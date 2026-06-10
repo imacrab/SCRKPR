@@ -3,8 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PLAYER_COLORS } from "./PlayerSetup";
 import EmojiPicker from "./EmojiPicker";
+
+const PLAYER_COLORS = [
+  "#FF3A3A", "#F97316", "#F59E0B", "#EAB308", "#84CC16",
+  "#22C55E", "#10B981", "#14B8A6", "#06B6D4", "#0EA5E9",
+  "#2DC5F8", "#3B82F6", "#6366F1", "#8B5CF6", "#EC4899",
+  "#9CA3AF", "#6B7280", "#374151", "#FFFFFF", "#000000",
+];
 
 export default function EditPlayerModal({ player, isOpen, onSave, onClose }) {
   const [name, setName] = useState("");

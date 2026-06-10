@@ -24,7 +24,7 @@ export default function GameModeModal({ isOpen, winMode, onSelect, onClose }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/60 backdrop-blur-[4px] z-40"
             onClick={onClose}
           />
           <motion.div

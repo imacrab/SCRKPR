@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { MoreHorizontal, Shuffle } from "lucide-react";
+import { Shuffle, UserPlus, RotateCcw } from "lucide-react";
 import { motion, LayoutGroup } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import FluentEmoji from "./FluentEmoji";
@@ -7,7 +7,7 @@ import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
 import EditPlayerModal from "./EditPlayerModal";
 import EndGameModal from "./EndGameModal";
-import GameMenuModal from "./GameMenuModal";
+import ResetConfirmModal from "./ResetConfirmModal";
 import { isLowMode, isCircleMode } from "@/lib/gameModes";
 
 export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
@@ -16,7 +16,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [gameStartTime] = useState(new Date());
   const [scrollPos, setScrollPos] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [sortDesc, setSortDesc] = useState(true);
   const scrollContainerRef = useRef(null);
 
@@ -155,11 +155,21 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           >
             <Shuffle size={22} strokeWidth={2} />
           </button>
+          {players.length < 20 && (
+            <button
+              onClick={onAddPlayer}
+              className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              aria-label="Add player"
+            >
+              <UserPlus size={22} strokeWidth={2} />
+            </button>
+          )}
           <button
-            onClick={() => setMenuOpen(true)}
+            onClick={() => setShowResetConfirm(true)}
             className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            aria-label="Reset scores"
           >
-            <MoreHorizontal size={24} strokeWidth={2} />
+            <RotateCcw size={22} strokeWidth={2} />
           </button>
         </div>
       </div>
@@ -234,12 +244,10 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         onClose={() => setEditingPlayer(null)}
       />
 
-      <GameMenuModal
-        isOpen={menuOpen}
-        canAddPlayer={players.length < 20}
-        onAddPlayer={onAddPlayer}
-        onResetScores={onReset}
-        onClose={() => setMenuOpen(false)}
+      <ResetConfirmModal
+        isOpen={showResetConfirm}
+        onConfirm={onReset}
+        onClose={() => setShowResetConfirm(false)}
       />
 
       <EndGameModal

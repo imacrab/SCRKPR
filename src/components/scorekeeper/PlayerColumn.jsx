@@ -111,7 +111,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
   const subtleText = isDarkText ? "rgba(17,17,17,0.65)" : "rgba(255,255,255,0.75)";
 
   return (
-    <div className="flex flex-col rounded-xl border border-border overflow-hidden">
+    <div className="flex flex-col rounded-xl overflow-hidden">
       {/* Header — player color background */}
       <div
         className="relative px-2 py-2 rounded-sm flex flex-col items-center z-10 transition-all overflow-hidden"

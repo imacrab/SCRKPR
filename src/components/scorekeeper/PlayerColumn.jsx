@@ -133,7 +133,8 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             <div className="flex items-center gap-2 w-full min-w-0">
               {player.emoji && (
                 <span
-                  className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-sm leading-none bg-white/20"
+                  className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-sm leading-none"
+                  style={{ backgroundColor: "rgba(0,0,0,0.18)" }}
                   aria-hidden="true"
                 >
                   {player.emoji}

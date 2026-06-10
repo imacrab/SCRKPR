@@ -100,7 +100,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
     const r = parseInt(full.slice(0, 2), 16);
     const g = parseInt(full.slice(2, 4), 16);
     const b = parseInt(full.slice(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, 0.2)`;
+    return `rgba(${r}, ${g}, ${b}, 0.5)`;
   }, [player.color]);
 
   // WCAG 2.2 — pick text color that contrasts with the player's background

@@ -41,7 +41,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     if (delta > 0) setPullY(Math.min(delta, PULL_THRESHOLD * 1.5));
   };
   const handleTouchEnd = () => {
-    if (anyModalOpen) { pullStartY.current = null; setPullY(0); return; }
+    if (anyModalOpen) {pullStartY.current = null;setPullY(0);return;}
     if (pullY >= PULL_THRESHOLD) window.location.reload();
     setPullY(0);
     pullStartY.current = null;
@@ -57,9 +57,9 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   useEffect(() => {
     base44.entities.Player.list("-created_date", 100).then((data) => {
       // Pin Adrian & Jayne to the top of the list
-      const pinned = DEFAULT_SELECTED_NAMES
-        .map((n) => data.find((p) => p.name === n))
-        .filter(Boolean);
+      const pinned = DEFAULT_SELECTED_NAMES.
+      map((n) => data.find((p) => p.name === n)).
+      filter(Boolean);
       const pinnedIds = new Set(pinned.map((p) => p.id));
       const rest = data.filter((p) => !pinnedIds.has(p.id));
       const ordered = [...pinned, ...rest];
@@ -95,8 +95,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const toggleSelected = (id) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) next.delete(id);else
+      next.add(id);
       return next;
     });
   };
@@ -142,17 +142,17 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       style={{ height: "100%", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
+      onTouchEnd={handleTouchEnd}>
+      
       {/* Pull-to-refresh indicator */}
       <div
         className="flex items-center justify-center overflow-hidden transition-all"
-        style={{ height: pullY > 0 ? `${pullY * 0.5}px` : 0, opacity: pullProgress }}
-      >
+        style={{ height: pullY > 0 ? `${pullY * 0.5}px` : 0, opacity: pullProgress }}>
+        
         <div
           className="w-6 h-6 rounded-full border-2 border-muted-foreground/40 border-t-foreground transition-transform"
-          style={{ transform: `rotate(${pullProgress * 360}deg)`, opacity: pullProgress >= 1 ? 1 : 0.5 }}
-        />
+          style={{ transform: `rotate(${pullProgress * 360}deg)`, opacity: pullProgress >= 1 ? 1 : 0.5 }} />
+        
       </div>
 
       {/* Header */}
@@ -166,127 +166,127 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
         <div
           ref={scrollRef}
-          className="h-full overflow-y-auto px-5 pt-2 pb-4 space-y-2"
-        >
-          {allPlayers === null ? (
-            <div className="flex items-center justify-center py-20">
+          className="h-full overflow-y-auto px-5 pt-2 pb-4 space-y-2">
+          
+          {allPlayers === null ?
+          <div className="flex items-center justify-center py-20">
               <div className="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
-            </div>
-          ) : (
-            <>
-              {allPlayers.length === 0 && (
-                <div className="text-center py-10 text-sm text-muted-foreground">
+            </div> :
+
+          <>
+              {allPlayers.length === 0 &&
+            <div className="text-center py-10 text-sm text-muted-foreground">
                   No players yet. Tap below to add one.
                 </div>
-              )}
+            }
 
               {(() => {
-                const selectedList = allPlayers.filter((p) => selectedIds.has(p.id));
-                const unselectedList = allPlayers.filter((p) => !selectedIds.has(p.id));
+              const selectedList = allPlayers.filter((p) => selectedIds.has(p.id));
+              const unselectedList = allPlayers.filter((p) => !selectedIds.has(p.id));
 
-                const hexToRgba = (hex, alpha) => {
-                  const h = (hex || "#000000").replace("#", "");
-                  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
-                  const r = parseInt(full.slice(0, 2), 16);
-                  const g = parseInt(full.slice(2, 4), 16);
-                  const b = parseInt(full.slice(4, 6), 16);
-                  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-                };
+              const hexToRgba = (hex, alpha) => {
+                const h = (hex || "#000000").replace("#", "");
+                const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+                const r = parseInt(full.slice(0, 2), 16);
+                const g = parseInt(full.slice(2, 4), 16);
+                const b = parseInt(full.slice(4, 6), 16);
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+              };
 
-                const renderRow = (player, { dragProvided, snapshot, selected, draggable }) => (
-                  <div
-                    ref={dragProvided?.innerRef}
-                    {...(dragProvided?.draggableProps || {})}
-                    {...(dragProvided?.dragHandleProps || {})}
-                    onClick={() => toggleSelected(player.id)}
-                    className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left transition-colors cursor-pointer"
-                    style={{
-                      backgroundColor: selected ? hexToRgba(player.color, 0.7) : "hsl(var(--card))",
-                      borderColor: selected ? "transparent" : "hsl(var(--border))",
-                      boxShadow: snapshot?.isDragging ? "0 10px 20px -5px rgba(0,0,0,0.25)" : "none",
-                      ...(dragProvided?.draggableProps?.style || {}),
-                    }}
-                  >
-                    {draggable ? (
-                      <div className="flex-shrink-0 text-muted-foreground touch-none flex items-center justify-center w-6 h-7">
+              const renderRow = (player, { dragProvided, snapshot, selected, draggable }) =>
+              <div
+                ref={dragProvided?.innerRef}
+                {...dragProvided?.draggableProps || {}}
+                {...dragProvided?.dragHandleProps || {}}
+                onClick={() => toggleSelected(player.id)}
+                className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left transition-colors cursor-pointer"
+                style={{
+                  backgroundColor: selected ? hexToRgba(player.color, 0.7) : "hsl(var(--card))",
+                  borderColor: selected ? "transparent" : "hsl(var(--border))",
+                  boxShadow: snapshot?.isDragging ? "0 10px 20px -5px rgba(0,0,0,0.25)" : "none",
+                  ...(dragProvided?.draggableProps?.style || {})
+                }}>
+                
+                    {draggable ?
+                <div className="flex-shrink-0 text-muted-foreground touch-none flex items-center justify-center w-6 h-7">
                         <GripVertical size={18} strokeWidth={2} />
-                      </div>
-                    ) : (
-                      <div className="flex-shrink-0 w-6 h-7" />
-                    )}
+                      </div> :
+
+                <div className="flex-shrink-0 w-6 h-7" />
+                }
                     <div
-                      className="w-7 h-7 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"
-                      style={{ backgroundColor: player.color }}
-                    >
+                  className="w-7 h-7 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"
+                  style={{ backgroundColor: player.color }}>
+                  
                       {player.emoji && <FluentEmoji emoji={player.emoji} size={18} />}
                     </div>
-                    <span className="flex-1 text-foreground text-base">{player.name}</span>
+                    <span className="flex-1 text-foreground text-base [font-family:'Geist',_sans-serif] font-semibold">{player.name}</span>
                     <div
-                      className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-                      style={{
-                        backgroundColor: selected ? "#FFFFFF" : "transparent",
-                        border: selected ? "none" : "2px solid hsl(var(--border))",
-                      }}
-                    >
+                  className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
+                  style={{
+                    backgroundColor: selected ? "#FFFFFF" : "transparent",
+                    border: selected ? "none" : "2px solid hsl(var(--border))"
+                  }}>
+                  
                       {selected && <Check size={16} strokeWidth={3} style={{ color: player.color }} />}
                     </div>
-                  </div>
-                );
+                  </div>;
 
-                return (
-                  <>
+
+              return (
+                <>
                     <DragDropContext onDragEnd={handleDragEnd}>
                       <Droppable droppableId="selected-players">
-                        {(dropProvided) => (
-                          <div
-                            ref={dropProvided.innerRef}
-                            {...dropProvided.droppableProps}
-                            className="space-y-2"
-                          >
-                            {selectedList.map((player, index) => (
-                              <Draggable key={player.id} draggableId={player.id} index={index}>
+                        {(dropProvided) =>
+                      <div
+                        ref={dropProvided.innerRef}
+                        {...dropProvided.droppableProps}
+                        className="space-y-2">
+                        
+                            {selectedList.map((player, index) =>
+                        <Draggable key={player.id} draggableId={player.id} index={index}>
                                 {(dragProvided, snapshot) =>
-                                  renderRow(player, { dragProvided, snapshot, selected: true, draggable: true })
-                                }
+                          renderRow(player, { dragProvided, snapshot, selected: true, draggable: true })
+                          }
                               </Draggable>
-                            ))}
+                        )}
                             {dropProvided.placeholder}
                           </div>
-                        )}
+                      }
                       </Droppable>
                     </DragDropContext>
 
-                    {unselectedList.length > 0 && (
-                      <div className="space-y-2 mt-2">
-                        {unselectedList.map((player) => (
-                          <div key={player.id}>
+                    {unselectedList.length > 0 &&
+                  <div className="space-y-2 mt-2">
+                        {unselectedList.map((player) =>
+                    <div key={player.id}>
                             {renderRow(player, { selected: false, draggable: false })}
                           </div>
-                        ))}
-                      </div>
                     )}
-                  </>
-                );
-              })()}
+                      </div>
+                  }
+                  </>);
+
+            })()}
 
               <button
-                onClick={() => setShowAddPlayerWithNav(true)}
-                className="w-full mt-1 h-11 rounded-lg flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50"
-              >
+              onClick={() => setShowAddPlayerWithNav(true)}
+              className="w-full mt-1 h-11 rounded-lg flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50">
+              
                 <Plus size={24} strokeWidth={2} />
                 Add Player
               </button>
             </>
-          )}
+          }
         </div>
       </div>
 
       {/* Win mode */}
       <div className="px-5 pt-2 pb-2">
         <button
-          onClick={() => { setShowGameMode(true); onModalChange?.(true); }}
-          className="w-full flex items-center justify-between gap-3 px-4 h-11 rounded-xl border border-border bg-card hover:bg-accent transition-colors"
-        >
+          onClick={() => {setShowGameMode(true);onModalChange?.(true);}}
+          className="w-full flex items-center justify-between gap-3 px-4 h-11 rounded-xl border border-border bg-card hover:bg-accent transition-colors">
+          
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Game mode</span>
           <span className="flex items-center gap-1.5">
             {(() => {
@@ -295,8 +295,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 <>
                   <FluentEmoji emoji={emoji} size={18} />
                   <span className="text-sm font-medium text-foreground">{label}</span>
-                </>
-              );
+                </>);
+
             })()}
           </span>
         </button>
@@ -308,8 +308,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
           onClick={handleStart}
           disabled={!canStart}
           className="w-full text-base font-semibold bg-white hover:bg-white/90"
-          style={{ height: "52px", color: "#111", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
-        >
+          style={{ height: "52px", color: "#111", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
+          
           <Play size={24} strokeWidth={2} className="mr-2" />
           Start Game
         </Button>
@@ -320,22 +320,22 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         player={null}
         usedColors={(allPlayers || []).map((p) => p.color)}
         onSave={handleAddPlayer}
-        onClose={() => setShowAddPlayerWithNav(false)}
-      />
+        onClose={() => setShowAddPlayerWithNav(false)} />
+      
 
       <BestOfModal
         isOpen={showBestOf}
         onConfirm={handleBestOfConfirm}
-        onClose={() => { setShowBestOf(false); onModalChange?.(false); }}
-      />
+        onClose={() => {setShowBestOf(false);onModalChange?.(false);}} />
+      
 
       <GameModeModal
         isOpen={showGameMode}
         winMode={winMode}
         onSelect={setWinMode}
-        onClose={() => { setShowGameMode(false); onModalChange?.(false); }}
-      />
+        onClose={() => {setShowGameMode(false);onModalChange?.(false);}} />
+      
 
-    </div>
-  );
+    </div>);
+
 }

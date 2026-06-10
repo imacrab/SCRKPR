@@ -58,7 +58,7 @@ export default function GameModeModal({ isOpen, winMode, onSelect, onClose }) {
                     
                       <FluentEmoji emoji={emoji} size={36} />
                       <span className="flex flex-col">
-                        <span className="text-foreground leading-tight text-lg [font-family:'Geist',_sans-serif] font-semibold">{label}</span>
+                        <span className="text-foreground leading-tight [font-family:'Geist',_sans-serif] font-semibold text-base">{label}</span>
                         <span className="text-muted-foreground leading-tight mt-0.5 text-sm">{sub}</span>
                       </span>
                     </button>);

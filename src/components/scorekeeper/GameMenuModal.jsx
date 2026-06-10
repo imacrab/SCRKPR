@@ -61,8 +61,7 @@ export default function GameMenuModal({ isOpen, canAddPlayer, onAddPlayer, onRes
 
                 <button
                   onClick={() => { onEndGame?.(); onClose(); }}
-                  className="w-full flex items-center gap-3 px-4 h-12 rounded-xl transition-colors text-left mt-1"
-                  style={{ color: "#FF3A3A", backgroundColor: "rgba(255,58,58,0.10)" }}
+                  className="w-full flex items-center gap-3 px-4 h-12 rounded-xl transition-colors text-left mt-1 bg-green-600 hover:bg-green-700 text-white"
                 >
                   <FlagOff size={20} strokeWidth={2} />
                   <span className="text-sm font-semibold">End Game</span>

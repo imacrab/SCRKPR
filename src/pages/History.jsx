@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Trophy, Trash2, RefreshCw, Handshake, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { isLowMode, getModeMeta } from "@/lib/gameModes";
 
 export default function History({ onBack, onModalChange }) {
   const [games, setGames] = useState([]);
@@ -143,7 +144,8 @@ export default function History({ onBack, onModalChange }) {
         ) : (
           <AnimatePresence>
             {games.map((game) => {
-              const isLowWin = game.win_mode === "low";
+              const isLowWin = isLowMode(game.win_mode);
+              const modeMeta = getModeMeta(game.win_mode);
               const sorted = [...game.players].sort((a, b) => isLowWin ? a.total - b.total : b.total - a.total);
               const winner = sorted[0];
               const isTie = sorted.length > 1 && sorted[0].total === sorted[1].total;
@@ -158,8 +160,13 @@ export default function History({ onBack, onModalChange }) {
                   {/* Game header */}
                   <div className="px-4 py-3 flex items-center justify-between border-b border-border">
                     <div className="flex flex-col gap-2">
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(game.played_at), "MMM d, yyyy · h:mm a")}
+                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <span>{format(new Date(game.played_at), "MMM d, yyyy · h:mm a")}</span>
+                        <span>·</span>
+                        <span className="inline-flex items-center gap-1">
+                          <modeMeta.Icon size={12} strokeWidth={2} />
+                          {modeMeta.label}
+                        </span>
                       </p>
                       <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
                         {isTie

@@ -5,6 +5,7 @@ import { ArrowLeft, Trophy, Trash2, RefreshCw, Handshake, AlertTriangle } from "
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
+import HistoryStats from "@/components/scorekeeper/HistoryStats";
 
 export default function History({ onBack, onModalChange }) {
   const [games, setGames] = useState([]);
@@ -142,7 +143,9 @@ export default function History({ onBack, onModalChange }) {
             <p className="text-muted-foreground/60 text-xs mt-1">Finish a game to see it here.</p>
           </div>
         ) : (
-          <AnimatePresence>
+          <>
+            <HistoryStats games={games} />
+            <AnimatePresence>
             {games.map((game) => {
               const isLowWin = isLowMode(game.win_mode);
               const modeMeta = getModeMeta(game.win_mode);
@@ -204,6 +207,7 @@ export default function History({ onBack, onModalChange }) {
               );
             })}
           </AnimatePresence>
+          </>
         )}
         </div>
       </div>

@@ -23,7 +23,7 @@ export default function BottomNavigationBar({ hidden = false }) {
       animate={{
         y: isHidden ? 140 : 0,
         opacity: isHidden ? 0 : 1,
-        filter: isHidden ? "blur(8px)" : "blur(2px)",
+        filter: isHidden ? "blur(8px)" : "blur(0px)",
       }}
       transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)", paddingLeft: "8px", paddingRight: "8px", pointerEvents: isHidden ? "none" : "auto" }}

@@ -117,7 +117,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
             <span className="text-xs text-muted-foreground w-4 text-right">{i + 1}</span>
             <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} />
             <span className="text-sm text-foreground flex-1 truncate font-medium">{p.name}</span>
-            <span className="text-sm font-semibold" style={{ color: p.color }}>{p.total}</span>
+            <span className="text-sm font-semibold text-white">{p.total}</span>
           </div>
         ))}
       </div>

@@ -140,7 +140,7 @@ export default function History({ onBack, onModalChange }) {
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Trophy size={36} strokeWidth={2} className="text-muted-foreground mb-3" />
             <p className="text-muted-foreground text-2xl [font-family:'Geist',_sans-serif] font-medium">No rounds saved yet.</p>
-            <p className="text-muted-foreground/60 text-xs mt-1 [font-family:'Geist',_sans-serif]">Finish a game to see it here.</p>
+            <p className="text-muted-foreground/60 mt-1 [font-family:'Geist',_sans-serif] font-normal text-base">Finish a game to see it here.</p>
           </div> :
 
           <>

@@ -3,42 +3,10 @@ import { ArrowLeft, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 
 export default function AccountSettings({ onBack, onModalChange }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [theme, setTheme] = useState("dark");
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    setTheme(savedTheme);
-    applyTheme(savedTheme);
-  }, []);
-
-  const applyTheme = (themeValue) => {
-    if (themeValue === "system") {
-      document.documentElement.style.colorScheme = "";
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      if (prefersDark) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    } else if (themeValue === "dark") {
-      document.documentElement.style.colorScheme = "dark";
-      document.documentElement.classList.add("dark");
-    } else if (themeValue === "light") {
-      document.documentElement.style.colorScheme = "light";
-      document.documentElement.classList.remove("dark");
-    }
-  };
-
-  const handleThemeChange = (newTheme) => {
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    applyTheme(newTheme);
-  };
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
@@ -76,40 +44,6 @@ export default function AccountSettings({ onBack, onModalChange }) {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 pt-2 pb-6 space-y-4">
-         {/* Theme */}
-         <div className="rounded-xl border border-border bg-card overflow-hidden">
-            <div className="px-4 py-4 flex items-center justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-foreground">Theme</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Choose your preferred appearance.</p>
-              </div>
-            </div>
-            <div className="flex gap-2 px-4 pb-4">
-              {[
-                { value: "system", label: "System", emoji: "📱" },
-                { value: "light", label: "Light", emoji: "☀️" },
-                { value: "dark", label: "Dark", emoji: "🌙" },
-              ].map((opt) => {
-                const active = theme === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    onClick={() => handleThemeChange(opt.value)}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border transition-all text-sm font-medium"
-                    style={{
-                      borderColor: active ? "hsl(199 94% 40% / 0.4)" : "hsl(var(--border))",
-                      backgroundColor: active ? "hsl(199 94% 40% / 0.12)" : "transparent",
-                      color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))",
-                    }}
-                  >
-                    <FluentEmoji emoji={opt.emoji} size={18} />
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
          {/* Sign Out */}
          <div className="rounded-xl border border-border bg-card overflow-hidden">
            <div className="px-4 py-4 flex items-center justify-between gap-4">

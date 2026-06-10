@@ -39,7 +39,7 @@ export default function BottomNavigationBar({ hidden = false }) {
             style={{ minHeight: 56 }}
           >
             <Icon
-              size={30}
+              size={24}
               strokeWidth={2}
               style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
             />

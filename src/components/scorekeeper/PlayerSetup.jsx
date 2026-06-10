@@ -24,12 +24,12 @@ export const PLAYER_COLORS = [
 
 function ColorPicker({ selected, onChange }) {
   return (
-    <div className="flex flex-wrap gap-1.5 mt-1.5">
+    <div className="grid grid-cols-5 gap-2 mt-2 justify-items-center">
       {PLAYER_COLORS.map((color) => (
         <button
           key={color}
           onPointerDown={(e) => { e.preventDefault(); onChange(color); }}
-          className="w-6 h-6 rounded-full transition-transform active:scale-90"
+          className="w-10 h-10 rounded-full transition-transform active:scale-90"
           style={{ backgroundColor: color, outline: selected === color ? "2px solid white" : "none", outlineOffset: "2px" }}
         />
       ))}

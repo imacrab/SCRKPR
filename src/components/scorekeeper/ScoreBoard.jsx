@@ -8,6 +8,7 @@ import ScoreInputModal from "./ScoreInputModal";
 import EditPlayerModal from "./EditPlayerModal";
 import EndGameModal from "./EndGameModal";
 import ResetConfirmModal from "./ResetConfirmModal";
+import ScoreHistoryPanel from "./ScoreHistoryPanel";
 import { isLowMode, isCircleMode } from "@/lib/gameModes";
 
 export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
@@ -224,6 +225,8 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
               </motion.div>
             )}
           </LayoutGroup>
+
+          {!circleMode && <ScoreHistoryPanel players={sortedPlayers} />}
         </div>
 
         {/* End Game — fixed at bottom of scoreboard, matches player card width */}

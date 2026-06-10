@@ -122,7 +122,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             zIndex: 0
           }}
           aria-hidden="true">
-            <FluentEmoji emoji={player.emoji} size={60} />
+            <FluentEmoji emoji={player.emoji} size={120} />
           </div>
         }
 
@@ -134,7 +134,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             whileTap={{ scale: 0.85 }}
             transition={{ type: "spring", stiffness: 600, damping: 14 }}
             className="flex items-center justify-center flex-shrink-0"
-            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor }}
+            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
             aria-label={`Subtract 1 from ${player.name}`}>
             
               <Minus size={20} strokeWidth={2.5} />
@@ -210,7 +210,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             whileTap={{ scale: 0.85 }}
             transition={{ type: "spring", stiffness: 600, damping: 14 }}
             className="flex items-center justify-center flex-shrink-0"
-            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor }}
+            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
             aria-label={`Add 1 to ${player.name}`}>
             
               <Plus size={20} strokeWidth={2.5} />

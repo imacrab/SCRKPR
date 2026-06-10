@@ -8,7 +8,7 @@ export const PLAYER_EMOJIS = [
 
 export default function EmojiPicker({ selected, onChange }) {
   return (
-    <div className="grid grid-cols-7 gap-2 p-3 justify-items-center max-h-56 overflow-y-auto">
+    <div className="grid grid-cols-7 gap-2 p-3 justify-items-center">
       <button
         type="button"
         onPointerDown={(e) => { e.preventDefault(); onChange(""); }}

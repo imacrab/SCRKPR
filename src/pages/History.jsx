@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
 import HistoryStats from "@/components/scorekeeper/HistoryStats";
+import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 
 export default function History({ onBack, onModalChange }) {
   const [games, setGames] = useState([]);
@@ -138,8 +139,8 @@ export default function History({ onBack, onModalChange }) {
           </div> :
           games.length === 0 ?
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Trophy size={36} strokeWidth={2} className="text-muted-foreground mb-3" />
-            <p className="text-muted-foreground text-2xl [font-family:'Geist',_sans-serif] font-medium">No rounds saved yet.</p>
+            <FluentEmoji emoji="😨" size={200} />
+            <p className="text-muted-foreground text-2xl [font-family:'Geist',_sans-serif] font-medium mt-3">No rounds saved yet.</p>
             <p className="text-muted-foreground/60 mt-1 [font-family:'Geist',_sans-serif] font-normal text-base">Finish a game to see it here.</p>
           </div> :
 

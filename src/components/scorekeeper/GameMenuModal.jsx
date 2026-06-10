@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { RotateCcw, UserPlus, FlagOff, Sun, Moon } from "lucide-react";
+import { RotateCcw, UserPlus, Sun, Moon } from "lucide-react";
 import { usePlayerTone } from "@/lib/usePlayerTone";
 
-export default function GameMenuModal({ isOpen, canAddPlayer, onAddPlayer, onResetScores, onEndGame, onClose }) {
+export default function GameMenuModal({ isOpen, canAddPlayer, onAddPlayer, onResetScores, onClose }) {
   const [tone, setTone] = usePlayerTone();
   const items = [
     canAddPlayer && {
@@ -83,14 +83,6 @@ export default function GameMenuModal({ isOpen, canAddPlayer, onAddPlayer, onRes
                     </span>
                   </button>
                 ))}
-
-                <button
-                  onClick={() => { onEndGame?.(); onClose(); }}
-                  className="w-full flex items-center gap-3 px-4 h-12 rounded-xl transition-colors text-left mt-1 bg-green-600 hover:bg-green-700 text-white"
-                >
-                  <FlagOff size={20} strokeWidth={2} />
-                  <span className="text-sm font-semibold">End Game</span>
-                </button>
               </div>
             </div>
           </motion.div>

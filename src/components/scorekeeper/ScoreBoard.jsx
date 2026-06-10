@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { MoreHorizontal, Shuffle } from "lucide-react";
+import { MoreHorizontal, Shuffle, FlagOff } from "lucide-react";
 import { motion, LayoutGroup } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import PlayerColumn from "./PlayerColumn";
@@ -165,10 +165,18 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
 
       {/* Rows — one player per row, sorted by total */}
       <div className="flex-1 px-2 pb-2 overflow-hidden w-full relative">
+        {/* Bottom fade — players that scroll near the End Game button fade out */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-20"
+          style={{
+            height: "120px",
+            background: "linear-gradient(to top, hsl(var(--background)) 30%, hsl(var(--background) / 0) 100%)",
+          }}
+        />
         <div
           ref={scrollContainerRef}
           className="flex flex-col h-full gap-2 w-full overflow-y-auto"
-          style={{ WebkitOverflowScrolling: "touch" }}
+          style={{ WebkitOverflowScrolling: "touch", paddingBottom: "96px" }}
         >
           <LayoutGroup>
             {sortedPlayers.map((player, idx) => (
@@ -194,6 +202,20 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             ))}
           </LayoutGroup>
         </div>
+
+        {/* End Game — fixed at bottom of scoreboard */}
+        <div
+          className="absolute inset-x-0 bottom-0 z-30 px-4 flex justify-center"
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
+        >
+          <button
+            onClick={() => setShowEndGame(true)}
+            className="flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-green-600 hover:bg-green-700 text-white font-semibold text-sm shadow-lg transition-colors"
+          >
+            <FlagOff size={18} strokeWidth={2.5} />
+            End Game
+          </button>
+        </div>
       </div>
 
       <ScoreInputModal
@@ -216,7 +238,6 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         canAddPlayer={players.length < 20}
         onAddPlayer={onAddPlayer}
         onResetScores={onReset}
-        onEndGame={() => setShowEndGame(true)}
         onClose={() => setMenuOpen(false)}
       />
 

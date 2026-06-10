@@ -199,12 +199,14 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 {...dragProvided?.draggableProps || {}}
                 {...dragProvided?.dragHandleProps || {}}
                 onClick={() => toggleSelected(player.id)}
-                className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left transition-colors cursor-pointer"
+                className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left transition-[background-color,border-color,transform,box-shadow] duration-200 ease-out cursor-pointer"
                 style={{
                   backgroundColor: selected ? hexToRgba(player.color, 0.7) : "hsl(var(--card))",
                   borderColor: selected ? "transparent" : "hsl(var(--border))",
-                  boxShadow: snapshot?.isDragging ? "0 10px 20px -5px rgba(0,0,0,0.25)" : "none",
-                  ...(dragProvided?.draggableProps?.style || {})
+                  boxShadow: snapshot?.isDragging ? "0 20px 35px -8px rgba(0,0,0,0.45)" : "none",
+                  ...(dragProvided?.draggableProps?.style || {}),
+                  transform: `${dragProvided?.draggableProps?.style?.transform || ""} ${snapshot?.isDragging ? "scale(1.04)" : "scale(1)"}`.trim(),
+                  transitionTimingFunction: snapshot?.isDragging ? "cubic-bezier(0.34, 1.56, 0.64, 1)" : "ease-out"
                 }}>
                 
                     {draggable ?

@@ -226,14 +226,14 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           </LayoutGroup>
         </div>
 
-        {/* End Game — fixed at bottom-center of scoreboard */}
+        {/* End Game — fixed at bottom of scoreboard, matches player card width */}
         <div
-          className="absolute inset-x-0 bottom-0 z-30 px-4 flex justify-center"
+          className="absolute inset-x-0 bottom-0 z-30 px-2"
           style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
         >
           <button
             onClick={() => setShowEndGame(true)}
-            className="flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-green-600 hover:bg-green-700 text-white font-semibold text-sm shadow-lg transition-colors"
+            className="w-full flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold text-sm shadow-lg transition-colors"
           >
             End Game
             <FluentEmoji emoji="🏳️" size={20} />

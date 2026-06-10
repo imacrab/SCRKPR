@@ -101,7 +101,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))",
         }}
       >
-        <div className="flex items-center justify-between w-full gap-3">
+        <div className="flex items-center justify-between w-full" style={{ gap: 8 }}>
           {/* Minus (±1) — hidden in bestof mode */}
           {!isBestOf && (
             <motion.button
@@ -132,7 +132,10 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           >
             <div className="flex items-center gap-2 w-full min-w-0">
               {player.emoji && (
-                <span className="text-base leading-none flex-shrink-0" aria-hidden="true">
+                <span
+                  className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-sm leading-none bg-white/20"
+                  aria-hidden="true"
+                >
                   {player.emoji}
                 </span>
               )}

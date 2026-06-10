@@ -249,13 +249,15 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           className="absolute inset-x-0 bottom-0 z-30 flex justify-center"
           style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)", paddingLeft: 48, paddingRight: 48 }}>
           
-          <button
+          <motion.button
             onClick={() => setShowEndGame(true)}
+            whileTap={{ scale: 0.90 }}
+            transition={{ type: "spring", stiffness: 800, damping: 8, mass: 0.5 }}
             className="relative flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-white hover:bg-white/90 text-background font-semibold text-sm shadow-lg transition-colors overflow-hidden">
             
             <span className="relative z-10 text-base">End Game</span>
             <FluentEmoji emoji="🏁" size={24} />
-          </button>
+          </motion.button>
         </div>
       </div>
 

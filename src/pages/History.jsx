@@ -171,7 +171,7 @@ export default function History({ onBack, onModalChange }) {
                   <div className="px-4 py-3 flex items-baseline justify-between border-b border-border">
                     <div className="flex flex-col gap-2">
                       <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <span>{format(new Date(game.played_at), "MMM d, yyyy · h:mm a")}</span>
+                        <span className="text-xs">{format(new Date(game.played_at), "MMM d, yyyy · h:mm a")}</span>
                         <span>·</span>
                         <span className="inline-flex items-center gap-1">
                           <FluentEmoji emoji={modeMeta.emoji} size={14} />

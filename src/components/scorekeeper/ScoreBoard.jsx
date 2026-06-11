@@ -199,7 +199,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
       </div>
 
       {/* Rows — one player per row, sorted by total */}
-      <div className="flex-1 px-2 pb-2 overflow-hidden w-full relative">
+      <div className="flex-1 px-4 pb-4 overflow-hidden w-full relative">
         {/* Bottom fade — players that scroll near the End Game button fade out */}
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 z-20"

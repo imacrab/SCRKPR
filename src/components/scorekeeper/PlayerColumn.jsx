@@ -154,7 +154,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             style={{ marginLeft: isBestOf ? 8 : 60 }}>
             
             <div className="flex items-center gap-2 w-full min-w-0">
-              <span className="font-bold truncate leading-tight text-xl" title={player.name} style={{ color: textColor }}>
+              <span className="font-bold truncate leading-tight text-xl [font-family:'Syne',_sans-serif]" title={player.name} style={{ color: textColor }}>
                 {player.name}
               </span>
               {streak >= 2 &&

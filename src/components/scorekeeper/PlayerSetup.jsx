@@ -99,10 +99,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   };
 
   const toggleSelected = (id) => {
-    // Trigger bouncy tap feedback
+    // Trigger bouncy tap feedback — release quickly so the spring-back doesn't feel sticky
     if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
     setTappedId(id);
-    tapTimerRef.current = setTimeout(() => setTappedId(null), 260);
+    tapTimerRef.current = setTimeout(() => setTappedId(null), 90);
 
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -238,9 +238,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   transformOrigin: "center center",
                   transition: isDragging
                     ? "transform 60ms linear, box-shadow 150ms ease-out"
-                    : isTapped
-                      ? "transform 90ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms ease-out, border-color 200ms ease-out"
-                      : "transform 260ms cubic-bezier(0.34, 1.8, 0.5, 1), box-shadow 180ms ease-out, background-color 200ms ease-out, border-color 200ms ease-out"
+                    : "transform 320ms cubic-bezier(0.34, 1.7, 0.4, 1), background-color 200ms ease-out, border-color 200ms ease-out, box-shadow 180ms ease-out"
                 }}>
                 
                     {draggable ?

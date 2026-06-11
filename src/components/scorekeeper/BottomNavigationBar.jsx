@@ -28,14 +28,32 @@ export default function BottomNavigationBar({ hidden = false }) {
       transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 24px)", paddingLeft: "32px", paddingRight: "32px", pointerEvents: isHidden ? "none" : "auto" }}
     >
-    <div className="flex flex-1 border border-border rounded-full overflow-hidden" style={{ backgroundColor: "hsl(var(--card) / 0.8)", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
+    <div
+      className="relative flex flex-1 rounded-full overflow-hidden"
+      style={{
+        backgroundColor: "rgba(28, 28, 32, 0.55)",
+        backdropFilter: "blur(28px) saturate(180%)",
+        WebkitBackdropFilter: "blur(28px) saturate(180%)",
+        border: "1px solid rgba(255, 255, 255, 0.12)",
+        boxShadow:
+          "0 10px 30px -8px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.04)",
+      }}
+    >
+      {/* Glossy top highlight */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-full"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 100%)",
+        }}
+      />
       {TABS.map(({ label, icon: Icon, path }) => {
         const active = pathname === path;
         return (
           <button
             key={path}
             onClick={() => navigate(path)}
-            className="flex-1 flex flex-col items-center justify-center gap-1 px-2 py-2 transition-colors"
+            className="relative flex-1 flex flex-col items-center justify-center gap-1 px-2 py-2 transition-colors"
             style={{ minHeight: 56 }}
           >
             <Icon

@@ -154,11 +154,11 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             style={{ marginLeft: isBestOf ? 8 : 60 }}>
             
             <div className="flex items-center gap-2 w-full min-w-0">
-              <span className="truncate leading-tight text-xl [font-family:'Geist',_sans-serif] font-semibold" title={player.name} style={{ color: textColor }}>
+              <span className="font-bold truncate leading-tight text-xl" title={player.name} style={{ color: textColor }}>
                 {player.name}
               </span>
               {streak >= 2 &&
-              <span className="inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 flex-shrink-0" style={{ backgroundColor: streakBg, color: textColor }}>
+              <span className="inline-flex items-center gap-0.5 rounded-full px-1 py-1 flex-shrink-0" style={{ backgroundColor: streakBg, color: textColor }}>
                   <Flame size={12} strokeWidth={2.5} />
                   <span className="text-[10px] font-semibold leading-none">{streak}</span>
                 </span>

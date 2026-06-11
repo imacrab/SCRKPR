@@ -309,9 +309,9 @@ export default function EmojiPicker({ selected, onChange }) {
   }, [query]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col flex-1 min-h-0">
       {/* Search */}
-      <div className="relative px-3 pt-1 pb-2">
+      <div className="relative px-3 pt-1 pb-2 flex-shrink-0">
         <Search
           size={16}
           strokeWidth={2}
@@ -327,7 +327,7 @@ export default function EmojiPicker({ selected, onChange }) {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-7 gap-2 p-3 justify-items-center max-h-56 overflow-y-auto">
+      <div className="grid grid-cols-7 gap-2 p-3 justify-items-center flex-1 min-h-0 overflow-y-auto">
         <button
           type="button"
           onPointerDown={(e) => { e.preventDefault(); onChange(""); }}

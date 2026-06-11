@@ -318,7 +318,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       </div>
 
       {/* Win mode */}
-      <div className="px-5 pt-2 pb-2">
+      <div className="px-5 pt-2 pb-2 relative z-30">
         <button
           onClick={() => {setShowGameMode(true);onModalChange?.(true);}}
           className="w-full flex items-center justify-between gap-3 px-4 rounded-full border border-border bg-card hover:bg-accent transition-colors"
@@ -340,7 +340,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       </div>
 
       {/* Actions */}
-      <div className="px-5 pt-0 flex flex-col gap-3" style={{ paddingBottom: "calc(32px + env(safe-area-inset-bottom))" }}>
+      <div className="px-5 pt-0 flex flex-col gap-3 relative z-30" style={{ paddingBottom: "calc(32px + env(safe-area-inset-bottom))" }}>
         <Button
           onClick={handleStart}
           disabled={!canStart}

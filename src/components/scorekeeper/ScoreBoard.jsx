@@ -174,7 +174,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           <button
             onClick={() => setSortDesc((v) => !v)}
             disabled={sortLocked}
-            className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:text-foreground hover:bg-accent transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground text-[hsl(var(--foreground))]"
             aria-label={sortDesc ? "Sort lowest to highest" : "Sort highest to lowest"}>
             
             <Shuffle size={22} strokeWidth={2} />
@@ -182,7 +182,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           {players.length < 20 &&
           <button
             onClick={onAddPlayer}
-            className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:text-foreground hover:bg-accent transition-colors text-[hsl(var(--foreground))]"
             aria-label="Add player">
             
               <UserPlus size={22} strokeWidth={2} />
@@ -190,7 +190,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           }
           <button
             onClick={() => setShowResetConfirm(true)}
-            className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:text-foreground hover:bg-accent transition-colors text-[hsl(var(--foreground))]"
             aria-label="Reset scores">
             
             <RotateCcw size={22} strokeWidth={2} />
@@ -237,11 +237,11 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             )}
           </LayoutGroup>
 
-          {!circleMode && (
-            <div className="flex-shrink-0">
+          {!circleMode &&
+          <div className="flex-shrink-0">
               <ScoreHistoryPanel players={sortedPlayers} />
             </div>
-          )}
+          }
         </div>
 
         {/* End Game — fixed at bottom of scoreboard, centered */}

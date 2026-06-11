@@ -144,8 +144,8 @@ export default function History({ onBack, onModalChange }) {
             </div>
             <div
               className="fixed inset-x-0 flex justify-center pointer-events-none"
-              style={{ bottom: "calc(56px + env(safe-area-inset-bottom))" }}>
-              
+              style={{ bottom: "calc(56px + env(safe-area-inset-bottom))" }}
+            >
               <FluentEmoji emoji="🙀" size={140} style={{ display: "block" }} />
             </div>
           </> :
@@ -170,20 +170,20 @@ export default function History({ onBack, onModalChange }) {
                   {/* Game header */}
                   <div className="px-4 py-3 flex items-baseline justify-between border-b border-border">
                     <div className="flex flex-col gap-2">
-                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <span className="text-xs">{format(new Date(game.played_at), "MMM d, yyyy · h:mm a")}</span>
-                        <span>·</span>
-                        <span className="inline-flex items-center gap-1">
-                          <FluentEmoji emoji={modeMeta.emoji} size={14} />
-                          {modeMeta.label}
-                        </span>
-                      </p>
-                      <p className="text-foreground flex items-center gap-1.5 text-lg [font-family:'Geist',_sans-serif] font-semibold">
+                      <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
                         {isTie ?
                           <Handshake size={20} strokeWidth={2} className="text-muted-foreground" /> :
                           <FluentEmoji emoji="🏆" size={24} />
                           }
                         {isTie ? "Tie" : winner.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <span>{format(new Date(game.played_at), "MMM d, yyyy · h:mm a")}</span>
+                        <span>·</span>
+                        <span className="inline-flex items-center gap-1">
+                          <FluentEmoji emoji={modeMeta.emoji} size={14} />
+                          {modeMeta.label}
+                        </span>
                       </p>
                     </div>
                   </div>

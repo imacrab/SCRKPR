@@ -58,7 +58,7 @@ export default function BottomSheetModal({
             dragSnapToOrigin
             onDragEnd={handleDragEnd}
             className="fixed inset-x-0 bg-card border border-border rounded-[44px] shadow-2xl flex flex-col"
-            style={{ zIndex, bottom: "8px", left: "8px", right: "8px", maxHeight: "calc(100dvh - 16px)" }}
+            style={{ zIndex, bottom: "8px", left: "8px", right: "8px", maxHeight: "calc(100dvh - 48px)" }}
           >
             {/* Drag handle */}
             <div

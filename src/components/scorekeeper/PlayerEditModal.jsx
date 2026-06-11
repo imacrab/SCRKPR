@@ -74,7 +74,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
           </div>
         }
       >
-        <div className="pb-3">
+        <div className="pt-1 pb-3">
           <Input
             ref={inputRef}
             type="text"

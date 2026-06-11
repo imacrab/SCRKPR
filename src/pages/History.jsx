@@ -170,7 +170,7 @@ export default function History({ onBack, onModalChange }) {
                   {/* Game header */}
                   <div className="px-4 py-3 flex items-baseline justify-between border-b border-border">
                     <div className="flex flex-col gap-2">
-                      <p className="text-sm font-large text-foreground flex items-center gap-1.5">
+                      <p className="text-lg text-foreground flex items-center gap-1.5">
                         {isTie ?
                           <Handshake size={20} strokeWidth={2} className="text-muted-foreground" /> :
                           <FluentEmoji emoji="🏆" size={24} />

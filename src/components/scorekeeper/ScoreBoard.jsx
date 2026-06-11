@@ -193,7 +193,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             aria-label="Reset scores">
             
-            <RotateCcw size={22} strokeWidth={2} />
+            <RotateCcw size={22} strokeWidth={2} className="text-[hsl(var(--foreground))]" />
           </button>
         </div>
       </div>

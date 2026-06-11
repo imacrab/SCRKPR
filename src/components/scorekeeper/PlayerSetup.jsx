@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Play, Check, GripVertical } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Button } from "@/components/ui/button";
@@ -281,7 +281,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
               const layoutTransition = { type: "spring", stiffness: 500, damping: 38, mass: 0.6 };
 
               return (
-                <LayoutGroup>
+                <>
                     <DragDropContext onDragEnd={handleDragEnd}>
                       <Droppable droppableId="selected-players">
                         {(dropProvided) =>
@@ -294,7 +294,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                         <Draggable key={player.id} draggableId={player.id} index={index}>
                                 {(dragProvided, snapshot) => (
                           <motion.div
-                            layoutId={`player-${player.id}`}
                             layout="position"
                             transition={layoutTransition}
                             onLayoutAnimationComplete={() => {
@@ -318,7 +317,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                         {unselectedList.map((player) =>
                     <motion.div
                       key={player.id}
-                      layoutId={`player-${player.id}`}
                       layout="position"
                       transition={layoutTransition}
                       onLayoutAnimationComplete={() => {
@@ -331,7 +329,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                     )}
                       </div>
                   }
-                  </LayoutGroup>);
+                  </>);
 
             })()}
 

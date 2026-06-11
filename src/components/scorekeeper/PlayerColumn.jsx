@@ -134,7 +134,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
             zIndex: 0
           }}
           aria-hidden="true">
-            <FluentEmoji emoji={player.emoji} size={72} />
+            <FluentEmoji emoji={player.emoji} size={80} />
           </div>
         }
 

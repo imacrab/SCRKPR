@@ -157,12 +157,12 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               <span className="font-bold truncate leading-tight text-xl" title={player.name} style={{ color: textColor }}>
                 {player.name}
               </span>
-              {/*streak >= 2 &&
+              {streak >= 2 &&
               <span className="inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 flex-shrink-0" style={{ backgroundColor: streakBg, color: textColor }}>
                   <Flame size={12} strokeWidth={2.5} />
                   <span className="text-[10px] font-semibold leading-none">{streak}</span>
                 </span>
-              */}
+              }
             </div>
             {!isBestOf && showPending &&
             <motion.span

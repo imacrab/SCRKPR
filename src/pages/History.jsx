@@ -144,8 +144,8 @@ export default function History({ onBack, onModalChange }) {
             </div>
             <div
               className="fixed inset-x-0 flex justify-center pointer-events-none"
-              style={{ bottom: "calc(56px + env(safe-area-inset-bottom))" }}
-            >
+              style={{ bottom: "calc(56px + env(safe-area-inset-bottom))" }}>
+              
               <FluentEmoji emoji="🙀" size={140} style={{ display: "block" }} />
             </div>
           </> :
@@ -170,7 +170,7 @@ export default function History({ onBack, onModalChange }) {
                   {/* Game header */}
                   <div className="px-4 py-3 flex items-baseline justify-between border-b border-border">
                     <div className="flex flex-col gap-2">
-                      <p className="text-lg text-foreground flex items-center gap-1.5">
+                      <p className="text-lg text-foreground flex items-center gap-1.5 [font-family:'Geist',_sans-serif] font-semibold">
                         {isTie ?
                           <Handshake size={20} strokeWidth={2} className="text-muted-foreground" /> :
                           <FluentEmoji emoji="🏆" size={24} />

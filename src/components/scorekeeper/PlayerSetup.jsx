@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Plus, Play, Check, GripVertical } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Button } from "@/components/ui/button";
@@ -269,8 +269,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
               };
 
 
+              const layoutTransition = { type: "spring", stiffness: 500, damping: 38, mass: 0.6 };
+
               return (
-                <>
+                <LayoutGroup>
                     <DragDropContext onDragEnd={handleDragEnd}>
                       <Droppable droppableId="selected-players">
                         {(dropProvided) =>
@@ -281,9 +283,15 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                         
                             {selectedList.map((player, index) =>
                         <Draggable key={player.id} draggableId={player.id} index={index}>
-                                {(dragProvided, snapshot) =>
-                          renderRow(player, { dragProvided, snapshot, selected: true, draggable: true })
-                          }
+                                {(dragProvided, snapshot) => (
+                          <motion.div
+                            layoutId={`player-${player.id}`}
+                            layout="position"
+                            transition={layoutTransition}
+                          >
+                            {renderRow(player, { dragProvided, snapshot, selected: true, draggable: true })}
+                          </motion.div>
+                          )}
                               </Draggable>
                         )}
                             {dropProvided.placeholder}
@@ -295,13 +303,18 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                     {unselectedList.length > 0 &&
                   <div className="space-y-2 mt-2">
                         {unselectedList.map((player) =>
-                    <div key={player.id}>
+                    <motion.div
+                      key={player.id}
+                      layoutId={`player-${player.id}`}
+                      layout="position"
+                      transition={layoutTransition}
+                    >
                             {renderRow(player, { selected: false, draggable: false })}
-                          </div>
+                          </motion.div>
                     )}
                       </div>
                   }
-                  </>);
+                  </LayoutGroup>);
 
             })()}
 

@@ -322,7 +322,8 @@ export default function EmojiPicker({ selected, onChange }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search emojis"
-          className="w-full h-10 pl-9 pr-3 rounded-lg bg-secondary border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+          className="w-full h-10 pl-9 pr-3 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+          style={{ fontSize: "16px" }}
         />
       </div>
 

@@ -83,7 +83,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
             onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); if (e.key === "Escape") onClose(); }}
             placeholder="Player name"
             maxLength={20}
-            className="mb-3 text-center text-base bg-secondary border-border"
+            className="mb-3 h-11 text-center text-base bg-secondary border-border"
           />
 
           <div className="grid grid-cols-5 gap-3 p-3 justify-items-center">

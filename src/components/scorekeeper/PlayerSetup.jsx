@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Plus, Play, Check, GripVertical } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Button } from "@/components/ui/button";
@@ -22,9 +22,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [showBestOf, setShowBestOf] = useState(false);
   const [showGameMode, setShowGameMode] = useState(false);
   const [tappedId, setTappedId] = useState(null);
-  const [pressedId, setPressedId] = useState(null);
   const tapTimerRef = useRef(null);
-  const pressTimerRef = useRef(null);
   const scrollRef = useRef(null);
 
   // Pull-to-refresh
@@ -60,7 +58,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
   useEffect(() => () => {
     if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
-    if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
   }, []);
 
   useEffect(() => {
@@ -102,16 +99,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   };
 
   const toggleSelected = (id) => {
-    // Short press squish (visual tap), separate from z-index elevation during layout move
-    if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
-    setPressedId(id);
-    pressTimerRef.current = setTimeout(() => setPressedId(null), 90);
-
-    // Longer-lived "tapped" flag so this card sits above its neighbours while the
-    // layout animation glides it to its new section. Cleared by onLayoutAnimationComplete.
+    // Trigger bouncy tap feedback — release quickly so the spring-back doesn't feel sticky
     if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
     setTappedId(id);
-    tapTimerRef.current = setTimeout(() => setTappedId(null), 800);
+    tapTimerRef.current = setTimeout(() => setTappedId(null), 90);
 
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -227,8 +218,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   }
                 }
 
-                const isPressed = pressedId === player.id;
-                const idleScale = isPressed ? "scale(0.92)" : "scale(1)";
+                const isTapped = tappedId === player.id;
+                const idleScale = isTapped ? "scale(0.92)" : "scale(1)";
                 const composedTransform = `${baseStyle.transform || ""} ${isDragging ? `scale(1.04) rotate(${tiltDeg}deg)` : idleScale}`.trim();
 
                 return (
@@ -281,7 +272,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
               const layoutTransition = { type: "spring", stiffness: 500, damping: 38, mass: 0.6 };
 
               return (
-                <>
+                <LayoutGroup>
                     <DragDropContext onDragEnd={handleDragEnd}>
                       <Droppable droppableId="selected-players">
                         {(dropProvided) =>
@@ -294,12 +285,9 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                         <Draggable key={player.id} draggableId={player.id} index={index}>
                                 {(dragProvided, snapshot) => (
                           <motion.div
+                            layoutId={`player-${player.id}`}
                             layout="position"
                             transition={layoutTransition}
-                            onLayoutAnimationComplete={() => {
-                              if (tappedId === player.id) setTappedId(null);
-                            }}
-                            style={{ position: "relative", zIndex: tappedId === player.id ? 30 : 1 }}
                           >
                             {renderRow(player, { dragProvided, snapshot, selected: true, draggable: true })}
                           </motion.div>
@@ -317,19 +305,16 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                         {unselectedList.map((player) =>
                     <motion.div
                       key={player.id}
+                      layoutId={`player-${player.id}`}
                       layout="position"
                       transition={layoutTransition}
-                      onLayoutAnimationComplete={() => {
-                        if (tappedId === player.id) setTappedId(null);
-                      }}
-                      style={{ position: "relative", zIndex: tappedId === player.id ? 30 : 1 }}
                     >
                             {renderRow(player, { selected: false, draggable: false })}
                           </motion.div>
                     )}
                       </div>
                   }
-                  </>);
+                  </LayoutGroup>);
 
             })()}
 

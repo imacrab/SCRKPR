@@ -262,6 +262,18 @@ export default function ScoreKeeper() {
         )}
       </AnimatePresence>
 
+      {/* Gradient fade so scrolling content fades to background 8px above the tab bar */}
+      {view !== "/game" && (
+        <div
+          className="fixed inset-x-0 z-20 pointer-events-none"
+          style={{
+            bottom: "calc(56px + env(safe-area-inset-bottom) + 8px)",
+            height: "64px",
+            background: "linear-gradient(to top, hsl(var(--background)) 0%, hsl(var(--background) / 0) 100%)",
+          }}
+        />
+      )}
+
       <BottomNavigationBar hidden={navHidden} />
     </>
   );

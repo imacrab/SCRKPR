@@ -121,8 +121,6 @@ export default function History({ onBack, onModalChange }) {
       <div className="flex-1 relative overflow-hidden">
         {/* Top fade */}
         {canScroll && <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />}
-        {/* Bottom fade */}
-        {canScroll && <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />}
 
         <div
           ref={scrollRef}

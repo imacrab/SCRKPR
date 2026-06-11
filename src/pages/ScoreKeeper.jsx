@@ -263,7 +263,7 @@ export default function ScoreKeeper() {
       </AnimatePresence>
 
       {/* Gradient fade so scrolling content fades to background 8px above the tab bar */}
-      {view !== "/game" && (
+      {view !== "/game" && view !== "/" && (
         <div
           className="fixed inset-x-0 z-20 pointer-events-none"
           style={{

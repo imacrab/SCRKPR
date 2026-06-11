@@ -321,7 +321,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       <div className="px-5 pt-2 pb-2">
         <button
           onClick={() => {setShowGameMode(true);onModalChange?.(true);}}
-          className="w-full flex items-center justify-between gap-3 px-4 h-11 rounded-full border border-border bg-card hover:bg-accent transition-colors">
+          className="w-full flex items-center justify-between gap-3 px-4 rounded-full border border-border bg-card hover:bg-accent transition-colors"
+          style={{ height: "52px" }}>
           
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Game mode</span>
           <span className="flex items-center gap-1.5">

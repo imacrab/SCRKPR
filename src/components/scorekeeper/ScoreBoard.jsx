@@ -158,7 +158,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   return (
     <div className="w-screen flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 pt-10 pb-3 flex-shrink-0" style={{ backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
+      <div className="flex items-center justify-between px-4 pt-10 pb-5 flex-shrink-0" style={{ backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <button onClick={() => setShowEndGame(true)} className="hover:opacity-75 transition-opacity">
           <img src={isDarkMode ? "https://media.base44.com/images/public/69ea763700078809357a164a/87badac38_SCRKPR_dark_mode.png" : "https://media.base44.com/images/public/69ea763700078809357a164a/6de7dc994_SCRKPR_light_mode.png"} alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
         </button>
@@ -169,7 +169,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             style={{ color: sortLocked ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
             aria-label={sortLocked ? "Unlock sort order" : "Lock sort order"}>
             
-            {sortLocked ? <Lock size={22} strokeWidth={2} /> : <Unlock size={22} strokeWidth={2} className="text-[hsl(var(--foreground))]" />}
+            {sortLocked ? <Lock size={22} strokeWidth={2} /> : <Unlock size={22} strokeWidth={2} />}
           </button>
           <button
             onClick={() => setSortDesc((v) => !v)}
@@ -177,7 +177,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
             aria-label={sortDesc ? "Sort lowest to highest" : "Sort highest to lowest"}>
             
-            <Shuffle size={22} strokeWidth={2} className="text-[hsl(var(--foreground))]" />
+            <Shuffle size={22} strokeWidth={2} />
           </button>
           {players.length < 20 &&
           <button
@@ -185,7 +185,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             aria-label="Add player">
             
-              <UserPlus size={22} strokeWidth={2} className="text-[hsl(var(--foreground))]" />
+              <UserPlus size={22} strokeWidth={2} />
             </button>
           }
           <button
@@ -193,7 +193,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             aria-label="Reset scores">
             
-            <RotateCcw size={22} strokeWidth={2} className="text-[hsl(var(--foreground))]" />
+            <RotateCcw size={22} strokeWidth={2} />
           </button>
         </div>
       </div>
@@ -237,11 +237,11 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             )}
           </LayoutGroup>
 
-          {!circleMode &&
-          <div className="flex-shrink-0">
+          {!circleMode && (
+            <div className="flex-shrink-0">
               <ScoreHistoryPanel players={sortedPlayers} />
             </div>
-          }
+          )}
         </div>
 
         {/* End Game — fixed at bottom of scoreboard, centered */}

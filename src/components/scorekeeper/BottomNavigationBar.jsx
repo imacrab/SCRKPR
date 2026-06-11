@@ -28,16 +28,7 @@ export default function BottomNavigationBar({ hidden = false }) {
       transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 24px)", paddingLeft: "32px", paddingRight: "32px", pointerEvents: isHidden ? "none" : "auto" }}
     >
-    <div
-      className="relative flex flex-1 rounded-full overflow-hidden"
-      style={{
-        backdropFilter: "blur(28px) saturate(180%)",
-        WebkitBackdropFilter: "blur(28px) saturate(180%)",
-        border: "1px solid rgba(255, 255, 255, 0.06)",
-      }}
-    >
-      {/* Glossy top highlight */}
-      <div />
+    <div className="relative flex flex-1">
       {TABS.map(({ label, icon: Icon, path }) => {
         const active = pathname === path;
         return (

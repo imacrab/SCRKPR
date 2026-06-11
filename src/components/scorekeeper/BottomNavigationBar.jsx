@@ -40,13 +40,7 @@ export default function BottomNavigationBar({ hidden = false }) {
       }}
     >
       {/* Glossy top highlight */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-full"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 100%)",
-        }}
-      />
+      <div />
       {TABS.map(({ label, icon: Icon, path }) => {
         const active = pathname === path;
         return (

@@ -31,12 +31,9 @@ export default function BottomNavigationBar({ hidden = false }) {
     <div
       className="relative flex flex-1 rounded-full overflow-hidden"
       style={{
-        backgroundColor: "rgba(28, 28, 32, 0.55)",
         backdropFilter: "blur(28px) saturate(180%)",
         WebkitBackdropFilter: "blur(28px) saturate(180%)",
-        border: "1px solid rgba(255, 255, 255, 0.12)",
-        boxShadow:
-          "0 10px 30px -8px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.04)",
+        border: "1px solid rgba(255, 255, 255, 0.06)",
       }}
     >
       {/* Glossy top highlight */}

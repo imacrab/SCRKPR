@@ -26,7 +26,7 @@ export default function BottomNavigationBar({ hidden = false }) {
         filter: isHidden ? "blur(8px)" : "blur(0px)",
       }}
       transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 24px)", paddingLeft: "32px", paddingRight: "32px", pointerEvents: isHidden ? "none" : "auto" }}
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 24px)", paddingLeft: "32px", paddingRight: "32px", pointerEvents: isHidden ? "none" : "auto", backgroundColor: "hsl(var(--background))" }}
     >
     <div className="relative flex flex-1">
       {TABS.map(({ label, icon: Icon, path }) => {

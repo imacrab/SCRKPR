@@ -265,8 +265,11 @@ export default function ScoreKeeper() {
         )}
       </AnimatePresence>
 
-      {/* Gradient fade so scrolling content fades to background 8px above the tab bar */}
-      {view !== "/game" && view !== "/" && (
+      {/* Gradient fade so scrolling content fades to background 8px above the tab bar.
+          Hidden alongside the nav when a modal is open — page-level fixed overlays
+          would otherwise paint on top of modals (transformed page wrappers trap
+          modal z-index in a lower stacking context). */}
+      {view !== "/game" && view !== "/" && !navHidden && (
         <div
           className="fixed inset-x-0 z-20 pointer-events-none"
           style={{

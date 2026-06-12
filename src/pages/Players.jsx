@@ -27,8 +27,26 @@ export default function Players({ onBack, onModalChange }) {
   }, []);
 
   useEffect(() => {
-    onModalChange?.(!!editing || showBulkConfirm);
-  }, [editing, showBulkConfirm, onModalChange]);
+    // Hide the tab bar (and its gradient) for modals AND select mode —
+    // the bulk-delete pill takes the nav's place while selecting.
+    onModalChange?.(!!editing || showBulkConfirm || selectMode);
+  }, [editing, showBulkConfirm, selectMode, onModalChange]);
+
+  // Long-press a card (1.5s) to jump straight into select mode with it selected
+  const longPressFiredRef = useRef(false);
+  const startLongPress = (e, player) => {
+    if (selectMode) return;
+    const timer = setTimeout(() => {
+      longPressFiredRef.current = true;
+      if (navigator.vibrate) navigator.vibrate(10);
+      setSelectMode(true);
+      setSelectedIds(new Set([player.id]));
+    }, 1500);
+    const cancel = () => clearTimeout(timer);
+    e.currentTarget.addEventListener("pointerup", cancel, { once: true });
+    e.currentTarget.addEventListener("pointerleave", cancel, { once: true });
+    e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
+  };
 
   const toggleSelect = (id) => {
     setSelectedIds((prev) => {
@@ -130,7 +148,12 @@ export default function Players({ onBack, onModalChange }) {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, height: 0 }}
-                    onClick={() => (selectMode ? toggleSelect(p.id) : setEditing(p))}
+                    onClick={() => {
+                      if (longPressFiredRef.current) { longPressFiredRef.current = false; return; }
+                      if (selectMode) toggleSelect(p.id); else setEditing(p);
+                    }}
+                    onPointerDown={(e) => startLongPress(e, p)}
+                    onContextMenu={(e) => e.preventDefault()}
                     className={`w-full rounded-lg border bg-card overflow-hidden flex items-center gap-3 px-3 py-2.5 text-left active:scale-[0.99] transition-all ${
                       isSelected ? "border-accent-red bg-accent-red/5" : "border-border"
                     }`}
@@ -172,7 +195,7 @@ export default function Players({ onBack, onModalChange }) {
             exit={{ y: 80, opacity: 0 }}
             transition={SPRING_SHEET}
             className="fixed inset-x-0 z-40 flex justify-center pointer-events-none"
-            style={{ bottom: "calc(56px + 24px + env(safe-area-inset-bottom))" }}
+            style={{ bottom: "calc(24px + env(safe-area-inset-bottom))" }}
           >
             <button
               onClick={() => setShowBulkConfirm(true)}

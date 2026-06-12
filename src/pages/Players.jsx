@@ -32,7 +32,7 @@ export default function Players({ onBack, onModalChange }) {
     onModalChange?.(!!editing || showBulkConfirm || selectMode);
   }, [editing, showBulkConfirm, selectMode, onModalChange]);
 
-  // Long-press a card (1.5s) to jump straight into select mode with it selected
+  // Long-press a card (0.5s) to jump straight into select mode with it selected
   const longPressFiredRef = useRef(false);
   const startLongPress = (e, player) => {
     if (selectMode) return;
@@ -41,7 +41,7 @@ export default function Players({ onBack, onModalChange }) {
       if (navigator.vibrate) navigator.vibrate(10);
       setSelectMode(true);
       setSelectedIds(new Set([player.id]));
-    }, 1500);
+    }, 500);
     const cancel = () => clearTimeout(timer);
     e.currentTarget.addEventListener("pointerup", cancel, { once: true });
     e.currentTarget.addEventListener("pointerleave", cancel, { once: true });

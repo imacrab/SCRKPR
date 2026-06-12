@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Minus, Flame } from "lucide-react";
 import { readableTextColor } from "@/lib/contrast";
 import FluentEmoji from "./FluentEmoji";
+import { SPRING_POP, SPRING_SNAPPY } from "@/lib/motion";
 
 function AnimatedTotal({ value, color }) {
   const [displayValue, setDisplayValue] = useState(value);
@@ -48,7 +49,7 @@ function AnimatedTotal({ value, color }) {
           initial={{ y: "-100%", opacity: 0 }}
           animate={{ y: "0%", opacity: 1 }}
           exit={{ y: "100%", opacity: 0 }}
-          transition={{ type: "spring", stiffness: 500, damping: 18, mass: 0.8 }}
+          transition={SPRING_SNAPPY}
           className="block">
           
           {displayValue}
@@ -169,7 +170,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               key="pending"
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 24 }}
+              transition={SPRING_SNAPPY}
               className="text-sm font-semibold leading-none"
               style={{ color: textColor }}>
               
@@ -181,7 +182,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               key={lastIdx}
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 24 }}
+              transition={SPRING_SNAPPY}
               onClick={(e) => {e.stopPropagation();onEditScore?.(lastIdx);}}
               className="text-sm leading-none cursor-pointer [font-family:'Geist',_sans-serif] font-medium"
               style={{ color: subtleText }}>
@@ -206,7 +207,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           <motion.button
             onClick={() => handleQuickTap(-1)}
             whileTap={{ scale: 0.75 }}
-            transition={{ type: "spring", stiffness: 800, damping: 8, mass: 0.5 }}
+            transition={SPRING_POP}
             className="flex items-center justify-center flex-shrink-0"
             style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor, backdropFilter: "blur(2.5px)", WebkitBackdropFilter: "blur(2.5px)" }}
             aria-label={`Subtract 1 from ${player.name}`}>
@@ -220,7 +221,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           <motion.button
             onClick={() => handleQuickTap(1)}
             whileTap={{ scale: 0.75 }}
-            transition={{ type: "spring", stiffness: 800, damping: 8, mass: 0.5 }}
+            transition={SPRING_POP}
             className="flex items-center justify-center flex-shrink-0 bg-[#ffffff]/20"
             style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
             aria-label={`Add 1 to ${player.name}`}>
@@ -241,7 +242,7 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
               key={idx}
               initial={won ? { scale: 0 } : false}
               animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 500, damping: 25 }}
+              transition={SPRING_SNAPPY}
               className="w-3 h-3 rounded-full border-2 flex-shrink-0"
               style={{
                 backgroundColor: won ? player.color : "transparent",

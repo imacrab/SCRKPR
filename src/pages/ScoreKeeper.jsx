@@ -9,6 +9,8 @@ import BottomNavigationBar from "@/components/scorekeeper/BottomNavigationBar";
 import History from "./History";
 import Players from "./Players";
 import AccountSettings from "./AccountSettings";
+import { TRANSITION_PAGE } from "@/lib/motion";
+import { ACCENT_BLUE } from "@/lib/colors";
 
 // Game state persists across route transitions and page refreshes via module scope + localStorage
 let _players = [];
@@ -90,7 +92,7 @@ export default function ScoreKeeper() {
     const initialPlayers = playerData.map((p, i) => ({
       id: i + 1,
       name: p.name || p,
-      color: p.color || "#2DC5F8",
+      color: p.color || ACCENT_BLUE,
       emoji: p.emoji || "",
       scores: [],
     }));
@@ -184,7 +186,7 @@ export default function ScoreKeeper() {
       if (prev.length >= 20) return prev;
       const maxId = prev.reduce((m, p) => Math.max(m, p.id), 0);
       const newId = maxId + 1;
-      const next = [...prev, { id: newId, name, color: color || "#2DC5F8", emoji, scores: [] }];
+      const next = [...prev, { id: newId, name, color: color || ACCENT_BLUE, emoji, scores: [] }];
       saveGameState(next, _winMode, _bestOf, _targetScore);
       setLastAddedPlayerId(newId);
       return next;
@@ -197,7 +199,7 @@ export default function ScoreKeeper() {
     animate: { opacity: 1, filter: "blur(0px)", scale: 1 },
     exit:    { opacity: 0, filter: "blur(12px)", scale: 1.02 },
   };
-  const pageTransition = { duration: 0.4, ease: [0.4, 0, 0.2, 1] };
+  const pageTransition = TRANSITION_PAGE;
 
   // Height reserved for the bottom nav bar (hidden on /game)
   const navHeight = view === "/game" ? "0px" : "calc(56px + env(safe-area-inset-bottom))";

@@ -55,7 +55,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
         scrollable
         footer={
           <div className="flex gap-3">
-            {isEditing && (
+            {isEditing && onDelete && (
               <Button
                 onClick={() => setShowDeleteConfirm(true)}
                 className="h-11 bg-accent-red/15 hover:bg-accent-red/25 text-accent-red border-0 shadow-none"
@@ -67,7 +67,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
               onClick={handleSubmit}
               disabled={!name.trim()}
               className="flex-1 h-11 bg-white hover:bg-white/90 font-semibold"
-              style={{ color: "#111" }}
+              style={{ color: "#111111" }}
             >
               {isEditing ? "Save" : "Add"}
             </Button>

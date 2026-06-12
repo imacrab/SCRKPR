@@ -1,15 +1,16 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Shuffle, UserPlus, RotateCcw, Lock, Unlock } from "lucide-react";
 import { motion, LayoutGroup } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import FluentEmoji from "./FluentEmoji";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
-import EditPlayerModal from "./EditPlayerModal";
+import PlayerEditModal from "./PlayerEditModal";
 import EndGameModal from "./EndGameModal";
 import ResetConfirmModal from "./ResetConfirmModal";
 import ScoreHistoryPanel from "./ScoreHistoryPanel";
 import { isLowMode, isCircleMode } from "@/lib/gameModes";
+import { SPRING_POP, SPRING_SHEET } from "@/lib/motion";
 
 export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
@@ -218,7 +219,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             <motion.div
               key={player.id}
               layout
-              transition={{ type: "spring", stiffness: 400, damping: 32 }}
+              transition={SPRING_SHEET}
               className="w-full flex-shrink-0">
               
                 <PlayerColumn
@@ -252,7 +253,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           <motion.button
             onClick={() => setShowEndGame(true)}
             whileTap={{ scale: 0.90 }}
-            transition={{ type: "spring", stiffness: 800, damping: 8, mass: 0.5 }}
+            transition={SPRING_POP}
             className="relative flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-white hover:bg-white/90 text-background font-semibold text-sm shadow-lg transition-colors overflow-hidden">
             
             <span className="relative z-10 text-base">End Game</span>
@@ -269,9 +270,10 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         onClose={handleClose} />
       
 
-      <EditPlayerModal
+      <PlayerEditModal
         player={editingPlayer}
         isOpen={!!editingPlayer}
+        usedColors={players.map((p) => p.color)}
         onSave={handleSavePlayer}
         onClose={() => setEditingPlayer(null)} />
       

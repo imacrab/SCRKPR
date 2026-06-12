@@ -3,6 +3,7 @@ import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
+import { SPRING_SHEET } from "@/lib/motion";
 
 export default function AccountSettings({ onBack, onModalChange }) {
   const [showConfirm, setShowConfirm] = useState(false);
@@ -66,8 +67,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
              </div>
              <button
                onClick={() => setShowConfirm(true)}
-               className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
-               style={{ color: "#FF3A3A", backgroundColor: "rgba(255,58,58,0.08)" }}
+               className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors text-accent-red bg-accent-red/10 hover:bg-accent-red/20"
              >
                Delete
              </button>
@@ -88,14 +88,14 @@ export default function AccountSettings({ onBack, onModalChange }) {
               initial={{ y: "100%", opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: "100%", opacity: 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 35 }}
-              className="fixed inset-x-0 bottom-0 z-50 bg-card border-t border-border rounded-t-[44px] shadow-2xl"
+              transition={SPRING_SHEET}
+              className="fixed inset-x-0 bottom-0 z-50 bg-card border-t border-border rounded-t-sheet shadow-2xl"
               style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
             >
               <div className="px-5 pt-5 pb-8">
                 <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
                 <div className="flex flex-col items-center text-center mb-6">
-                  <AlertTriangle size={32} strokeWidth={2} className="mb-3" style={{ color: "#FF3A3A" }} />
+                  <AlertTriangle size={32} strokeWidth={2} className="mb-3 text-accent-red" />
                   <h2 className="font-display text-xl font-bold text-foreground mb-1">Delete Account?</h2>
                   <p className="text-sm text-muted-foreground">This will permanently delete all your games, groups, and account data. This cannot be undone.</p>
                 </div>
@@ -106,8 +106,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
                   <Button
                     onClick={handleDeleteAccount}
                     disabled={deleting}
-                    className="flex-1 h-11 font-semibold"
-                    style={{ backgroundColor: "#FF3A3A", color: "white" }}
+                    className="flex-1 h-11 font-semibold bg-accent-red hover:bg-accent-red/90 text-white"
                   >
                     {deleting ? "Deleting..." : "Yes, Delete"}
                   </Button>

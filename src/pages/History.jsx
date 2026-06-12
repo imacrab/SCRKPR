@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
 import HistoryStats from "@/components/scorekeeper/HistoryStats";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
+import { TRANSITION_PAGE } from "@/lib/motion";
 
 export default function History({ onBack, onModalChange }) {
   const [games, setGames] = useState([]);
@@ -189,7 +190,7 @@ export default function History({ onBack, onModalChange }) {
                   {/* Player scores */}
                   <div className="px-4 py-3 space-y-1">
                     {sorted.map((p, i) =>
-                      <div key={p.name} className="flex items-center gap-3 py-1.5 min-h-[44px]">
+                      <div key={p.name} className="flex items-center gap-3 py-1.5 min-h-touch">
                         <span className="text-xs text-muted-foreground w-4 text-right">{i + 1}</span>
                         <div
                           className="w-2.5 h-2.5 rounded-full flex-shrink-0"
@@ -226,14 +227,14 @@ export default function History({ onBack, onModalChange }) {
             initial={{ y: 120, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 120, opacity: 0 }}
-            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-            className="fixed inset-x-0 z-50 bg-card border border-border rounded-[44px] shadow-2xl"
+            transition={TRANSITION_PAGE}
+            className="fixed inset-x-0 z-50 bg-card border border-border rounded-sheet shadow-2xl"
             style={{ bottom: "8px", left: "8px", right: "8px", paddingBottom: "env(safe-area-inset-bottom)" }}>
             
               <div className="px-5 pt-5 pb-16">
                 <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
                 <div className="flex flex-col items-center text-center mb-6">
-                  <AlertTriangle size={32} strokeWidth={2} className="mb-3" style={{ color: "#FF3A3A" }} />
+                  <AlertTriangle size={32} strokeWidth={2} className="mb-3 text-accent-red" />
                   <h2 className="font-display text-xl font-bold text-foreground mb-1">Clear All Games?</h2>
                   <p className="text-sm text-muted-foreground">This will permanently delete all {games.length} game record{games.length !== 1 ? 's' : ''}.<br />This cannot be undone.</p>
                 </div>
@@ -244,8 +245,7 @@ export default function History({ onBack, onModalChange }) {
                   <Button
                   onClick={clearAllGames}
                   disabled={clearing}
-                  className="flex-1 h-11 font-semibold"
-                  style={{ backgroundColor: "#FF3A3A", color: "white" }}>
+                  className="flex-1 h-11 font-semibold bg-accent-red hover:bg-accent-red/90 text-white">
                   
                     {clearing ? "Clearing..." : "Yes, Clear All"}
                   </Button>

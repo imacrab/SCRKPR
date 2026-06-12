@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, BarChart3 } from "lucide-react";
 import { isLowMode } from "@/lib/gameModes";
+import { TRANSITION_FADE, TRANSITION_PANEL } from "@/lib/motion";
 
 export default function HistoryStats({ games }) {
   const [expanded, setExpanded] = useState(false);
@@ -52,7 +53,7 @@ export default function HistoryStats({ games }) {
             · {totalGames} game{totalGames !== 1 ? "s" : ""}
           </span>
         </div>
-        <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+        <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={TRANSITION_FADE}>
           <ChevronDown size={16} strokeWidth={2} className="text-muted-foreground" />
         </motion.div>
       </button>
@@ -63,7 +64,7 @@ export default function HistoryStats({ games }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            transition={TRANSITION_PANEL}
             className="overflow-hidden"
           >
             <div className="px-4 pb-3 pt-1 border-t border-border">

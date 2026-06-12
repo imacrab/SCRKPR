@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { History, ChevronDown } from "lucide-react";
 import FluentEmoji from "./FluentEmoji";
+import { TRANSITION_FADE, TRANSITION_PANEL } from "@/lib/motion";
 
 export default function ScoreHistoryPanel({ players }) {
   const [open, setOpen] = useState(false);
@@ -19,7 +20,7 @@ export default function ScoreHistoryPanel({ players }) {
       >
         <History size={14} strokeWidth={2} />
         <span>{open ? "Hide" : "Show"} Score History</span>
-        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
+        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={TRANSITION_FADE}>
           <ChevronDown size={14} strokeWidth={2} />
         </motion.span>
       </button>
@@ -30,7 +31,7 @@ export default function ScoreHistoryPanel({ players }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            transition={TRANSITION_PANEL}
             className="overflow-hidden"
           >
             <div className="rounded-xl border border-border bg-card/50 mt-2 overflow-hidden">

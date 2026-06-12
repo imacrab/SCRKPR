@@ -88,14 +88,14 @@ export default function BottomSheetModal({
             </div>
 
             {/* Body */}
-            <div className={scrollable ? "flex-1 overflow-y-auto px-5" : "flex-shrink-0 px-5"}>
+            <div className={scrollable ? "flex-1 overflow-y-auto px-5 pb-4" : "flex-shrink-0 px-5"}>
               {children}
             </div>
 
             {/* Footer */}
             {footer && (
               <div
-                className="flex-shrink-0 px-5 pt-3 pb-6"
+                className={`flex-shrink-0 px-5 pt-3 pb-6 ${scrollable ? "border-t border-border" : ""}`}
                 style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
               >
                 {footer}

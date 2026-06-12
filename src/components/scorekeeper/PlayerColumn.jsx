@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Plus, Minus, Flame } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import { readableTextColor } from "@/lib/contrast";
 import FluentEmoji from "./FluentEmoji";
 import { SPRING_POP, SPRING_SNAPPY } from "@/lib/motion";
@@ -184,11 +184,11 @@ export default function PlayerColumn({ player, isLeader = false, isHighlighted =
                 className="inline-flex items-center gap-0.5 rounded-full px-1 py-1 flex-shrink-0"
                 style={{ backgroundColor: streakBg, color: textColor }}>
                   <motion.span
-                    animate={{ scale: [1, 1.25, 1], rotate: [0, -6, 6, 0] }}
+                    animate={{ scale: [1, 1.35, 1], rotate: [0, -8, 8, 0] }}
                     transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
                     className="flex"
                   >
-                    <Flame size={12} strokeWidth={2.5} />
+                    <FluentEmoji emoji="🔥" size={14} />
                   </motion.span>
                   <span className="text-[10px] font-semibold leading-none">{streak}</span>
                 </motion.span>

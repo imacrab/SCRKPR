@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
 import HistoryStats from "@/components/scorekeeper/HistoryStats";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
-import { TRANSITION_PAGE } from "@/lib/motion";
+import { TRANSITION_PAGE, TRANSITION_PANEL, SPRING_SNAPPY } from "@/lib/motion";
 
 export default function History({ onBack, onModalChange }) {
   const [games, setGames] = useState([]);
@@ -17,6 +17,7 @@ export default function History({ onBack, onModalChange }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [canScroll, setCanScroll] = useState(false);
+  const [tab, setTab] = useState("games"); // "games" | "stats"
   const scrollRef = useRef(null);
   const touchStartY = useRef(null);
   const PULL_THRESHOLD = 64;
@@ -112,6 +113,39 @@ export default function History({ onBack, onModalChange }) {
         </div>
       </div>
 
+      {/* Games / Stats tabs */}
+      {!loading && games.length > 0 && (
+        <div className="px-5 pt-2 pb-2 flex-shrink-0">
+          <div className="relative flex rounded-full bg-secondary border border-border p-1">
+            {[
+              { id: "games", label: "Games", emoji: "🎲" },
+              { id: "stats", label: "Stats", emoji: "📊" },
+            ].map(({ id, label, emoji }) => {
+              const active = tab === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => setTab(id)}
+                  className="relative flex-1 h-9 rounded-full text-sm font-medium"
+                >
+                  {active && (
+                    <motion.div
+                      layoutId="history-tab-pill"
+                      transition={SPRING_SNAPPY}
+                      className="absolute inset-0 rounded-full bg-card border border-border shadow-sm"
+                    />
+                  )}
+                  <span className={`relative z-10 inline-flex items-center gap-1.5 transition-colors ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                    <FluentEmoji emoji={emoji} size={15} />
+                    {label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Pull indicator */}
       {pullDistance > 0 &&
       <div className="flex justify-center py-2 text-muted-foreground" style={{ height: pullDistance }}>
@@ -150,7 +184,25 @@ export default function History({ onBack, onModalChange }) {
           </> :
 
           <>
-            <HistoryStats games={games} />
+            <AnimatePresence mode="wait" initial={false}>
+            {tab === "stats" ? (
+              <motion.div
+                key="stats"
+                initial={{ opacity: 0, x: 24 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 24 }}
+                transition={TRANSITION_PANEL}
+              >
+                <HistoryStats games={games} />
+              </motion.div>
+            ) : (
+            <motion.div
+              key="games"
+              initial={{ opacity: 0, x: -24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={TRANSITION_PANEL}
+            >
             <AnimatePresence>
             {games.map((game, gameIdx) => {
                 const isLowWin = isLowMode(game.win_mode);
@@ -296,6 +348,9 @@ export default function History({ onBack, onModalChange }) {
                 </div>);
 
               })}
+          </AnimatePresence>
+          </motion.div>
+          )}
           </AnimatePresence>
           </>
           }

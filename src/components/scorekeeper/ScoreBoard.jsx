@@ -296,6 +296,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         player={editingPlayer}
         isOpen={!!editingPlayer}
         usedColors={players.map((p) => p.color)}
+        usedEmojis={players.map((p) => p.emoji).filter(Boolean)}
         onSave={handleSavePlayer}
         onClose={() => setEditingPlayer(null)} />
       

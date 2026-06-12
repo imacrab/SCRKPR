@@ -113,6 +113,7 @@ export default function Players({ onBack, onModalChange }) {
         isOpen={!!editing}
         player={editing}
         usedColors={players.map((p) => p.color)}
+        usedEmojis={players.map((p) => p.emoji).filter(Boolean)}
         onSave={handleSave}
         onDelete={handleDelete}
         onClose={() => setEditing(null)}

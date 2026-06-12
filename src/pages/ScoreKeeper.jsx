@@ -257,6 +257,7 @@ export default function ScoreKeeper() {
               isOpen={showAddPlayer}
               player={null}
               usedColors={players.map((p) => p.color)}
+              usedEmojis={players.map((p) => p.emoji).filter(Boolean)}
               onSave={({ name, color, emoji }) => handleAddPlayer(name, color, emoji)}
               onClose={() => setShowAddPlayer(false)}
             />

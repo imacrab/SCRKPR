@@ -1,6 +1,8 @@
 // Renders a Microsoft Fluent Emoji (3D) image from the lobehub CDN.
 // Falls back to the native unicode emoji if the image fails to load.
 
+import { useState, useEffect } from "react";
+
 function emojiToCodepoint(emoji) {
   if (!emoji) return "";
   const codepoints = [];
@@ -23,7 +25,27 @@ export function getFluentEmojiUrl(emoji) {
 }
 
 export default function FluentEmoji({ emoji, size = 10, className = "", style = {} }) {
+  const [failed, setFailed] = useState(false);
+
+  // If the emoji prop changes, give the new asset a fresh chance to load.
+  useEffect(() => setFailed(false), [emoji]);
+
   if (!emoji) return null;
+
+  // Final fallback — native unicode emoji, sized to match the image slot.
+  if (failed) {
+    return (
+      <span
+        role="img"
+        aria-label={emoji}
+        className={`inline-flex items-center justify-center select-none ${className}`}
+        style={{ width: size, height: size, fontSize: size * 0.82, lineHeight: 1, ...style }}
+      >
+        {emoji}
+      </span>
+    );
+  }
+
   return (
     <img
       src={getFluentEmojiUrl(emoji)}
@@ -38,8 +60,7 @@ export default function FluentEmoji({ emoji, size = 10, className = "", style = 
         if (fallback && e.currentTarget.src !== fallback) {
           e.currentTarget.src = fallback;
         } else {
-          // Final fallback — show native unicode emoji via a span replacement
-          e.currentTarget.style.display = "none";
+          setFailed(true);
         }
       }}
       className={`inline-block select-none ${className}`}

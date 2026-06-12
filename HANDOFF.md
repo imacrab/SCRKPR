@@ -67,9 +67,9 @@ Without `.env.local`, backend calls fail silently (e.g. adding a player does not
 
 ## Open items
 
-- [ ] Visual pass over both branches in the browser (Chrome extension connection was flaky; manual checklist was used instead).
+- [x] ~~Visual pass over both branches in the browser.~~ Done June 12, 2026 on `delight-pass` via headless Chromium + mocked Base44 API (sandbox can't reach the backend). All 11 key screens verified against this doc: setup, selection, scoreboard, score input, end-game modal (confetti ✓), Players + select mode + delete pill, History hero card + Games/Stats tabs, Account. Found & fixed: `FluentEmoji` claimed a unicode fallback but only hid the broken `<img>` — offline/CDN-blocked devices lost ALL emoji (avatars, leader crown, medals, winner). Now renders a real unicode `<span>` fallback. Remaining nit: the SCRKPR logo loads from media.base44.com, so it's a broken-image icon offline — consider bundling it locally before the App Store wrapper.
 - [ ] Possibly extend stagger-on-load to Players list and History cards (offered, not requested).
 - [ ] Possibly "Select all" in Players select mode (offered, not requested).
 - [ ] App Store wrapper (Capacitor or similar), icons, splash screens — not started.
 - [ ] Open PRs / merge strategy for the two branches (Base44 syncs from the repo).
-- [ ] The Base44 API key was pasted in a chat once — rotate it in Base44 dashboard if not already done.
+- [x] ~~The Base44 API key was pasted in a chat once — rotate it in Base44 dashboard.~~ Rotated June 12, 2026.

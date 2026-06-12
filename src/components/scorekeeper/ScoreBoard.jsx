@@ -233,7 +233,14 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             <motion.div
               key={player.id}
               layout
-              transition={SPRING_SHEET}
+              initial={{ opacity: 0, y: 48, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{
+                layout: SPRING_SHEET,
+                y: { ...SPRING_SHEET, delay: idx * 0.07 },
+                scale: { ...SPRING_SHEET, delay: idx * 0.07 },
+                opacity: { duration: 0.25, delay: idx * 0.07 },
+              }}
               className="w-full flex-shrink-0">
               
                 <PlayerColumn

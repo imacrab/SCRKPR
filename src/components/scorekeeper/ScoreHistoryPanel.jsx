@@ -59,7 +59,12 @@ export default function ScoreHistoryPanel({ players }) {
                   </thead>
                   <tbody>
                     {Array.from({ length: maxRounds }).map((_, roundIdx) => (
-                      <tr key={roundIdx} className="border-b border-border/50 last:border-0">
+                      <motion.tr
+                        key={roundIdx}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ ...TRANSITION_PANEL, delay: 0.1 + roundIdx * 0.04 }}
+                        className="border-b border-border/50 last:border-0">
                         <td className="text-left px-3 py-2 text-muted-foreground sticky left-0 bg-card/80 backdrop-blur-sm">
                           {roundIdx + 1}
                         </td>
@@ -71,7 +76,7 @@ export default function ScoreHistoryPanel({ players }) {
                             </td>
                           );
                         })}
-                      </tr>
+                      </motion.tr>
                     ))}
                     <tr className="bg-muted/30">
                       <td className="text-left px-3 py-2 font-semibold sticky left-0 bg-muted/60 backdrop-blur-sm">

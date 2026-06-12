@@ -2,20 +2,20 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BottomSheetModal from "./BottomSheetModal";
-import EmojiPicker from "./EmojiPicker";
+import EmojiPicker, { PLAYER_EMOJIS } from "./EmojiPicker";
 import FluentEmoji from "./FluentEmoji";
 import DeletePlayerConfirmModal from "./DeletePlayerConfirmModal";
 import { getPaletteForTone, readableTextColor } from "@/lib/contrast";
 import { usePlayerTone } from "@/lib/usePlayerTone";
 
-function pickRandomColor(palette, usedColors = []) {
-  const used = new Set(usedColors);
-  const available = palette.filter((c) => !used.has(c));
-  const pool = available.length > 0 ? available : palette;
+function pickRandomUnused(options, used = []) {
+  const taken = new Set(used);
+  const available = options.filter((o) => !taken.has(o));
+  const pool = available.length > 0 ? available : options;
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-export default function PlayerEditModal({ isOpen, player, usedColors = [], onSave, onDelete, onClose }) {
+export default function PlayerEditModal({ isOpen, player, usedColors = [], usedEmojis = [], onSave, onDelete, onClose }) {
   const [tone] = usePlayerTone();
   const palette = useMemo(() => getPaletteForTone(tone), [tone]);
   const [name, setName] = useState("");
@@ -33,11 +33,11 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], onSav
       setEmoji(player.emoji || "");
     } else {
       setName("");
-      setColor(pickRandomColor(palette, usedColors));
-      setEmoji("");
+      setColor(pickRandomUnused(palette, usedColors));
+      setEmoji(pickRandomUnused(PLAYER_EMOJIS, usedEmojis));
     }
     setTimeout(() => inputRef.current?.focus(), 120);
-  }, [isOpen, player, usedColors, palette]);
+  }, [isOpen, player, usedColors, usedEmojis, palette]);
 
   const handleSubmit = () => {
     const trimmed = name.trim();

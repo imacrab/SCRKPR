@@ -1,15 +1,18 @@
 import { Button } from "@/components/ui/button";
 import BottomSheetModal from "./BottomSheetModal";
 
-export default function DeletePlayerConfirmModal({ isOpen, playerName, onConfirm, onClose }) {
+export default function DeletePlayerConfirmModal({ isOpen, playerName, count = 1, onConfirm, onClose }) {
+  const isBulk = count > 1;
   return (
     <BottomSheetModal
       isOpen={isOpen}
       onClose={onClose}
       zIndex={70}
       eyebrow="Confirm"
-      title={`Delete ${playerName || "this player"}?`}
-      description="This will permanently remove the player from your saved players. This can't be undone."
+      title={isBulk ? `Delete ${count} players?` : `Delete ${playerName || "this player"}?`}
+      description={isBulk
+        ? `This will permanently remove ${count} players from your saved players. This can't be undone.`
+        : "This will permanently remove the player from your saved players. This can't be undone."}
       footer={
         <div className="flex gap-3">
           <Button onClick={onClose} variant="outline" className="flex-1 h-11">

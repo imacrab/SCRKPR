@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import { SPRING_SHEET, TRANSITION_FADE } from "@/lib/motion";
 
@@ -24,6 +25,7 @@ export default function BottomSheetModal({
   scrollable = false,
 }) {
   const dragControls = useDragControls();
+  const [scrolled, setScrolled] = useState(false);
 
   const handleDragEnd = (_, info) => {
     if (info.offset.y > 120 || info.velocity.y > 500) {
@@ -61,10 +63,12 @@ export default function BottomSheetModal({
             className="fixed inset-x-0 bg-card border border-border rounded-sheet shadow-2xl flex flex-col"
             style={{ zIndex, bottom: "8px", left: "8px", right: "8px", maxHeight: "calc(100dvh - 48px)" }}
           >
-            {/* Drag handle + Header (both draggable) */}
+            {/* Drag handle + Header (both draggable) — border fades in once the body scrolls */}
             <div
               onPointerDown={(e) => dragControls.start(e)}
-              className="flex-shrink-0 touch-none select-none cursor-grab active:cursor-grabbing"
+              className={`flex-shrink-0 touch-none select-none cursor-grab active:cursor-grabbing border-b transition-colors duration-200 ${
+                scrollable && scrolled ? "border-border" : "border-transparent"
+              }`}
             >
               <div className="pt-3 pb-2">
                 <div className="w-10 h-1 bg-border rounded-full mx-auto" />
@@ -88,14 +92,17 @@ export default function BottomSheetModal({
             </div>
 
             {/* Body */}
-            <div className={scrollable ? "flex-1 overflow-y-auto px-5" : "flex-shrink-0 px-5"}>
+            <div
+              className={scrollable ? "flex-1 overflow-y-auto px-5 pb-4" : "flex-shrink-0 px-5"}
+              onScroll={scrollable ? (e) => setScrolled(e.currentTarget.scrollTop > 0) : undefined}
+            >
               {children}
             </div>
 
             {/* Footer */}
             {footer && (
               <div
-                className="flex-shrink-0 px-5 pt-3 pb-6"
+                className={`flex-shrink-0 px-5 pt-3 pb-6 ${scrollable ? "border-t border-border" : ""}`}
                 style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
               >
                 {footer}

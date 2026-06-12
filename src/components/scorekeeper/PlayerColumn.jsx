@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Plus, Minus, Flame } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import { readableTextColor } from "@/lib/contrast";
 import FluentEmoji from "./FluentEmoji";
 import { SPRING_POP, SPRING_SNAPPY } from "@/lib/motion";
@@ -46,9 +46,9 @@ function AnimatedTotal({ value, color }) {
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
           key={animKey}
-          initial={{ y: "-100%", opacity: 0 }}
-          animate={{ y: "0%", opacity: 1 }}
-          exit={{ y: "100%", opacity: 0 }}
+          initial={{ y: "-100%", opacity: 0, scale: 0.7 }}
+          animate={{ y: "0%", opacity: 1, scale: 1 }}
+          exit={{ y: "100%", opacity: 0, scale: 0.7 }}
           transition={SPRING_SNAPPY}
           className="block">
           
@@ -59,7 +59,7 @@ function AnimatedTotal({ value, color }) {
 
 }
 
-export default function PlayerColumn({ player, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, onAddScore, onQuickScore, onEditScore, onEditPlayer }) {
+export default function PlayerColumn({ player, isLeader = false, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, onAddScore, onQuickScore, onEditScore, onEditPlayer }) {
   const baseTotal = player.scores.reduce((s, n) => s + n, 0);
   const isBestOf = winsNeeded !== null;
   const lastIdx = player.scores.length - 1;
@@ -123,6 +123,24 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
           borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))"
         }}>
 
+        {/* Leader crown — flies between players when the lead changes (shared layoutId) */}
+        <AnimatePresence>
+          {isLeader && (
+            <motion.div
+              layoutId="leader-crown"
+              initial={{ scale: 0, rotate: -40, opacity: 0 }}
+              animate={{ scale: 1, rotate: 14, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={SPRING_POP}
+              className="absolute pointer-events-none select-none z-20"
+              style={{ top: 4, right: 8 }}
+              aria-hidden="true"
+            >
+              <FluentEmoji emoji="👑" size={26} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Flourish — oversized tilted player emoji bleeding off the left edge */}
         {player.emoji &&
         <div
@@ -159,10 +177,21 @@ export default function PlayerColumn({ player, isHighlighted = false, streak = 0
                 {player.name}
               </span>
               {streak >= 2 &&
-              <span className="inline-flex items-center gap-0.5 rounded-full px-1 py-1 flex-shrink-0" style={{ backgroundColor: streakBg, color: textColor }}>
-                  <Flame size={12} strokeWidth={2.5} />
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={SPRING_POP}
+                className="inline-flex items-center gap-0.5 rounded-full px-1 py-1 flex-shrink-0"
+                style={{ backgroundColor: streakBg, color: textColor }}>
+                  <motion.span
+                    animate={{ scale: [1, 1.35, 1], rotate: [0, -8, 8, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                    className="flex"
+                  >
+                    <FluentEmoji emoji="🔥" size={14} />
+                  </motion.span>
                   <span className="text-[10px] font-semibold leading-none">{streak}</span>
-                </span>
+                </motion.span>
               }
             </div>
             {!isBestOf && showPending &&

@@ -1,14 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Users } from "lucide-react";
+import { Plus, Users, Check, Trash2 } from "lucide-react";
 import PlayerEditModal from "@/components/scorekeeper/PlayerEditModal";
+import DeletePlayerConfirmModal from "@/components/scorekeeper/DeletePlayerConfirmModal";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
+import { SPRING_SHEET } from "@/lib/motion";
 
 export default function Players({ onBack, onModalChange }) {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null); // null | {} (new) | player (existing)
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(() => new Set());
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false);
   const [canScroll, setCanScroll] = useState(false);
   const scrollRef = useRef(null);
 
@@ -22,8 +27,47 @@ export default function Players({ onBack, onModalChange }) {
   }, []);
 
   useEffect(() => {
-    onModalChange?.(!!editing);
-  }, [editing, onModalChange]);
+    // Hide the tab bar (and its gradient) for modals AND select mode —
+    // the bulk-delete pill takes the nav's place while selecting.
+    onModalChange?.(!!editing || showBulkConfirm || selectMode);
+  }, [editing, showBulkConfirm, selectMode, onModalChange]);
+
+  // Long-press a card (0.5s) to jump straight into select mode with it selected
+  const longPressFiredRef = useRef(false);
+  const startLongPress = (e, player) => {
+    if (selectMode) return;
+    const timer = setTimeout(() => {
+      longPressFiredRef.current = true;
+      if (navigator.vibrate) navigator.vibrate(10);
+      setSelectMode(true);
+      setSelectedIds(new Set([player.id]));
+    }, 500);
+    const cancel = () => clearTimeout(timer);
+    e.currentTarget.addEventListener("pointerup", cancel, { once: true });
+    e.currentTarget.addEventListener("pointerleave", cancel, { once: true });
+    e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const exitSelectMode = () => {
+    setSelectMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const handleBulkDelete = async () => {
+    const ids = [...selectedIds];
+    setShowBulkConfirm(false);
+    exitSelectMode();
+    setPlayers((prev) => prev.filter((p) => !ids.includes(p.id)));
+    await Promise.allSettled(ids.map((id) => base44.entities.Player.delete(id)));
+  };
 
   useEffect(() => {
     const checkScroll = () => {
@@ -56,13 +100,23 @@ export default function Players({ onBack, onModalChange }) {
   return (
     <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       <div className="pt-10 pb-2 px-5 flex items-center flex-shrink-0 relative" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
+        {players.length > 0 && (
+          <button
+            onClick={() => (selectMode ? exitSelectMode() : setSelectMode(true))}
+            className="absolute left-5 top-10 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+          >
+            {selectMode ? "Cancel" : "Select"}
+          </button>
+        )}
         <h1 className="font-sans font-medium text-lg text-foreground flex-1 text-center">Players</h1>
-        <button
-          onClick={() => setEditing({})}
-          className="absolute right-5 top-10 text-sm font-medium text-foreground hover:text-foreground transition-colors px-2 py-1 flex items-center gap-1"
-        >
-          <Plus size={20} strokeWidth={2} />
-        </button>
+        {!selectMode && (
+          <button
+            onClick={() => setEditing({})}
+            className="absolute right-5 top-10 text-sm font-medium text-foreground hover:text-foreground transition-colors px-2 py-1 flex items-center gap-1"
+          >
+            <Plus size={20} strokeWidth={2} />
+          </button>
+        )}
       </div>
 
       <div className="flex-1 relative overflow-hidden">
@@ -86,36 +140,90 @@ export default function Players({ onBack, onModalChange }) {
             </div>
           ) : (
             <AnimatePresence>
-              {players.map((p) => (
-                <motion.button
-                  key={p.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, height: 0 }}
-                  onClick={() => setEditing(p)}
-                  className="w-full rounded-lg border border-border bg-card overflow-hidden flex items-center gap-3 px-3 py-2.5 text-left active:scale-[0.99] transition-transform"
-                >
-                  <div
-                    className="w-9 h-9 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"
-                    style={{ backgroundColor: p.color }}
+              {players.map((p) => {
+                const isSelected = selectedIds.has(p.id);
+                return (
+                  <motion.button
+                    key={p.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, height: 0 }}
+                    onClick={() => {
+                      if (longPressFiredRef.current) { longPressFiredRef.current = false; return; }
+                      if (selectMode) toggleSelect(p.id); else setEditing(p);
+                    }}
+                    onPointerDown={(e) => startLongPress(e, p)}
+                    onContextMenu={(e) => e.preventDefault()}
+                    className={`w-full rounded-lg border bg-card overflow-hidden flex items-center gap-3 px-3 py-2.5 text-left active:scale-[0.99] transition-all ${
+                      isSelected ? "border-accent-red bg-accent-red/5" : "border-border"
+                    }`}
                   >
-                    {p.emoji && <FluentEmoji emoji={p.emoji} size={22} />}
-                  </div>
-                  <span className="flex-1 text-foreground text-base">{p.name}</span>
-                </motion.button>
-              ))}
+                    <div
+                      className="w-9 h-9 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"
+                      style={{ backgroundColor: p.color }}
+                    >
+                      {p.emoji && <FluentEmoji emoji={p.emoji} size={22} />}
+                    </div>
+                    <span className="flex-1 text-foreground text-base">{p.name}</span>
+                    {selectMode && (
+                      <motion.span
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={SPRING_SHEET}
+                        className={`w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center border-2 transition-colors ${
+                          isSelected ? "bg-accent-red border-accent-red text-white" : "border-border text-transparent"
+                        }`}
+                      >
+                        <Check size={14} strokeWidth={3} />
+                      </motion.span>
+                    )}
+                  </motion.button>
+                );
+              })}
             </AnimatePresence>
           )}
         </div>
       </div>
 
+      {/* Floating bulk-delete pill — slides up when something is selected */}
+      <AnimatePresence>
+        {selectMode && selectedIds.size > 0 && (
+          <motion.div
+            initial={{ y: 80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 80, opacity: 0 }}
+            transition={SPRING_SHEET}
+            className="fixed inset-x-0 z-40 flex justify-center pointer-events-none"
+            style={{ bottom: "calc(24px + env(safe-area-inset-bottom))" }}
+          >
+            <button
+              onClick={() => setShowBulkConfirm(true)}
+              className="pointer-events-auto flex items-center gap-2 px-5 h-11 rounded-full bg-accent-red hover:bg-accent-red/90 text-white text-sm font-semibold shadow-2xl active:scale-95 transition-transform"
+            >
+              <Trash2 size={16} strokeWidth={2.5} />
+              Delete {selectedIds.size} {selectedIds.size === 1 ? "player" : "players"}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <PlayerEditModal
         isOpen={!!editing}
         player={editing}
         usedColors={players.map((p) => p.color)}
+        usedEmojis={players.map((p) => p.emoji).filter(Boolean)}
         onSave={handleSave}
         onDelete={handleDelete}
         onClose={() => setEditing(null)}
+      />
+
+      <DeletePlayerConfirmModal
+        isOpen={showBulkConfirm}
+        count={selectedIds.size}
+        playerName={selectedIds.size === 1 ? players.find((p) => selectedIds.has(p.id))?.name : undefined}
+        onConfirm={handleBulkDelete}
+        onClose={() => setShowBulkConfirm(false)}
       />
     </div>
   );

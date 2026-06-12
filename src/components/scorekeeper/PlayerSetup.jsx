@@ -355,6 +355,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         isOpen={showAddPlayer}
         player={null}
         usedColors={(allPlayers || []).map((p) => p.color)}
+        usedEmojis={(allPlayers || []).map((p) => p.emoji).filter(Boolean)}
         onSave={handleAddPlayer}
         onClose={() => setShowAddPlayerWithNav(false)} />
       

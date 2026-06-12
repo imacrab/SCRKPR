@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
 import HistoryStats from "@/components/scorekeeper/HistoryStats";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
-import { TRANSITION_PAGE } from "@/lib/motion";
+import { TRANSITION_PAGE, TRANSITION_PANEL, SPRING_SNAPPY } from "@/lib/motion";
 
 export default function History({ onBack, onModalChange }) {
   const [games, setGames] = useState([]);
@@ -17,6 +17,7 @@ export default function History({ onBack, onModalChange }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [canScroll, setCanScroll] = useState(false);
+  const [tab, setTab] = useState("games"); // "games" | "stats"
   const scrollRef = useRef(null);
   const touchStartY = useRef(null);
   const PULL_THRESHOLD = 64;
@@ -112,6 +113,39 @@ export default function History({ onBack, onModalChange }) {
         </div>
       </div>
 
+      {/* Games / Stats tabs */}
+      {!loading && games.length > 0 && (
+        <div className="px-5 pt-2 pb-2 flex-shrink-0">
+          <div className="relative flex rounded-full bg-secondary border border-border p-1">
+            {[
+              { id: "games", label: "Games", emoji: "🎲" },
+              { id: "stats", label: "Stats", emoji: "📊" },
+            ].map(({ id, label, emoji }) => {
+              const active = tab === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => setTab(id)}
+                  className="relative flex-1 h-9 rounded-full text-sm font-medium"
+                >
+                  {active && (
+                    <motion.div
+                      layoutId="history-tab-pill"
+                      transition={SPRING_SNAPPY}
+                      className="absolute inset-0 rounded-full bg-card border border-border shadow-sm"
+                    />
+                  )}
+                  <span className={`relative z-10 inline-flex items-center gap-1.5 transition-colors ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                    <FluentEmoji emoji={emoji} size={15} />
+                    {label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Pull indicator */}
       {pullDistance > 0 &&
       <div className="flex justify-center py-2 text-muted-foreground" style={{ height: pullDistance }}>
@@ -150,22 +184,129 @@ export default function History({ onBack, onModalChange }) {
           </> :
 
           <>
-            <HistoryStats games={games} />
+            <AnimatePresence mode="wait" initial={false}>
+            {tab === "stats" ? (
+              <motion.div
+                key="stats"
+                initial={{ opacity: 0, x: 24 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 24 }}
+                transition={TRANSITION_PANEL}
+              >
+                <HistoryStats games={games} />
+              </motion.div>
+            ) : (
+            <motion.div
+              key="games"
+              initial={{ opacity: 0, x: -24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={TRANSITION_PANEL}
+            >
             <AnimatePresence>
-            {games.map((game) => {
+            {games.map((game, gameIdx) => {
                 const isLowWin = isLowMode(game.win_mode);
                 const modeMeta = getModeMeta(game.win_mode);
                 const sorted = [...game.players].sort((a, b) => isLowWin ? a.total - b.total : b.total - a.total);
                 const winner = sorted[0];
                 const isTie = sorted.length > 1 && sorted[0].total === sorted[1].total;
+                const isLatest = gameIdx === 0;
+
+                if (isLatest) {
+                  return (
+                    <motion.div
+                      key={game.id}
+                      initial={{ opacity: 0, y: 16, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mb-4 rounded-3xl overflow-hidden relative border"
+                      style={{
+                        borderColor: `${winner.color}66`,
+                        background: `linear-gradient(155deg, ${winner.color}30 0%, ${winner.color}10 35%, hsl(var(--card)) 70%)`,
+                      }}>
+
+                      {/* Oversized winner emoji bleeding off the corner — same flourish as the scoreboard */}
+                      {!isTie && winner.emoji && (
+                        <div
+                          className="absolute pointer-events-none select-none"
+                          style={{ right: -18, top: -14, transform: "rotate(16deg)", opacity: 0.22 }}
+                          aria-hidden="true">
+                          <FluentEmoji emoji={winner.emoji} size={130} />
+                        </div>
+                      )}
+
+                      <div className="px-5 pt-4 pb-2 flex items-center justify-between relative z-10">
+                        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Latest Game</p>
+                        <p className="text-xs text-muted-foreground">{format(new Date(game.played_at), "MMM d · h:mm a")}</p>
+                      </div>
+
+                      {/* Winner hero */}
+                      <div className="px-5 pb-3 flex items-center gap-3 relative z-10">
+                        <div
+                          className="w-14 h-14 rounded-full flex-shrink-0 border-2 border-white/25 flex items-center justify-center overflow-hidden"
+                          style={{ backgroundColor: isTie ? "hsl(var(--muted))" : winner.color }}>
+                          {isTie
+                            ? <Handshake size={26} strokeWidth={2} className="text-muted-foreground" />
+                            : winner.emoji
+                              ? <FluentEmoji emoji={winner.emoji} size={34} />
+                              : <FluentEmoji emoji="🏆" size={30} />}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-0.5 flex items-center gap-1">
+                            {!isTie && <FluentEmoji emoji="🏆" size={12} />}
+                            {isTie ? "It's a Tie" : "Winner"}
+                          </p>
+                          <h2 className="font-display text-2xl font-bold text-foreground leading-tight truncate">
+                            {isTie ? sorted.filter((p) => p.total === winner.total).map((p) => p.name).join(" & ") : winner.name}
+                          </h2>
+                          <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                            {winner.total} pts
+                            <span>·</span>
+                            <FluentEmoji emoji={modeMeta.emoji} size={12} />
+                            {modeMeta.label}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Podium */}
+                      <div className="px-4 pb-4 space-y-1 relative z-10">
+                        {sorted.map((p, i) => (
+                          <motion.div
+                            key={p.name}
+                            initial={{ opacity: 0, x: -12 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.15 + i * 0.06 }}
+                            className="flex items-center gap-3 py-2 px-3 rounded-xl"
+                            style={{ backgroundColor: `${p.color}14` }}>
+                            <span className="text-xs text-muted-foreground w-5 text-right">
+                              {!isTie && i === 0 ? <FluentEmoji emoji="🥇" size={16} />
+                                : !isTie && i === 1 ? <FluentEmoji emoji="🥈" size={16} />
+                                : !isTie && i === 2 ? <FluentEmoji emoji="🥉" size={16} />
+                                : i + 1}
+                            </span>
+                            {p.emoji
+                              ? <span className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden" style={{ backgroundColor: p.color }}><FluentEmoji emoji={p.emoji} size={16} /></span>
+                              : <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 mx-[7px]" style={{ backgroundColor: p.color }} />}
+                            <span className="text-sm text-foreground flex-1 truncate font-medium">{p.name}</span>
+                            <span className="text-sm font-bold" style={{ color: p.color }}>{p.total}</span>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  );
+                }
+
                 return (
+                  <div key={game.id}>
+                  {gameIdx === 1 && (
+                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-1 pt-1 pb-2">Earlier</p>
+                  )}
                   <motion.div
-                    key={game.id}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, height: 0 }}
                     className="mb-3 rounded-xl border border-border bg-card overflow-hidden">
-                    
+
                   {/* Game header */}
                   <div className="px-4 py-3 flex items-baseline justify-between border-b border-border">
                     <div className="flex flex-col gap-2">
@@ -195,7 +336,7 @@ export default function History({ onBack, onModalChange }) {
                         <div
                           className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                           style={{ backgroundColor: p.color }} />
-                        
+
                         <span className="text-sm text-foreground flex-1 truncate">{p.name}</span>
                         <span className="text-sm font-semibold" style={{ color: p.color }}>
                           {p.total}
@@ -203,9 +344,13 @@ export default function History({ onBack, onModalChange }) {
                       </div>
                       )}
                   </div>
-                </motion.div>);
+                </motion.div>
+                </div>);
 
               })}
+          </AnimatePresence>
+          </motion.div>
+          )}
           </AnimatePresence>
           </>
           }

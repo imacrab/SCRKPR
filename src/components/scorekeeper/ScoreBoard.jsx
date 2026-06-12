@@ -64,6 +64,20 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   null;
   const circleMode = isCircleMode(winMode);
 
+  // Current leader — gets the crown 👑. No crown on ties or before any scores.
+  const leaderId = useMemo(() => {
+    const isLowWin = isLowMode(winMode);
+    const totals = players.map((p) => ({
+      id: p.id,
+      total: p.scores.reduce((s, n) => s + n, 0),
+      played: p.scores.length,
+    }));
+    if (!totals.some((t) => t.played > 0)) return null;
+    const ranked = [...totals].sort((a, b) => (isLowWin ? a.total - b.total : b.total - a.total));
+    if (ranked.length > 1 && ranked[0].total === ranked[1].total) return null;
+    return ranked[0].id;
+  }, [players, winMode]);
+
   // Sort players by total score — direction toggled by user; locking preserves setup order
   const sortedPlayers = useMemo(() => {
     if (sortLocked) return players;
@@ -219,11 +233,19 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             <motion.div
               key={player.id}
               layout
-              transition={SPRING_SHEET}
+              initial={{ opacity: 0, y: 48, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{
+                layout: SPRING_SHEET,
+                y: { ...SPRING_SHEET, delay: idx * 0.07 },
+                scale: { ...SPRING_SHEET, delay: idx * 0.07 },
+                opacity: { duration: 0.25, delay: idx * 0.07 },
+              }}
               className="w-full flex-shrink-0">
               
                 <PlayerColumn
                 player={player}
+                isLeader={player.id === leaderId}
                 isHighlighted={player.id === lastAddedPlayerId}
                 streak={streakMap[player.name] || 0}
                 winsNeeded={winsNeeded}
@@ -274,6 +296,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         player={editingPlayer}
         isOpen={!!editingPlayer}
         usedColors={players.map((p) => p.color)}
+        usedEmojis={players.map((p) => p.emoji).filter(Boolean)}
         onSave={handleSavePlayer}
         onClose={() => setEditingPlayer(null)} />
       

@@ -11,6 +11,8 @@ import ResetConfirmModal from "./ResetConfirmModal";
 import ScoreHistoryPanel from "./ScoreHistoryPanel";
 import { isLowMode, isCircleMode } from "@/lib/gameModes";
 import { SPRING_POP, SPRING_SHEET } from "@/lib/motion";
+import logoDark from "@/assets/SCRKPR_dark_mode.png";
+import logoLight from "@/assets/SCRKPR_light_mode.png";
 
 export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
@@ -175,7 +177,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-10 pb-5 flex-shrink-0" style={{ backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <button onClick={() => setShowEndGame(true)} className="hover:opacity-75 transition-opacity">
-          <img src={isDarkMode ? "https://media.base44.com/images/public/69ea763700078809357a164a/87badac38_SCRKPR_dark_mode.png" : "https://media.base44.com/images/public/69ea763700078809357a164a/6de7dc994_SCRKPR_light_mode.png"} alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
+          <img src={isDarkMode ? logoDark : logoLight} alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
         </button>
         <div className="flex items-center gap-2">
           <button

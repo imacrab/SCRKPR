@@ -8,6 +8,8 @@ import GameModeModal from "./GameModeModal";
 import PlayerEditModal from "./PlayerEditModal";
 import FluentEmoji from "./FluentEmoji";
 import { getModeMeta } from "@/lib/gameModes";
+import logoDark from "@/assets/SCRKPR_dark_mode.png";
+import logoLight from "@/assets/SCRKPR_light_mode.png";
 
 const DEFAULT_SELECTED_NAMES = ["Adrian", "Jayne"];
 
@@ -167,7 +169,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
       {/* Header */}
       <div className="pt-10 pb-5 px-6" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
-        <img src={isDarkMode ? "https://media.base44.com/images/public/69ea763700078809357a164a/87badac38_SCRKPR_dark_mode.png" : "https://media.base44.com/images/public/69ea763700078809357a164a/6de7dc994_SCRKPR_light_mode.png"} alt="SCRKPR!" className="mx-auto" style={{ maxWidth: 200, height: "auto" }} />
+        <img src={isDarkMode ? logoDark : logoLight} alt="SCRKPR!" className="mx-auto" style={{ maxWidth: 200, height: "auto" }} />
       </div>
 
       {/* Player list — pick who's playing */}

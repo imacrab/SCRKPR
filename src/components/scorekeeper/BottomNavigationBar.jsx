@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Spade, Users, History, Settings } from "lucide-react";
 import { motion } from "framer-motion";
-import { TRANSITION_PAGE } from "@/lib/motion";
+import { TRANSITION_PAGE, SPRING_SNAPPY } from "@/lib/motion";
 
 const TABS = [
   { label: "New Game", icon: Spade,    path: "/" },
@@ -33,18 +33,34 @@ export default function BottomNavigationBar({ hidden = false }) {
       {TABS.map(({ label, icon: Icon, path }) => {
         const active = pathname === path;
         return (
-          <button
+          <motion.button
             key={path}
             onClick={() => navigate(path)}
+            whileTap={{ scale: 0.88 }}
+            transition={SPRING_SNAPPY}
             className="relative flex-1 flex flex-col items-center justify-center gap-1 px-2 py-2 transition-colors"
             style={{ minHeight: 56 }}
           >
-            <Icon
-              size={24}
-              strokeWidth={2}
-              style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
-            />
-          </button>
+            {active && (
+              <motion.div
+                layoutId="nav-active-pill"
+                transition={SPRING_SNAPPY}
+                className="absolute rounded-full bg-accent"
+                style={{ width: 56, height: 40, top: "50%", left: "50%", marginLeft: -28, marginTop: -20 }}
+              />
+            )}
+            <motion.span
+              animate={{ scale: active ? 1.1 : 1, y: active ? -1 : 0 }}
+              transition={SPRING_SNAPPY}
+              className="relative z-10 flex"
+            >
+              <Icon
+                size={24}
+                strokeWidth={2}
+                style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
+              />
+            </motion.span>
+          </motion.button>
         );
       })}
     </div>

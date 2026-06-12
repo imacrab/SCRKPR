@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import FluentEmoji from "./FluentEmoji";
 
@@ -346,7 +347,13 @@ export default function EmojiPicker({ selected, onChange }) {
             className="w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-90"
             style={{ outline: selected === emoji ? "2px solid white" : "none", outlineOffset: "2px" }}
           >
-            <FluentEmoji emoji={emoji} size={28} />
+            <motion.span
+              animate={selected === emoji ? { scale: [1, 1.35, 1], rotate: [0, -10, 10, 0] } : { scale: 1, rotate: 0 }}
+              transition={{ duration: 0.45, ease: "easeInOut" }}
+              className="flex"
+            >
+              <FluentEmoji emoji={emoji} size={28} />
+            </motion.span>
           </button>
         ))}
 

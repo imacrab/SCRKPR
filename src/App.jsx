@@ -8,6 +8,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScoreKeeper from './pages/ScoreKeeper';
 import AccountSettings from './pages/AccountSettings';
 import { motion } from 'framer-motion';
+import { TRANSITION_PAGE } from "@/lib/motion";
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -49,7 +50,7 @@ function App() {
           <motion.div
             initial={{ opacity: 0, filter: "blur(12px)", scale: 0.97 }}
             animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            transition={TRANSITION_PAGE}
           >
             <AuthenticatedApp />
           </motion.div>

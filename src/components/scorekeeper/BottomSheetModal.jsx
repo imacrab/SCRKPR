@@ -1,4 +1,5 @@
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
+import { SPRING_SHEET, TRANSITION_FADE } from "@/lib/motion";
 
 /**
  * BottomSheetModal — the standardized modal shell used across the app.
@@ -40,8 +41,8 @@ export default function BottomSheetModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-[4px]"
+            transition={TRANSITION_FADE}
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
             style={{ zIndex: backdropZ }}
             onClick={onClose}
           />
@@ -49,7 +50,7 @@ export default function BottomSheetModal({
             initial={{ y: "100%", opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
-            transition={{ type: "spring", stiffness: 400, damping: 35 }}
+            transition={SPRING_SHEET}
             drag="y"
             dragControls={dragControls}
             dragListener={false}
@@ -57,7 +58,7 @@ export default function BottomSheetModal({
             dragElastic={{ top: 0, bottom: 0.6 }}
             dragSnapToOrigin
             onDragEnd={handleDragEnd}
-            className="fixed inset-x-0 bg-card border border-border rounded-[44px] shadow-2xl flex flex-col"
+            className="fixed inset-x-0 bg-card border border-border rounded-sheet shadow-2xl flex flex-col"
             style={{ zIndex, bottom: "8px", left: "8px", right: "8px", maxHeight: "calc(100dvh - 48px)" }}
           >
             {/* Drag handle + Header (both draggable) */}

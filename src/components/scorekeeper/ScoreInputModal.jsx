@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import NumberPad from "./NumberPad";
 import { Button } from "@/components/ui/button";
 import BottomSheetModal from "./BottomSheetModal";
+import { SPRING_SNAPPY } from "@/lib/motion";
 
 export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit, onClose }) {
   const [value, setValue] = useState("");
@@ -67,7 +68,7 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
             initial={{ opacity: 0, y: -14, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 14, scale: 0.8 }}
-            transition={{ type: "spring", stiffness: 500, damping: 24 }}
+            transition={SPRING_SNAPPY}
             className="text-5xl font-bold inline-block"
             style={{ color: value === "" ? "rgba(150,150,150,0.3)" : "#FFFFFF" }}
           >

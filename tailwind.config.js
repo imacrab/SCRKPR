@@ -7,7 +7,14 @@ module.exports = {
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
+  			sm: 'calc(var(--radius) - 4px)',
+  			sheet: '44px'
+  		},
+  		minHeight: {
+  			touch: '44px'
+  		},
+  		backdropBlur: {
+  			xs: '4px'
   		},
   		colors: {
   			background: 'hsl(var(--background))',

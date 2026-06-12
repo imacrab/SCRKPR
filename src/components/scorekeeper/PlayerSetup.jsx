@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Play, Check, GripVertical } from "lucide-react";
+import { Plus, Check, GripVertical } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";

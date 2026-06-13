@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Plus, Check, GripVertical } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { motion } from "framer-motion";
@@ -25,6 +25,65 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [tappedId, setTappedId] = useState(null);
   const tapTimerRef = useRef(null);
   const scrollRef = useRef(null);
+
+  // --- FLIP reordering -----------------------------------------------------
+  // Smoothly animates rows to new positions whenever the list reorders — when
+  // a player is toggled (the card flies between the selected/unselected lists)
+  // and on drag-drop (sibling cards glide to their new slots instead of
+  // snapping). We use manual FLIP on a plain wrapper rather than framer's
+  // `layout`, because framer shared-layout deadlocks the page-transition
+  // AnimatePresence (mode="wait"). Positions are keyed by player id in viewport
+  // coordinates so a card can be tracked even across the two separate lists.
+  const rowTops = useRef(new Map()); // id -> last settled viewport top
+  const flippingIds = useRef(new Set()); // ids mid-FLIP (don't re-measure)
+  const isDraggingRef = useRef(false); // true while a dnd drag is in flight
+  const justDroppedId = useRef(null); // dnd animates the dropped card itself
+
+  useLayoutEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const els = container.querySelectorAll("[data-row-id]");
+
+    // During a drag, dnd owns the transforms — just keep positions fresh.
+    if (isDraggingRef.current) {
+      els.forEach((el) => {
+        const id = el.dataset.rowId;
+        if (!flippingIds.current.has(id)) rowTops.current.set(id, el.getBoundingClientRect().top);
+      });
+      return;
+    }
+
+    els.forEach((el) => {
+      const id = el.dataset.rowId;
+      if (flippingIds.current.has(id)) return; // already animating
+      const cur = el.getBoundingClientRect().top;
+      const prev = rowTops.current.get(id);
+      rowTops.current.set(id, cur);
+      if (prev == null) return; // first appearance — entrance handles it
+      const delta = prev - cur;
+      if (Math.abs(delta) < 1) return;
+      if (id === justDroppedId.current) return; // dnd's drop animation owns it
+
+      // Invert to the old position with no transition, then play to 0.
+      flippingIds.current.add(id);
+      el.style.transition = "none";
+      el.style.transform = `translateY(${delta}px)`;
+      el.getBoundingClientRect(); // force reflow so the invert takes
+      requestAnimationFrame(() => {
+        el.style.transition = "transform 0.42s cubic-bezier(0.22, 1, 0.36, 1)";
+        el.style.transform = "translateY(0)";
+        const done = () => {
+          el.removeEventListener("transitionend", done);
+          el.style.transition = "";
+          el.style.transform = "";
+          flippingIds.current.delete(id);
+          rowTops.current.set(id, el.getBoundingClientRect().top);
+        };
+        el.addEventListener("transitionend", done);
+      });
+    });
+    justDroppedId.current = null;
+  });
 
   // Staggered entrance plays once when the list first loads. Toggling a
   // player's selection remounts its row (it moves between the selected and
@@ -92,8 +151,16 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     return () => window.removeEventListener("resize", checkScroll);
   }, [allPlayers]);
 
+  const handleDragStart = () => {
+    isDraggingRef.current = true;
+  };
+
   const handleDragEnd = (result) => {
+    isDraggingRef.current = false;
     if (!result.destination || result.source.index === result.destination.index) return;
+    // dnd plays its own drop animation for the dragged card — let the FLIP pass
+    // skip it (otherwise both animate it). Siblings still FLIP to their slots.
+    justDroppedId.current = result.draggableId;
     setAllPlayers((prev) => {
       const selectedSeq = prev.filter((p) => selectedIds.has(p.id));
       const unselectedSeq = prev.filter((p) => !selectedIds.has(p.id));
@@ -101,6 +168,14 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       selectedSeq.splice(result.destination.index, 0, moved);
       return [...selectedSeq, ...unselectedSeq];
     });
+    // Once dnd's drop animation settles, record the dropped card's true
+    // resting position so the next reorder measures its delta correctly.
+    setTimeout(() => {
+      const el = scrollRef.current?.querySelector(`[data-row-id="${result.draggableId}"]`);
+      if (el && !flippingIds.current.has(result.draggableId)) {
+        rowTops.current.set(result.draggableId, el.getBoundingClientRect().top);
+      }
+    }, 450);
     if (navigator.vibrate) navigator.vibrate(10);
   };
 
@@ -246,6 +321,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 const composedTransform = `${baseStyle.transform || ""} ${rowScale} rotate(${isLifted ? tiltDeg : 0}deg)`.trim();
 
                 return (
+                // Plain FLIP wrapper — its transform is driven manually by the
+                // useLayoutEffect above (never by framer), so it can glide to a
+                // new slot on reorder without fighting framer's transform mgmt.
+                <div data-row-id={player.id} style={{ willChange: "transform" }}>
                 <motion.div
                 // Two entrance modes, both keyed off mount (framer `initial`
                 // only fires on mount):
@@ -320,13 +399,14 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                     </div>
                   </div>
                 </motion.div>
+                </div>
                 );
               };
 
 
               return (
                 <>
-                    <DragDropContext onDragEnd={handleDragEnd}>
+                    <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                       <Droppable droppableId="selected-players">
                         {(dropProvided) =>
                       <div

@@ -268,53 +268,39 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           className="absolute inset-x-0 bottom-0 z-30 flex justify-center"
           style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)", paddingLeft: 48, paddingRight: 48 }}>
           
-          <div className="relative">
-            {/* Pulsing brand halo — a sibling (not a child) so it isn't clipped
-                by the button's overflow-hidden, and drifts through the brand
-                colors in sync with the gradient fill. */}
+          <motion.button
+            onClick={() => setShowEndGame(true)}
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.03 }}
+            transition={SPRING_POP}
+            className="relative rounded-full p-1 overflow-hidden">
+
+            {/* Flowing brand gradient — visible only as the 4px stroke around
+                the ink fill (the inner span is inset by the p-1 padding). */}
             <motion.span
               aria-hidden="true"
-              className="absolute -inset-1 rounded-full blur-xl pointer-events-none"
-              style={{ background: "linear-gradient(110deg, #2DC5F8, #A855F7, #FF3A3A)" }}
-              animate={{ opacity: [0.45, 0.7, 0.45], scale: [0.97, 1.03, 0.97] }}
-              transition={{ duration: 3.2, ease: "easeInOut", repeat: Infinity }}
+              className="absolute inset-0"
+              style={{
+                background: "linear-gradient(110deg, #2DC5F8 0%, #6366F1 22%, #A855F7 48%, #FF3A3A 74%, #2DC5F8 100%)",
+                backgroundSize: "220% 100%",
+              }}
+              animate={{ backgroundPosition: ["0% 50%", "220% 50%"] }}
+              transition={{ duration: 6, ease: "linear", repeat: Infinity }}
             />
-            <motion.button
-              onClick={() => setShowEndGame(true)}
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.03 }}
-              transition={SPRING_POP}
-              className="relative flex items-center justify-center gap-2.5 py-4 px-8 rounded-full overflow-hidden">
-
-              {/* Flowing gradient fill */}
+            {/* Ink fill — the app background, so the button reads as a glowing
+                gradient outline. */}
+            <span className="relative flex items-center justify-center gap-2.5 rounded-full bg-background px-7 py-3.5">
+              <span className="text-base font-bold text-white tracking-wide">End Game</span>
+              {/* Same playful pop the streak/emoji flourishes use across the app */}
               <motion.span
-                aria-hidden="true"
-                className="absolute inset-0"
-                style={{
-                  background: "linear-gradient(110deg, #2DC5F8 0%, #6366F1 22%, #A855F7 48%, #FF3A3A 74%, #2DC5F8 100%)",
-                  backgroundSize: "220% 100%",
-                }}
-                animate={{ backgroundPosition: ["0% 50%", "220% 50%"] }}
-                transition={{ duration: 6, ease: "linear", repeat: Infinity }}
-              />
-              {/* Sheen sweep */}
-              <motion.span
-                aria-hidden="true"
-                className="absolute inset-y-0 w-1/3"
-                style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)", filter: "blur(2px)", transform: "skewX(-18deg)" }}
-                animate={{ x: ["-180%", "460%"] }}
-                transition={{ duration: 2.4, ease: "easeInOut", repeat: Infinity, repeatDelay: 1.8 }}
-              />
-              <span className="relative z-10 text-base font-bold text-white tracking-wide" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.3)" }}>End Game</span>
-              <motion.span
-                className="relative z-10 flex"
-                animate={{ rotate: [0, -14, 12, -7, 0] }}
-                transition={{ duration: 1.8, ease: "easeInOut", repeat: Infinity, repeatDelay: 1.6 }}
+                className="flex"
+                animate={{ scale: [1, 1.35, 1], rotate: [0, -8, 8, 0] }}
+                transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
               >
                 <FluentEmoji emoji="🏁" size={22} />
               </motion.span>
-            </motion.button>
-          </div>
+            </span>
+          </motion.button>
         </div>
       </div>
 

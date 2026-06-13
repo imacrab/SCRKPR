@@ -8,7 +8,10 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ScoreKeeper from './pages/ScoreKeeper';
 import AccountSettings from './pages/AccountSettings';
-import { motion } from 'framer-motion';
+import Onboarding from '@/components/Onboarding';
+import { hasOnboarded } from '@/lib/onboarding';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { TRANSITION_PAGE } from "@/lib/motion";
 
 const AuthenticatedApp = () => {
@@ -44,6 +47,10 @@ const AuthenticatedApp = () => {
 };
 
 function App() {
+  // First-time user experience: show the welcome flow once on first launch.
+  // It sits above the routed app and animates out into the home screen.
+  const [showOnboarding, setShowOnboarding] = useState(() => !hasOnboarded());
+
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
@@ -60,6 +67,9 @@ function App() {
             >
               <AuthenticatedApp />
             </motion.div>
+            <AnimatePresence>
+              {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
+            </AnimatePresence>
           </ErrorBoundary>
         </Router>
         <Toaster />

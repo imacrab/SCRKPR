@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { base44 } from "@/api/base44Client";
+import { db } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Users, Check, Trash2 } from "lucide-react";
 import PlayerEditModal from "@/components/scorekeeper/PlayerEditModal";
@@ -18,8 +18,12 @@ export default function Players({ onBack, onModalChange }) {
   const scrollRef = useRef(null);
 
   const fetchPlayers = async () => {
-    const data = await base44.entities.Player.list("-created_date", 100);
-    setPlayers(data);
+    try {
+      const data = await db.players.list("-created_date", 100);
+      setPlayers(data);
+    } catch (e) {
+      console.error("Failed to load players:", e);
+    }
   };
 
   useEffect(() => {
@@ -72,7 +76,7 @@ export default function Players({ onBack, onModalChange }) {
     setShowBulkConfirm(false);
     exitSelectMode();
     setPlayers((prev) => prev.filter((p) => !ids.includes(p.id)));
-    await Promise.allSettled(ids.map((id) => base44.entities.Player.delete(id)));
+    await Promise.allSettled(ids.map((id) => db.players.delete(id)));
   };
 
   useEffect(() => {
@@ -88,10 +92,10 @@ export default function Players({ onBack, onModalChange }) {
 
   const handleSave = async ({ id, name, color, emoji }) => {
     if (id) {
-      await base44.entities.Player.update(id, { name, color, emoji });
+      await db.players.update(id, { name, color, emoji });
       setPlayers((prev) => prev.map((p) => (p.id === id ? { ...p, name, color, emoji } : p)));
     } else {
-      const created = await base44.entities.Player.create({ name, color, emoji });
+      const created = await db.players.create({ name, color, emoji });
       setPlayers((prev) => [created, ...prev]);
     }
     setEditing(null);
@@ -100,7 +104,7 @@ export default function Players({ onBack, onModalChange }) {
   const handleDelete = async (id) => {
     setPlayers((prev) => prev.filter((p) => p.id !== id));
     setEditing(null);
-    await base44.entities.Player.delete(id);
+    await db.players.delete(id);
   };
 
   return (

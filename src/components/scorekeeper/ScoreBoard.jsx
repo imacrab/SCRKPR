@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Shuffle, UserPlus, RotateCcw, Lock, Unlock } from "lucide-react";
 import { motion, LayoutGroup } from "framer-motion";
-import { base44 } from "@/api/base44Client";
+import { db } from "@/lib/store";
 import FluentEmoji from "./FluentEmoji";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
@@ -26,7 +26,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const scrollContainerRef = useRef(null);
 
   useEffect(() => {
-    base44.entities.GameHistory.list("-played_at", 20).then((games) => {
+    db.games.list("-played_at", 20).then((games) => {
       // For each current player, count consecutive wins from most recent game
       const map = {};
       players.forEach((player) => {
@@ -46,7 +46,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         if (streak >= 2) map[player.name] = streak;
       });
       setStreakMap(map);
-    });
+    }).catch((e) => console.error("Failed to load streaks:", e));
   }, []);
   const [editingScore, setEditingScore] = useState(null);
 

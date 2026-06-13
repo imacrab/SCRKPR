@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { db } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Handshake, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,8 +29,12 @@ export default function History({ onBack, onModalChange }) {
   const PULL_THRESHOLD = 64;
 
   const fetchGames = useCallback(async () => {
-    const data = await base44.entities.GameHistory.list("-played_at", 50);
-    setGames(data);
+    try {
+      const data = await db.games.list("-played_at", 50);
+      setGames(data);
+    } catch (e) {
+      console.error("Failed to load game history:", e);
+    }
   }, []);
 
   useEffect(() => {
@@ -65,7 +69,7 @@ export default function History({ onBack, onModalChange }) {
     const prev = games;
     setGames((g) => g.filter((item) => item.id !== id));
     try {
-      await base44.entities.GameHistory.delete(id);
+      await db.games.delete(id);
     } catch {
       setGames(prev);
     }
@@ -76,7 +80,7 @@ export default function History({ onBack, onModalChange }) {
     const prev = games;
     setGames([]);
     try {
-      await Promise.all(games.map((g) => base44.entities.GameHistory.delete(g.id)));
+      await Promise.all(games.map((g) => db.games.delete(g.id)));
       setShowConfirm(false);
     } catch {
       setGames(prev);

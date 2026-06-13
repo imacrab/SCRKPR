@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
+import { SYNC_ENABLED } from '@/lib/store';
 
 const AuthContext = createContext();
 
@@ -15,6 +16,17 @@ export const AuthProvider = ({ children }) => {
   const [appPublicSettings, setAppPublicSettings] = useState(null); // Contains only { id, public_settings }
 
   useEffect(() => {
+    // Local-first / auth deferred: skip the Base44 app-state + auth network
+    // checks entirely so the app loads instantly and works fully offline with
+    // no account. Flip SYNC_ENABLED on (see lib/store.js) to restore the cloud
+    // auth flow once cross-device sync is built.
+    if (!SYNC_ENABLED) {
+      setIsLoadingPublicSettings(false);
+      setIsLoadingAuth(false);
+      setIsAuthenticated(false);
+      setAuthChecked(true);
+      return;
+    }
     checkAppState();
   }, []);
 

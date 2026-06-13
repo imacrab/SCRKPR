@@ -3,7 +3,7 @@ import { Plus, Check, GripVertical } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { base44 } from "@/api/base44Client";
+import { db } from "@/lib/store";
 import BestOfModal from "./BestOfModal";
 import GameModeModal from "./GameModeModal";
 import PlayerEditModal from "./PlayerEditModal";
@@ -160,7 +160,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   }, [allPlayers]);
 
   useEffect(() => {
-    base44.entities.Player.list("-created_date", 100).then((data) => {
+    db.players.list("-created_date", 100).then((data) => {
       // Pin Adrian & Jayne to the top of the list
       const pinned = DEFAULT_SELECTED_NAMES.
       map((n) => data.find((p) => p.name === n)).
@@ -228,7 +228,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   };
 
   const handleAddPlayer = async ({ name, color, emoji }) => {
-    const created = await base44.entities.Player.create({ name, color, emoji });
+    const created = await db.players.create({ name, color, emoji });
     setAllPlayers((prev) => [...(prev || []), created]);
     setSelectedIds((prev) => new Set([...prev, created.id]));
     setShowAddPlayer(false);

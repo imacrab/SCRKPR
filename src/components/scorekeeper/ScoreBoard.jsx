@@ -12,26 +12,18 @@ import ScoreHistoryPanel from "./ScoreHistoryPanel";
 import { isLowMode, isCircleMode } from "@/lib/gameModes";
 import { SPRING_POP, SPRING_SHEET } from "@/lib/motion";
 import logoDark from "@/assets/SCRKPR_dark_mode.png";
-import logoLight from "@/assets/SCRKPR_light_mode.png";
 
 export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [streakMap, setStreakMap] = useState({});
   const [gameStartTime] = useState(new Date());
   const [scrollPos, setScrollPos] = useState(0);
-  const [isDarkMode, setIsDarkMode] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [sortDesc, setSortDesc] = useState(true);
   const [sortLocked, setSortLocked] = useState(false);
+  const [editingPlayer, setEditingPlayer] = useState(null);
+  const [showEndGame, setShowEndGame] = useState(false);
   const scrollContainerRef = useRef(null);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e) => setIsDarkMode(e.matches);
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
 
   useEffect(() => {
     base44.entities.GameHistory.list("-played_at", 20).then((games) => {
@@ -57,8 +49,6 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     });
   }, []);
   const [editingScore, setEditingScore] = useState(null);
-  const [editingPlayer, setEditingPlayer] = useState(null);
-  const [showEndGame, setShowEndGame] = useState(false);
 
   // For bestof: first to ceil(N/2) wins. For phase10: complete all 10 phases.
   const winsNeeded = bestOf ?
@@ -177,7 +167,11 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-10 pb-5 flex-shrink-0" style={{ backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <button onClick={() => setShowEndGame(true)} className="hover:opacity-75 transition-opacity">
-          <img src={isDarkMode ? logoDark : logoLight} alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
+          {/* Invisible anchor — see PlayerSetup note; the persistent logo
+              hoisted to ScoreKeeper floats over this slot. The button still
+              receives the tap (opens End Game) since the floating logo is
+              pointer-events:none. */}
+          <img src={logoDark} alt="SCRKPR!" data-logo-anchor style={{ maxWidth: 120, height: "auto", opacity: 0 }} />
         </button>
         <div className="flex items-center gap-2">
           <button
@@ -276,12 +270,36 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           
           <motion.button
             onClick={() => setShowEndGame(true)}
-            whileTap={{ scale: 0.90 }}
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.03 }}
             transition={SPRING_POP}
-            className="relative flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-white hover:bg-white/90 text-background font-semibold text-sm shadow-lg transition-colors overflow-hidden">
-            
-            <span className="relative z-10 text-base">End Game</span>
-            <FluentEmoji emoji="🏁" size={24} />
+            className="relative rounded-full p-1 overflow-hidden">
+
+            {/* Flowing brand gradient — visible only as the 4px stroke around
+                the ink fill (the inner span is inset by the p-1 padding). */}
+            <motion.span
+              aria-hidden="true"
+              className="absolute inset-0"
+              style={{
+                background: "linear-gradient(110deg, #2DC5F8 0%, #6366F1 22%, #A855F7 48%, #FF3A3A 74%, #2DC5F8 100%)",
+                backgroundSize: "220% 100%",
+              }}
+              animate={{ backgroundPosition: ["0% 50%", "220% 50%"] }}
+              transition={{ duration: 6, ease: "linear", repeat: Infinity }}
+            />
+            {/* Ink fill — the app background, so the button reads as a glowing
+                gradient outline. */}
+            <span className="relative flex items-center justify-center gap-2.5 rounded-full bg-background px-7 py-3.5">
+              <span className="text-base font-bold text-white tracking-wide">End Game</span>
+              {/* Same playful pop the streak/emoji flourishes use across the app */}
+              <motion.span
+                className="flex"
+                animate={{ scale: [1, 1.35, 1], rotate: [0, -8, 8, 0] }}
+                transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+              >
+                <FluentEmoji emoji="🏁" size={22} />
+              </motion.span>
+            </span>
           </motion.button>
         </div>
       </div>

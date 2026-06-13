@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import { SPRING_SHEET, TRANSITION_FADE } from "@/lib/motion";
 
@@ -35,7 +36,11 @@ export default function BottomSheetModal({
 
   const backdropZ = zIndex - 10;
 
-  return (
+  // Portal to <body> so the modal escapes the page wrapper's stacking context
+  // (the page is transformed/blurred during transitions, which traps any
+  // z-index inside it). At the document root the backdrop/sheet sit above the
+  // app-level persistent logo, so the backdrop dims it naturally.
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -111,6 +116,7 @@ export default function BottomSheetModal({
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

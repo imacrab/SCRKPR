@@ -42,16 +42,21 @@ function AnimatedTotal({ value, color }) {
   }, [value]);
 
   return (
-    <span className="font-bold leading-none block text-3xl relative overflow-hidden" style={{ color, opacity: isResetting ? 0.7 : 1, height: "1em", minWidth: "1ch" }}>
+    // overflow is intentionally NOT clipped here — the sliding digits are
+    // allowed to travel beyond this little number box and get clipped by the
+    // player card instead (the card header has overflow-hidden). This gives
+    // the digit a full runway: the old value slides up and fades out the top,
+    // the new value rises in from below.
+    <span className="font-bold leading-none block text-3xl relative" style={{ color, opacity: isResetting ? 0.7 : 1, height: "1em", minWidth: "1ch" }}>
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
           key={animKey}
-          initial={{ y: "-100%", opacity: 0, scale: 0.7 }}
+          initial={{ y: "120%", opacity: 0, scale: 0.7 }}
           animate={{ y: "0%", opacity: 1, scale: 1 }}
-          exit={{ y: "100%", opacity: 0, scale: 0.7 }}
+          exit={{ y: "-120%", opacity: 0, scale: 0.7 }}
           transition={SPRING_SNAPPY}
           className="block">
-          
+
           {displayValue}
         </motion.span>
       </AnimatePresence>

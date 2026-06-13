@@ -5,7 +5,7 @@ import { Plus, Users, Check, Trash2 } from "lucide-react";
 import PlayerEditModal from "@/components/scorekeeper/PlayerEditModal";
 import DeletePlayerConfirmModal from "@/components/scorekeeper/DeletePlayerConfirmModal";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
-import { SPRING_SHEET } from "@/lib/motion";
+import { SPRING_SHEET, DUR_MEDIUM } from "@/lib/motion";
 
 export default function Players({ onBack, onModalChange }) {
   const [players, setPlayers] = useState([]);
@@ -140,21 +140,37 @@ export default function Players({ onBack, onModalChange }) {
             </div>
           ) : (
             <AnimatePresence>
-              {players.map((p) => {
+              {players.map((p, idx) => {
                 const isSelected = selectedIds.has(p.id);
+                // Same rise + settle as the scoreboard, 70ms apart; capped so
+                // long lists don't keep staggering below the fold. Delay lives
+                // on `animate` only — exits stay instant.
+                const delay = Math.min(idx, 8) * 0.07;
                 return (
                   <motion.button
                     key={p.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 48, scale: 0.95 }}
+                    animate={{
+                      opacity: 1, y: 0, scale: 1,
+                      transition: {
+                        y: { ...SPRING_SHEET, delay },
+                        scale: { ...SPRING_SHEET, delay },
+                        opacity: { duration: DUR_MEDIUM, delay },
+                      },
+                    }}
                     exit={{ opacity: 0, height: 0 }}
+                    whileTap={{ scale: 0.99 }}
                     onClick={() => {
                       if (longPressFiredRef.current) { longPressFiredRef.current = false; return; }
                       if (selectMode) toggleSelect(p.id); else setEditing(p);
                     }}
                     onPointerDown={(e) => startLongPress(e, p)}
                     onContextMenu={(e) => e.preventDefault()}
-                    className={`w-full rounded-lg border bg-card overflow-hidden flex items-center gap-3 px-3 py-2.5 text-left active:scale-[0.99] transition-all ${
+                    // transition-colors, NOT transition-all: a CSS transition on
+                    // transform would re-interpolate every frame framer-motion
+                    // writes during the entrance spring, making it look choppy.
+                    // The tap squish moved to whileTap for the same reason.
+                    className={`w-full rounded-lg border bg-card overflow-hidden flex items-center gap-3 px-3 py-2.5 text-left transition-colors ${
                       isSelected ? "border-accent-red bg-accent-red/5" : "border-border"
                     }`}
                   >

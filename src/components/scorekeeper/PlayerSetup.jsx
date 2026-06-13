@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Plus, Check, GripVertical } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import BestOfModal from "./BestOfModal";
@@ -8,8 +9,8 @@ import GameModeModal from "./GameModeModal";
 import PlayerEditModal from "./PlayerEditModal";
 import FluentEmoji from "./FluentEmoji";
 import { getModeMeta } from "@/lib/gameModes";
+import { SPRING_SHEET, DUR_MEDIUM } from "@/lib/motion";
 import logoDark from "@/assets/SCRKPR_dark_mode.png";
-import logoLight from "@/assets/SCRKPR_light_mode.png";
 
 const DEFAULT_SELECTED_NAMES = ["Adrian", "Jayne"];
 
@@ -18,13 +19,67 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [canScrollPlayers, setCanScrollPlayers] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [winMode, setWinMode] = useState("ginrummy");
   const [showBestOf, setShowBestOf] = useState(false);
   const [showGameMode, setShowGameMode] = useState(false);
   const [tappedId, setTappedId] = useState(null);
   const tapTimerRef = useRef(null);
   const scrollRef = useRef(null);
+
+  // --- FLIP reordering -----------------------------------------------------
+  // Smoothly animates rows to new positions whenever the list reorders — when
+  // a player is toggled (the card flies between the selected/unselected lists)
+  // and on drag-drop (sibling cards glide to their new slots instead of
+  // snapping). We use manual FLIP on a plain wrapper rather than framer's
+  // `layout`, because framer shared-layout deadlocks the page-transition
+  // AnimatePresence (mode="wait"). Positions are keyed by player id in viewport
+  // coordinates so a card can be tracked even across the two separate lists.
+  const rowTops = useRef(new Map()); // id -> last settled viewport top
+  const flippingIds = useRef(new Set()); // ids mid-FLIP (don't re-measure)
+  const isDraggingRef = useRef(false); // true while a dnd drag is in flight
+  const justDroppedId = useRef(null); // dnd animates the dropped card itself
+  const [flipMap, setFlipMap] = useState({}); // id -> inverted Y delta to animate from
+
+  useLayoutEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const els = container.querySelectorAll("[data-row-id]");
+
+    // During a drag, dnd owns the transforms — just keep positions fresh.
+    if (isDraggingRef.current) {
+      els.forEach((el) => {
+        const id = el.dataset.rowId;
+        if (!flippingIds.current.has(id)) rowTops.current.set(id, el.getBoundingClientRect().top);
+      });
+      return;
+    }
+
+    const newFlips = {};
+    els.forEach((el) => {
+      const id = el.dataset.rowId;
+      if (flippingIds.current.has(id)) return; // already animating — leave it
+      const cur = el.getBoundingClientRect().top;
+      const prev = rowTops.current.get(id);
+      rowTops.current.set(id, cur);
+      if (prev == null) return; // first appearance — entrance handles it
+      const delta = prev - cur;
+      if (Math.abs(delta) < 1) return;
+      if (id === justDroppedId.current) return; // dnd's drop animation owns it
+      // Record the invert delta; framer plays it to 0 (see motion.div animate).
+      flippingIds.current.add(id);
+      newFlips[id] = delta;
+    });
+    justDroppedId.current = null;
+    // setState inside useLayoutEffect flushes before paint, so the row's first
+    // paint is already at the inverted position — no flash.
+    if (Object.keys(newFlips).length) setFlipMap((m) => ({ ...m, ...newFlips }));
+  });
+
+  // Staggered entrance plays once when the list first loads. Toggling a
+  // player's selection remounts its row (it moves between the selected and
+  // unselected lists), so without this guard the entrance would replay on
+  // every tap.
+  const [entranceDone, setEntranceDone] = useState(false);
 
   // Pull-to-refresh
   const [pullY, setPullY] = useState(0);
@@ -50,16 +105,15 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     pullStartY.current = null;
   };
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e) => setIsDarkMode(e.matches);
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
   useEffect(() => () => {
     if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
   }, []);
+
+  // Flip after the first render with data — rows mounted in that render keep
+  // their entrance animation; rows mounted later (selection toggles) skip it.
+  useEffect(() => {
+    if (allPlayers !== null) setEntranceDone(true);
+  }, [allPlayers]);
 
   useEffect(() => {
     base44.entities.Player.list("-created_date", 100).then((data) => {
@@ -87,8 +141,16 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     return () => window.removeEventListener("resize", checkScroll);
   }, [allPlayers]);
 
+  const handleDragStart = () => {
+    isDraggingRef.current = true;
+  };
+
   const handleDragEnd = (result) => {
+    isDraggingRef.current = false;
     if (!result.destination || result.source.index === result.destination.index) return;
+    // dnd plays its own drop animation for the dragged card — let the FLIP pass
+    // skip it (otherwise both animate it). Siblings still FLIP to their slots.
+    justDroppedId.current = result.draggableId;
     setAllPlayers((prev) => {
       const selectedSeq = prev.filter((p) => selectedIds.has(p.id));
       const unselectedSeq = prev.filter((p) => !selectedIds.has(p.id));
@@ -96,6 +158,14 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       selectedSeq.splice(result.destination.index, 0, moved);
       return [...selectedSeq, ...unselectedSeq];
     });
+    // Once dnd's drop animation settles, record the dropped card's true
+    // resting position so the next reorder measures its delta correctly.
+    setTimeout(() => {
+      const el = scrollRef.current?.querySelector(`[data-row-id="${result.draggableId}"]`);
+      if (el && !flippingIds.current.has(result.draggableId)) {
+        rowTops.current.set(result.draggableId, el.getBoundingClientRect().top);
+      }
+    }, 450);
     if (navigator.vibrate) navigator.vibrate(10);
   };
 
@@ -169,7 +239,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
       {/* Header */}
       <div className="pt-10 pb-5 px-6" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
-        <img src={isDarkMode ? logoDark : logoLight} alt="SCRKPR!" className="mx-auto" style={{ maxWidth: 200, height: "auto" }} />
+        {/* Invisible anchor — the visible logo is the persistent one hoisted to
+            ScoreKeeper, which measures this slot and floats over it (opacity:0
+            here keeps the layout space + position). */}
+        <img src={logoDark} alt="SCRKPR!" data-logo-anchor className="mx-auto" style={{ maxWidth: 200, height: "auto", opacity: 0 }} />
       </div>
 
       {/* Player list — pick who's playing */}
@@ -205,9 +278,13 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 return `rgba(${r}, ${g}, ${b}, ${alpha})`;
               };
 
-              const renderRow = (player, { dragProvided, snapshot, selected, draggable }) => {
+              const renderRow = (player, { dragProvided, snapshot, selected, draggable, index = 0 }) => {
                 const baseStyle = dragProvided?.draggableProps?.style || {};
                 const isDragging = snapshot?.isDragging;
+                const isDropAnimating = snapshot?.isDropAnimating;
+                // Entrance: same rise + settle as the scoreboard, 70ms apart
+                // (capped so long lists don't keep staggering off-screen).
+                const entranceDelay = Math.min(index, 8) * 0.07;
 
                 // Derive tilt from the dnd transform's Y offset so the card leans into its drag direction
                 let tiltDeg = 0;
@@ -220,10 +297,74 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 }
 
                 const isTapped = tappedId === player.id;
-                const idleScale = isTapped ? "scale(0.92)" : "scale(1)";
-                const composedTransform = `${baseStyle.transform || ""} ${isDragging ? `scale(1.04) rotate(${tiltDeg}deg)` : idleScale}`.trim();
+                // NB: while dnd's drop animation runs, isDragging stays true AND
+                // isDropAnimating is true — so "lifted" styling must check both,
+                // otherwise the lift scale/tilt/shadow stick through the drop.
+                const isLifted = isDragging && !isDropAnimating;
+                // The transform must keep the SAME function list (scale + rotate)
+                // in every state. Mismatched lists (e.g. dropping rotate when
+                // idle) force the browser into matrix-fallback interpolation,
+                // which pops visibly at the drag-release boundary.
+                // Lifted = the "cinch": squeezed vertically, slightly wider,
+                // like pinching the card off the table.
+                const rowScale = isLifted ? "scale(1.03, 0.85)" : isTapped ? "scale(0.92, 0.92)" : "scale(1, 1)";
+                const composedTransform = `${baseStyle.transform || ""} ${rowScale} rotate(${isLifted ? tiltDeg : 0}deg)`.trim();
 
+                // FLIP: a card that has been seen before (rowTops has it) and is
+                // re-mounting/repositioning should glide from its old slot, not
+                // pop. flipMap[id] holds the inverted Y delta; we feed it to
+                // framer as a [delta, 0] keyframe so the card flies to its new
+                // position. New cards (no prior position) still play the entrance.
+                // We drive FLIP through framer on this motion.div (NOT a separate
+                // wrapper — an extra element inside the Draggable breaks dnd's
+                // drag positioning; and NOT framer `layout`, which deadlocks the
+                // page-transition AnimatePresence).
+                const flipDelta = flipMap[player.id];
+                const isFlipping = flipDelta != null;
+                const seenBefore = rowTops.current.has(player.id);
                 return (
+                <motion.div
+                data-row-id={player.id}
+                initial={
+                  isFlipping
+                    ? false
+                    : entranceDone && seenBefore
+                    ? // a card re-mounting to be FLIP'd: hide the single mount
+                      // frame (which paints at the NEW slot before the invert
+                      // applies) so there's no flash — it becomes visible at its
+                      // old slot the instant the fly starts.
+                      { opacity: 0 }
+                    : entranceDone
+                    ? { opacity: 0, y: 16, scale: 0.94 }
+                    : { opacity: 0, y: 48, scale: 0.95 }
+                }
+                animate={{
+                  opacity: 1,
+                  y: isFlipping ? [flipDelta, 0] : 0,
+                  scale: 1,
+                  transition: isFlipping
+                    ? { y: SPRING_SHEET, opacity: { duration: 0 } }
+                    : entranceDone
+                    ? SPRING_SHEET
+                    : {
+                        y: { ...SPRING_SHEET, delay: entranceDelay },
+                        scale: { ...SPRING_SHEET, delay: entranceDelay },
+                        opacity: { duration: DUR_MEDIUM, delay: entranceDelay },
+                      },
+                }}
+                onAnimationComplete={() => {
+                  if (flipMap[player.id] != null) {
+                    flippingIds.current.delete(player.id);
+                    setFlipMap((m) => {
+                      if (m[player.id] == null) return m;
+                      const next = { ...m };
+                      delete next[player.id];
+                      return next;
+                    });
+                    const el = scrollRef.current?.querySelector(`[data-row-id="${player.id}"]`);
+                    if (el) rowTops.current.set(player.id, el.getBoundingClientRect().top);
+                  }
+                }}>
                 <div
                 ref={dragProvided?.innerRef}
                 {...dragProvided?.draggableProps || {}}
@@ -233,12 +374,22 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 style={{
                   backgroundColor: selected ? hexToRgba(player.color, 0.7) : "hsl(var(--card))",
                   borderColor: selected ? "transparent" : "hsl(var(--border))",
-                  boxShadow: isDragging ? "0 20px 35px -8px rgba(0,0,0,0.45)" : "none",
+                  boxShadow: isLifted ? "0 20px 35px -8px rgba(0,0,0,0.45)" : "none",
                   ...baseStyle,
                   transform: composedTransform,
                   transformOrigin: "center center",
-                  transition: isDragging
+                  // Order matters: isDropAnimating must be checked BEFORE
+                  // isDragging (dnd keeps isDragging true through the drop).
+                  // Whenever dnd is steering a card's transform (drop animation
+                  // or siblings shifting out of the way), defer to dnd's own
+                  // gentle ease-out. The bouncy overshoot curve only applies to
+                  // the tap squish.
+                  transition: isDropAnimating
+                    ? `${baseStyle.transition || "transform 250ms cubic-bezier(0.2, 0, 0, 1)"}, background-color 200ms ease-out, border-color 200ms ease-out, box-shadow 180ms ease-out`
+                    : isDragging
                     ? "transform 60ms linear, box-shadow 150ms ease-out"
+                    : baseStyle.transition
+                    ? `${baseStyle.transition}, background-color 200ms ease-out, border-color 200ms ease-out, box-shadow 180ms ease-out`
                     : "transform 320ms cubic-bezier(0.34, 1.7, 0.4, 1), background-color 200ms ease-out, border-color 200ms ease-out, box-shadow 180ms ease-out"
                 }}>
                 
@@ -266,13 +417,14 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                       {selected && <Check size={16} strokeWidth={3} style={{ color: player.color }} />}
                     </div>
                   </div>
+                </motion.div>
                 );
               };
 
 
               return (
                 <>
-                    <DragDropContext onDragEnd={handleDragEnd}>
+                    <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                       <Droppable droppableId="selected-players">
                         {(dropProvided) =>
                       <div
@@ -283,7 +435,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                             {selectedList.map((player, index) =>
                         <Draggable key={player.id} draggableId={player.id} index={index}>
                                 {(dragProvided, snapshot) =>
-                          renderRow(player, { dragProvided, snapshot, selected: true, draggable: true })
+                          renderRow(player, { dragProvided, snapshot, selected: true, draggable: true, index })
                           }
                               </Draggable>
                         )}
@@ -295,9 +447,9 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
                     {unselectedList.length > 0 &&
                   <div className="space-y-2 mt-2">
-                        {unselectedList.map((player) =>
+                        {unselectedList.map((player, i) =>
                     <div key={player.id}>
-                            {renderRow(player, { selected: false, draggable: false })}
+                            {renderRow(player, { selected: false, draggable: false, index: selectedList.length + i })}
                           </div>
                     )}
                       </div>
@@ -306,13 +458,19 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
             })()}
 
-              <button
+              <motion.button
               onClick={() => setShowAddPlayerWithNav(true)}
+              // Fades in only after the card stagger has played out: the last
+              // card's entrance delay + its spring settle. Guarded by
+              // entranceDone so it doesn't refade on selection toggles.
+              initial={entranceDone ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(allPlayers.length - 1, 8) * 0.07 + 0.45, duration: DUR_MEDIUM }}
               className="w-full mt-1 h-11 rounded-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50">
-              
+
                 <Plus size={24} strokeWidth={2} />
                 Add Player
-              </button>
+              </motion.button>
             </>
           }
         </div>

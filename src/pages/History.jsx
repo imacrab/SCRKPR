@@ -5,6 +5,12 @@ import { RefreshCw, Handshake, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
+
+// Guard against malformed/missing dates — never let a bad value crash the page.
+const safeFormat = (value, fmt) => {
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? "—" : format(d, fmt);
+};
 import HistoryStats from "@/components/scorekeeper/HistoryStats";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 import { TRANSITION_PAGE, TRANSITION_PANEL, SPRING_SNAPPY } from "@/lib/motion";
@@ -211,13 +217,16 @@ export default function History({ onBack, onModalChange }) {
                 const winner = sorted[0];
                 const isTie = sorted.length > 1 && sorted[0].total === sorted[1].total;
                 const isLatest = gameIdx === 0;
+                // Staggered rise on load, 60ms apart (capped). Delay lives on
+                // `animate` only so deletions (exit) stay instant.
+                const enterDelay = Math.min(gameIdx, 8) * 0.06;
 
                 if (isLatest) {
                   return (
                     <motion.div
                       key={game.id}
                       initial={{ opacity: 0, y: 16, scale: 0.97 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      animate={{ opacity: 1, y: 0, scale: 1, transition: { ...SPRING_SNAPPY, delay: enterDelay } }}
                       exit={{ opacity: 0, height: 0 }}
                       className="mb-4 rounded-3xl overflow-hidden relative border"
                       style={{
@@ -237,7 +246,7 @@ export default function History({ onBack, onModalChange }) {
 
                       <div className="px-5 pt-4 pb-2 flex items-center justify-between relative z-10">
                         <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Latest Game</p>
-                        <p className="text-xs text-muted-foreground">{format(new Date(game.played_at), "MMM d · h:mm a")}</p>
+                        <p className="text-xs text-muted-foreground">{safeFormat(game.played_at, "MMM d · h:mm a")}</p>
                       </div>
 
                       {/* Winner hero */}
@@ -303,7 +312,7 @@ export default function History({ onBack, onModalChange }) {
                   )}
                   <motion.div
                     initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    animate={{ opacity: 1, y: 0, transition: { ...SPRING_SNAPPY, delay: enterDelay } }}
                     exit={{ opacity: 0, height: 0 }}
                     className="mb-3 rounded-xl border border-border bg-card overflow-hidden">
 
@@ -318,7 +327,7 @@ export default function History({ onBack, onModalChange }) {
                         {isTie ? "Tie" : winner.name}
                       </p>
                       <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <span>{format(new Date(game.played_at), "MMM d, yyyy · h:mm a")}</span>
+                        <span>{safeFormat(game.played_at, "MMM d, yyyy · h:mm a")}</span>
                         <span>·</span>
                         <span className="inline-flex items-center gap-1">
                           <FluentEmoji emoji={modeMeta.emoji} size={14} />

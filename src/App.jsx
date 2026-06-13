@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import ScoreKeeper from './pages/ScoreKeeper';
 import AccountSettings from './pages/AccountSettings';
 import { motion } from 'framer-motion';
@@ -47,13 +48,19 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
-          <motion.div
-            initial={{ opacity: 0, filter: "blur(12px)", scale: 0.97 }}
-            animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-            transition={TRANSITION_PAGE}
-          >
-            <AuthenticatedApp />
-          </motion.div>
+          {/* ErrorBoundary wraps the animated wrapper (not inside it) so its
+              fixed-position fallback is relative to the viewport — a transformed
+              ancestor would otherwise become its containing block and break the
+              full-screen centering (the app's stacking-context trap). */}
+          <ErrorBoundary>
+            <motion.div
+              initial={{ opacity: 0, filter: "blur(12px)", scale: 0.97 }}
+              animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
+              transition={TRANSITION_PAGE}
+            >
+              <AuthenticatedApp />
+            </motion.div>
+          </ErrorBoundary>
         </Router>
         <Toaster />
       </QueryClientProvider>

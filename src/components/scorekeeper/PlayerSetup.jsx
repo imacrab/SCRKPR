@@ -38,6 +38,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const flippingIds = useRef(new Set()); // ids mid-FLIP (don't re-measure)
   const isDraggingRef = useRef(false); // true while a dnd drag is in flight
   const justDroppedId = useRef(null); // dnd animates the dropped card itself
+  const [flipMap, setFlipMap] = useState({}); // id -> inverted Y delta to animate from
 
   useLayoutEffect(() => {
     const container = scrollRef.current;
@@ -53,9 +54,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       return;
     }
 
+    const newFlips = {};
     els.forEach((el) => {
       const id = el.dataset.rowId;
-      if (flippingIds.current.has(id)) return; // already animating
+      if (flippingIds.current.has(id)) return; // already animating — leave it
       const cur = el.getBoundingClientRect().top;
       const prev = rowTops.current.get(id);
       rowTops.current.set(id, cur);
@@ -63,26 +65,14 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       const delta = prev - cur;
       if (Math.abs(delta) < 1) return;
       if (id === justDroppedId.current) return; // dnd's drop animation owns it
-
-      // Invert to the old position with no transition, then play to 0.
+      // Record the invert delta; framer plays it to 0 (see motion.div animate).
       flippingIds.current.add(id);
-      el.style.transition = "none";
-      el.style.transform = `translateY(${delta}px)`;
-      el.getBoundingClientRect(); // force reflow so the invert takes
-      requestAnimationFrame(() => {
-        el.style.transition = "transform 0.42s cubic-bezier(0.22, 1, 0.36, 1)";
-        el.style.transform = "translateY(0)";
-        const done = () => {
-          el.removeEventListener("transitionend", done);
-          el.style.transition = "";
-          el.style.transform = "";
-          flippingIds.current.delete(id);
-          rowTops.current.set(id, el.getBoundingClientRect().top);
-        };
-        el.addEventListener("transitionend", done);
-      });
+      newFlips[id] = delta;
     });
     justDroppedId.current = null;
+    // setState inside useLayoutEffect flushes before paint, so the row's first
+    // paint is already at the inverted position — no flash.
+    if (Object.keys(newFlips).length) setFlipMap((m) => ({ ...m, ...newFlips }));
   });
 
   // Staggered entrance plays once when the list first loads. Toggling a
@@ -320,31 +310,60 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 const rowScale = isLifted ? "scale(1.03, 0.85)" : isTapped ? "scale(0.92, 0.92)" : "scale(1, 1)";
                 const composedTransform = `${baseStyle.transform || ""} ${rowScale} rotate(${isLifted ? tiltDeg : 0}deg)`.trim();
 
+                // FLIP: a card that has been seen before (rowTops has it) and is
+                // re-mounting/repositioning should glide from its old slot, not
+                // pop. flipMap[id] holds the inverted Y delta; we feed it to
+                // framer as a [delta, 0] keyframe so the card flies to its new
+                // position. New cards (no prior position) still play the entrance.
+                // We drive FLIP through framer on this motion.div (NOT a separate
+                // wrapper — an extra element inside the Draggable breaks dnd's
+                // drag positioning; and NOT framer `layout`, which deadlocks the
+                // page-transition AnimatePresence).
+                const flipDelta = flipMap[player.id];
+                const isFlipping = flipDelta != null;
+                const seenBefore = rowTops.current.has(player.id);
                 return (
-                // Plain FLIP wrapper — its transform is driven manually by the
-                // useLayoutEffect above (never by framer), so it can glide to a
-                // new slot on reorder without fighting framer's transform mgmt.
-                <div data-row-id={player.id} style={{ willChange: "transform" }}>
                 <motion.div
-                // Two entrance modes, both keyed off mount (framer `initial`
-                // only fires on mount):
-                //  - first load (entranceDone false): big staggered rise.
-                //  - after load: a toggled card moves between the selected and
-                //    unselected lists, which remounts it here — so it pops/rises
-                //    in quickly instead of teleporting.
-                // We deliberately avoid framer `layout`/`layoutId`: shared-layout
-                // animations deadlock the parent page's AnimatePresence
-                // (mode="wait") exit and break navigation to the scoreboard.
-                initial={entranceDone ? { opacity: 0, y: 16, scale: 0.94 } : { opacity: 0, y: 48, scale: 0.95 }}
+                data-row-id={player.id}
+                initial={
+                  isFlipping
+                    ? false
+                    : entranceDone && seenBefore
+                    ? // a card re-mounting to be FLIP'd: hide the single mount
+                      // frame (which paints at the NEW slot before the invert
+                      // applies) so there's no flash — it becomes visible at its
+                      // old slot the instant the fly starts.
+                      { opacity: 0 }
+                    : entranceDone
+                    ? { opacity: 0, y: 16, scale: 0.94 }
+                    : { opacity: 0, y: 48, scale: 0.95 }
+                }
                 animate={{
-                  opacity: 1, y: 0, scale: 1,
-                  transition: entranceDone
+                  opacity: 1,
+                  y: isFlipping ? [flipDelta, 0] : 0,
+                  scale: 1,
+                  transition: isFlipping
+                    ? { y: SPRING_SHEET, opacity: { duration: 0 } }
+                    : entranceDone
                     ? SPRING_SHEET
                     : {
                         y: { ...SPRING_SHEET, delay: entranceDelay },
                         scale: { ...SPRING_SHEET, delay: entranceDelay },
                         opacity: { duration: DUR_MEDIUM, delay: entranceDelay },
                       },
+                }}
+                onAnimationComplete={() => {
+                  if (flipMap[player.id] != null) {
+                    flippingIds.current.delete(player.id);
+                    setFlipMap((m) => {
+                      if (m[player.id] == null) return m;
+                      const next = { ...m };
+                      delete next[player.id];
+                      return next;
+                    });
+                    const el = scrollRef.current?.querySelector(`[data-row-id="${player.id}"]`);
+                    if (el) rowTops.current.set(player.id, el.getBoundingClientRect().top);
+                  }
                 }}>
                 <div
                 ref={dragProvided?.innerRef}
@@ -399,7 +418,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                     </div>
                   </div>
                 </motion.div>
-                </div>
                 );
               };
 

@@ -9,8 +9,9 @@ import BottomNavigationBar from "@/components/scorekeeper/BottomNavigationBar";
 import History from "./History";
 import Players from "./Players";
 import AccountSettings from "./AccountSettings";
-import { TRANSITION_PAGE } from "@/lib/motion";
+import { TRANSITION_PAGE, SPRING_SHEET } from "@/lib/motion";
 import { ACCENT_BLUE } from "@/lib/colors";
+import logoDark from "@/assets/SCRKPR_dark_mode.png";
 
 // Game state persists across route transitions and page refreshes via module scope + localStorage
 let _players = [];
@@ -70,6 +71,37 @@ export default function ScoreKeeper() {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
   const [lastAddedPlayerId, setLastAddedPlayerId] = useState(null);
+
+  // Persistent app-level SCRKPR logo. It lives OUTSIDE the page AnimatePresence
+  // so it never unmounts, and glides/resizes between each page's logo slot —
+  // a shared-element transition that mode="wait" otherwise makes impossible
+  // (the two pages never coexist for a layoutId tween). Each page renders an
+  // invisible [data-logo-anchor] in its real slot; we measure that and move the
+  // floating logo to match.
+  const [logoBox, setLogoBox] = useState({ x: 0, y: 0, w: 200, visible: false, ready: false });
+
+  const measureLogo = useCallback(() => {
+    if (view !== "/" && view !== "/game") {
+      setLogoBox((b) => (b.ready ? { ...b, visible: false } : b));
+      return;
+    }
+    const el = document.querySelector("[data-logo-anchor]");
+    if (!el) return; // anchor not mounted yet (mid-transition) — keep last box
+    const r = el.getBoundingClientRect();
+    if (r.width === 0) return;
+    setLogoBox({ x: r.left, y: r.top, w: r.width, visible: true, ready: true });
+  }, [view]);
+
+  // Re-measure on every view change (covers initial mount) and on resize.
+  useEffect(() => {
+    const id = requestAnimationFrame(measureLogo);
+    return () => cancelAnimationFrame(id);
+  }, [measureLogo]);
+
+  useEffect(() => {
+    window.addEventListener("resize", measureLogo);
+    return () => window.removeEventListener("resize", measureLogo);
+  }, [measureLogo]);
 
   // On mount, load game state from localStorage and redirect to game if one exists
   useEffect(() => {
@@ -206,7 +238,7 @@ export default function ScoreKeeper() {
 
   return (
     <>
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" onExitComplete={() => requestAnimationFrame(measureLogo)}>
         {view === "/history" && (
           <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
             <History onBack={() => navigate(-1)} onModalChange={setNavHidden} />
@@ -264,6 +296,29 @@ export default function ScoreKeeper() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Persistent SCRKPR logo — glides between the home + game logo slots.
+          z-30 keeps it above page content but below modals (backdrop z-40).
+          pointer-events:none so taps fall through to the invisible in-page
+          logo button beneath (which still opens End Game on the game screen). */}
+      {logoBox.ready && (
+        <motion.img
+          src={logoDark}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          className="fixed left-0 top-0 z-30 pointer-events-none select-none"
+          style={{ height: "auto", transformOrigin: "top left" }}
+          initial={{ x: logoBox.x, y: logoBox.y, width: logoBox.w, opacity: 0 }}
+          animate={{
+            x: logoBox.x,
+            y: logoBox.y,
+            width: logoBox.w,
+            opacity: logoBox.visible ? 1 : 0,
+          }}
+          transition={{ x: SPRING_SHEET, y: SPRING_SHEET, width: SPRING_SHEET, opacity: { duration: 0.2 } }}
+        />
+      )}
 
       {/* Gradient fade so scrolling content fades to background 8px above the tab bar.
           Hidden alongside the nav when a modal is open — page-level fixed overlays

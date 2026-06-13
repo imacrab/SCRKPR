@@ -12,26 +12,16 @@ import ScoreHistoryPanel from "./ScoreHistoryPanel";
 import { isLowMode, isCircleMode } from "@/lib/gameModes";
 import { SPRING_POP, SPRING_SHEET } from "@/lib/motion";
 import logoDark from "@/assets/SCRKPR_dark_mode.png";
-import logoLight from "@/assets/SCRKPR_light_mode.png";
 
 export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [streakMap, setStreakMap] = useState({});
   const [gameStartTime] = useState(new Date());
   const [scrollPos, setScrollPos] = useState(0);
-  const [isDarkMode, setIsDarkMode] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [sortDesc, setSortDesc] = useState(true);
   const [sortLocked, setSortLocked] = useState(false);
   const scrollContainerRef = useRef(null);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e) => setIsDarkMode(e.matches);
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
 
   useEffect(() => {
     base44.entities.GameHistory.list("-played_at", 20).then((games) => {
@@ -177,7 +167,11 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-10 pb-5 flex-shrink-0" style={{ backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <button onClick={() => setShowEndGame(true)} className="hover:opacity-75 transition-opacity">
-          <img src={isDarkMode ? logoDark : logoLight} alt="SCRKPR!" style={{ maxWidth: 120, height: "auto" }} />
+          {/* Invisible anchor — see PlayerSetup note; the persistent logo
+              hoisted to ScoreKeeper floats over this slot. The button still
+              receives the tap (opens End Game) since the floating logo is
+              pointer-events:none. */}
+          <img src={logoDark} alt="SCRKPR!" data-logo-anchor style={{ maxWidth: 120, height: "auto", opacity: 0 }} />
         </button>
         <div className="flex items-center gap-2">
           <button
@@ -274,15 +268,53 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           className="absolute inset-x-0 bottom-0 z-30 flex justify-center"
           style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)", paddingLeft: 48, paddingRight: 48 }}>
           
-          <motion.button
-            onClick={() => setShowEndGame(true)}
-            whileTap={{ scale: 0.90 }}
-            transition={SPRING_POP}
-            className="relative flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-white hover:bg-white/90 text-background font-semibold text-sm shadow-lg transition-colors overflow-hidden">
-            
-            <span className="relative z-10 text-base">End Game</span>
-            <FluentEmoji emoji="🏁" size={24} />
-          </motion.button>
+          <div className="relative">
+            {/* Pulsing brand halo — a sibling (not a child) so it isn't clipped
+                by the button's overflow-hidden, and drifts through the brand
+                colors in sync with the gradient fill. */}
+            <motion.span
+              aria-hidden="true"
+              className="absolute -inset-1 rounded-full blur-xl pointer-events-none"
+              style={{ background: "linear-gradient(110deg, #2DC5F8, #A855F7, #FF3A3A)" }}
+              animate={{ opacity: [0.45, 0.7, 0.45], scale: [0.97, 1.03, 0.97] }}
+              transition={{ duration: 3.2, ease: "easeInOut", repeat: Infinity }}
+            />
+            <motion.button
+              onClick={() => setShowEndGame(true)}
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.03 }}
+              transition={SPRING_POP}
+              className="relative flex items-center justify-center gap-2.5 py-4 px-8 rounded-full overflow-hidden">
+
+              {/* Flowing gradient fill */}
+              <motion.span
+                aria-hidden="true"
+                className="absolute inset-0"
+                style={{
+                  background: "linear-gradient(110deg, #2DC5F8 0%, #6366F1 22%, #A855F7 48%, #FF3A3A 74%, #2DC5F8 100%)",
+                  backgroundSize: "220% 100%",
+                }}
+                animate={{ backgroundPosition: ["0% 50%", "220% 50%"] }}
+                transition={{ duration: 6, ease: "linear", repeat: Infinity }}
+              />
+              {/* Sheen sweep */}
+              <motion.span
+                aria-hidden="true"
+                className="absolute inset-y-0 w-1/3"
+                style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)", filter: "blur(2px)", transform: "skewX(-18deg)" }}
+                animate={{ x: ["-180%", "460%"] }}
+                transition={{ duration: 2.4, ease: "easeInOut", repeat: Infinity, repeatDelay: 1.8 }}
+              />
+              <span className="relative z-10 text-base font-bold text-white tracking-wide" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.3)" }}>End Game</span>
+              <motion.span
+                className="relative z-10 flex"
+                animate={{ rotate: [0, -14, 12, -7, 0] }}
+                transition={{ duration: 1.8, ease: "easeInOut", repeat: Infinity, repeatDelay: 1.6 }}
+              >
+                <FluentEmoji emoji="🏁" size={22} />
+              </motion.span>
+            </motion.button>
+          </div>
         </div>
       </div>
 

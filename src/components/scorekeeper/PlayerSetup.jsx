@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { Plus, Check, GripVertical } from "lucide-react";
+import { Plus, Check, GripVertical, Star } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,6 @@ import { getModeMeta } from "@/lib/gameModes";
 import { DUR_MEDIUM } from "@/lib/motion";
 import logoDark from "@/assets/SCRKPR_dark_mode.png";
 
-const DEFAULT_SELECTED_NAMES = ["Adrian", "Jayne"];
-
 export default function PlayerSetup({ onStart, onModalChange }) {
   const [allPlayers, setAllPlayers] = useState(null); // null = loading
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -23,6 +21,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [showBestOf, setShowBestOf] = useState(false);
   const [showGameMode, setShowGameMode] = useState(false);
   const [tappedId, setTappedId] = useState(null);
+  const [poppedId, setPoppedId] = useState(null); // star that just bounced
   const tapTimerRef = useRef(null);
   const scrollRef = useRef(null);
 
@@ -161,16 +160,12 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
   useEffect(() => {
     db.players.list("-created_date", 100).then((data) => {
-      // Pin Adrian & Jayne to the top of the list
-      const pinned = DEFAULT_SELECTED_NAMES.
-      map((n) => data.find((p) => p.name === n)).
-      filter(Boolean);
-      const pinnedIds = new Set(pinned.map((p) => p.id));
-      const rest = data.filter((p) => !pinnedIds.has(p.id));
-      const ordered = [...pinned, ...rest];
-
-      setAllPlayers(ordered);
-      setSelectedIds(new Set(pinned.map((p) => p.id)));
+      // Regulars (favorites) pin to the top of the list and start pre-selected,
+      // so a typical game is ready in one tap.
+      const favs = data.filter((p) => p.favorite);
+      const rest = data.filter((p) => !p.favorite);
+      setAllPlayers([...favs, ...rest]);
+      setSelectedIds(new Set(favs.map((p) => p.id)));
     }).catch(() => setAllPlayers([]));
   }, []);
 
@@ -225,6 +220,24 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       next.add(id);
       return next;
     });
+  };
+
+  // Star/unstar a regular. Persisted immediately; we don't re-pin mid-session
+  // (the selected/unselected ordering governs the list during setup) — the
+  // favorite ordering + pre-select takes effect next time the screen loads.
+  const toggleFavorite = async (id, e) => {
+    e?.stopPropagation();
+    const current = (allPlayers || []).find((p) => p.id === id);
+    const nextVal = !current?.favorite;
+    if (navigator.vibrate) navigator.vibrate(8);
+    setPoppedId(id);
+    setTimeout(() => setPoppedId((cur) => (cur === id ? null : cur)), 500);
+    setAllPlayers((prev) => (prev || []).map((p) => (p.id === id ? { ...p, favorite: nextVal } : p)));
+    try {
+      await db.players.update(id, { favorite: nextVal });
+    } catch (err) {
+      console.error("Failed to update favorite:", err);
+    }
   };
 
   const handleAddPlayer = async ({ name, color, emoji }) => {
@@ -389,6 +402,25 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                       {player.emoji && <FluentEmoji emoji={player.emoji} size={18} />}
                     </div>
                     <span className="flex-1 text-foreground text-base [font-family:'Geist',_sans-serif] font-semibold">{player.name}</span>
+                    <button
+                  type="button"
+                  onClick={(e) => toggleFavorite(player.id, e)}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  aria-label={player.favorite ? "Remove from favorites" : "Add to favorites"}
+                  className="flex-shrink-0 w-11 h-11 -mr-2 flex items-center justify-center">
+                      <motion.span
+                    animate={poppedId === player.id ? { scale: [1, player.favorite ? 1.4 : 1.18, 1] } : { scale: 1 }}
+                    transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
+                    style={{ display: "inline-flex" }}>
+                        <Star
+                      size={18}
+                      strokeWidth={2}
+                      style={{
+                        fill: player.favorite ? "#FFC93C" : "transparent",
+                        color: player.favorite ? "#FFC93C" : selected ? "rgba(255,255,255,0.65)" : "hsl(var(--muted-foreground))",
+                      }} />
+                      </motion.span>
+                    </button>
                     <div
                   className="w-6 h-6 rounded-full flex items-center justify-center transition-colors"
                   style={{

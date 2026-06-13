@@ -96,7 +96,8 @@ export default function BottomSheetModal({
               )}
             </div>
 
-            {/* Body */}
+            {/* Body — content scrolls and clips cleanly under the header, whose
+                border-b fades in once scrolled (the crisp top "cap"). */}
             <div
               className={scrollable ? "flex-1 overflow-y-auto px-5 pb-4" : "flex-shrink-0 px-5"}
               onScroll={scrollable ? (e) => setScrolled(e.currentTarget.scrollTop > 0) : undefined}

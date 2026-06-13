@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
-import { isLowMode } from "@/lib/gameModes";
+import { isLowMode, getModeMeta } from "@/lib/gameModes";
 import FluentEmoji from "./FluentEmoji";
 import BottomSheetModal from "./BottomSheetModal";
 import { PLAYER_COLORS } from "@/lib/colors";
@@ -68,6 +68,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
   const tied = sorted.filter((p) => p.total === topScore);
   const isTie = tied.length > 1;
   const winner = sorted[0];
+  const modeMeta = getModeMeta(winMode);
 
   const totalRounds = hasPlayers
     ? players.reduce((sum, p) => sum + p.scores.length, 0) / players.length
@@ -108,53 +109,96 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
             </div>
           }
         >
-          {/* Winner / Tie */}
-          <div className="flex flex-col items-center text-center mb-6 pt-2">
-            <motion.div
-              initial={{ scale: 0, rotate: -20 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 12, delay: 0.25 }}
-              className="w-12 h-12 rounded-full mb-3 flex items-center justify-center bg-muted"
-            >
-              <motion.span
-                animate={{ rotate: [0, -8, 8, -4, 4, 0] }}
-                transition={{ delay: 0.7, duration: 0.8, ease: "easeInOut" }}
-                className="flex"
+          {/* Winner hero — mirrors the History "Latest Game" card: winner-color
+              gradient, hairline border, oversized ghosted winner emoji, big
+              avatar, display name + pts·mode. */}
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ ...SPRING_SHEET, delay: 0.1 }}
+            className="mb-5 rounded-3xl overflow-hidden relative"
+            style={{
+              background: isTie
+                ? "hsl(var(--muted) / 0.4)"
+                : `linear-gradient(155deg, ${winner?.color}3a 0%, ${winner?.color}14 38%, hsl(var(--card)) 72%)`,
+            }}
+          >
+            {/* Oversized winner emoji bleeding off the corner */}
+            {!isTie && winner?.emoji && (
+              <div
+                className="absolute pointer-events-none select-none"
+                style={{ right: -18, top: -14, transform: "rotate(16deg)", opacity: 0.22 }}
+                aria-hidden="true"
               >
-                <FluentEmoji emoji={isTie ? "🤝" : "🏆"} size={32} />
-              </motion.span>
-            </motion.div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">
-              {isTie ? "It's a Tie!" : "Winner"}
-            </p>
-            <h2 className="font-display text-2xl font-bold text-foreground">
-              {isTie ? tied.map((p) => p.name).join(" & ") : winner?.name}
-            </h2>
-            <p className="text-sm text-muted-foreground mt-0.5">{winner?.total ?? 0} pts · {isLowWin ? "lowest score" : "highest score"} wins</p>
-          </div>
+                <FluentEmoji emoji={winner.emoji} size={130} />
+              </div>
+            )}
 
-          {/* Standings — staggered entrance, medals for the podium */}
-          <div className="space-y-1 mb-6">
-            {sorted.map((p, i) => (
+            <div className="px-5 py-4 flex items-center gap-3 relative z-10">
               <motion.div
-                key={p.id}
-                initial={{ opacity: 0, x: -16 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ ...SPRING_SHEET, delay: 0.35 + i * 0.07 }}
-                className="flex items-center gap-3 py-2 px-3 rounded-xl"
-                style={{ backgroundColor: `${p.color}12` }}
+                initial={{ scale: 0, rotate: -20 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 400, damping: 12, delay: 0.25 }}
+                className="w-14 h-14 rounded-full flex-shrink-0 border-2 border-white/25 flex items-center justify-center overflow-hidden"
+                style={{ backgroundColor: isTie ? "hsl(var(--muted))" : winner?.color }}
               >
-                <span className="text-xs text-muted-foreground w-5 text-right">
-                  {!isTie && i === 0 ? <FluentEmoji emoji="🥇" size={16} />
-                    : !isTie && i === 1 ? <FluentEmoji emoji="🥈" size={16} />
-                    : !isTie && i === 2 ? <FluentEmoji emoji="🥉" size={16} />
-                    : i + 1}
-                </span>
-                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} />
-                <span className="text-sm text-foreground flex-1 truncate font-medium">{p.name}</span>
-                <span className="text-sm font-semibold text-white">{p.total}</span>
+                <motion.span
+                  animate={{ rotate: [0, -8, 8, -4, 4, 0] }}
+                  transition={{ delay: 0.7, duration: 0.8, ease: "easeInOut" }}
+                  className="flex"
+                >
+                  {isTie
+                    ? <FluentEmoji emoji="🤝" size={30} />
+                    : winner?.emoji
+                      ? <FluentEmoji emoji={winner.emoji} size={34} />
+                      : <FluentEmoji emoji="🏆" size={30} />}
+                </motion.span>
               </motion.div>
-            ))}
+              <div className="min-w-0">
+                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-0.5 flex items-center gap-1">
+                  {!isTie && <FluentEmoji emoji="🏆" size={12} />}
+                  {isTie ? "It's a Tie" : "Winner"}
+                </p>
+                <h2 className="font-display text-2xl font-bold text-foreground leading-tight truncate">
+                  {isTie ? tied.map((p) => p.name).join(" & ") : winner?.name}
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                  {winner?.total ?? 0} pts
+                  <span>·</span>
+                  <FluentEmoji emoji={modeMeta.emoji} size={12} />
+                  {modeMeta.label}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Standings — same emoji chips + medals as the History podium, but
+              NOT inside the winner-color border. A long bordered card became a
+              tall scroll region whose side borders ran past the sheet's top edge
+              (no sticky header to mask them). Borderless, it scrolls cleanly. */}
+          <div className="space-y-1 mb-6">
+              {sorted.map((p, i) => (
+                <motion.div
+                  key={p.id}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ ...SPRING_SHEET, delay: 0.35 + i * 0.07 }}
+                  className="flex items-center gap-3 py-2 px-3 rounded-xl"
+                  style={{ backgroundColor: `${p.color}14` }}
+                >
+                  <span className="text-xs text-muted-foreground w-5 text-right">
+                    {!isTie && i === 0 ? <FluentEmoji emoji="🥇" size={16} />
+                      : !isTie && i === 1 ? <FluentEmoji emoji="🥈" size={16} />
+                      : !isTie && i === 2 ? <FluentEmoji emoji="🥉" size={16} />
+                      : i + 1}
+                  </span>
+                  {p.emoji
+                    ? <span className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden" style={{ backgroundColor: p.color }}><FluentEmoji emoji={p.emoji} size={16} /></span>
+                    : <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 mx-[7px]" style={{ backgroundColor: p.color }} />}
+                  <span className="text-sm text-foreground flex-1 truncate font-medium">{p.name}</span>
+                  <span className="text-sm font-bold" style={{ color: p.color }}>{p.total}</span>
+                </motion.div>
+              ))}
           </div>
 
           {/* Stats */}

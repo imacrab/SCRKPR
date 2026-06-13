@@ -219,10 +219,13 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             background: "linear-gradient(to top, hsl(var(--background)) 30%, hsl(var(--background) / 0) 100%)"
           }} />
         
+        {/* paddingBottom just clears the fixed End Game button + its 120px
+            bottom fade so the last player isn't hidden behind them — NOT the old
+            flat 200px, which left a scrollable void below the button on short games. */}
         <div
           ref={scrollContainerRef}
           className="flex flex-col h-full gap-2 w-full overflow-y-auto relative z-0"
-          style={{ WebkitOverflowScrolling: "touch", paddingBottom: "200px" }}>
+          style={{ WebkitOverflowScrolling: "touch", paddingBottom: "calc(env(safe-area-inset-bottom) + 120px)" }}>
           
           <LayoutGroup>
             {sortedPlayers.map((player, idx) =>

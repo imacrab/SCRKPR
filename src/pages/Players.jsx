@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { db } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Users, Check, Trash2 } from "lucide-react";
+import { Plus, Users, Check, Trash2, Star } from "lucide-react";
 import PlayerEditModal from "@/components/scorekeeper/PlayerEditModal";
 import DeletePlayerConfirmModal from "@/components/scorekeeper/DeletePlayerConfirmModal";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
-import { SPRING_SHEET, DUR_MEDIUM } from "@/lib/motion";
+import { SPRING_SHEET } from "@/lib/motion";
 
 export default function Players({ onBack, onModalChange }) {
   const [players, setPlayers] = useState([]);
@@ -15,7 +15,33 @@ export default function Players({ onBack, onModalChange }) {
   const [selectedIds, setSelectedIds] = useState(() => new Set());
   const [showBulkConfirm, setShowBulkConfirm] = useState(false);
   const [canScroll, setCanScroll] = useState(false);
+  const [poppedId, setPoppedId] = useState(null); // star that just bounced
   const scrollRef = useRef(null);
+  // Fully manual entrance + FLIP for the player list — NO framer on the rows or
+  // section headers. Framer re-writes transform/layout on render and fought the
+  // FLIP (the snap/teleport when re-sorting or removing all favorites). Rows and
+  // headers are plain divs; this owns their entrance rise and the reorder glide.
+  const rowTops = useRef(new Map());
+  const flippingIds = useRef(new Set());
+  const enteredRef = useRef(false); // first-load stagger done
+  const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+  const animateTo = (el, transition, transform, opacity) => {
+    requestAnimationFrame(() => {
+      el.style.transition = transition;
+      el.style.transform = transform;
+      if (opacity != null) el.style.opacity = opacity;
+      const done = (e) => {
+        if (e.propertyName !== "transform") return;
+        el.removeEventListener("transitionend", done);
+        el.style.transition = "";
+        el.style.transform = "";
+        el.style.opacity = "";
+        flippingIds.current.delete(el.dataset.rowId);
+        rowTops.current.set(el.dataset.rowId, el.getBoundingClientRect().top);
+      };
+      el.addEventListener("transitionend", done);
+    });
+  };
 
   const fetchPlayers = async () => {
     try {
@@ -90,6 +116,61 @@ export default function Players({ onBack, onModalChange }) {
     return () => window.removeEventListener("resize", checkScroll);
   }, [players, loading]);
 
+  // Runs after every render. A row appearing for the first time rises + fades
+  // in (staggered on first load, quick pop later); a row whose position changed
+  // — a favorite re-sorting, or a section header appearing/disappearing pushing
+  // rows up/down — inverts→plays a translateY glide. All on plain divs, so
+  // nothing re-writes the transform mid-flight. Rows already animating are left
+  // alone (guards against the star-bounce re-render corrupting an in-flight glide).
+  useLayoutEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    container.querySelectorAll("[data-row-id]").forEach((el) => {
+      const id = el.dataset.rowId;
+      if (flippingIds.current.has(id)) return; // already animating — leave it
+      const cur = el.getBoundingClientRect().top;
+      const prev = rowTops.current.get(id);
+      rowTops.current.set(id, cur);
+      if (prev == null) {
+        // First appearance — entrance.
+        const firstLoad = !enteredRef.current;
+        const idx = Number(el.dataset.idx || 0);
+        const dy = firstLoad ? 48 : 16;
+        const delay = firstLoad ? Math.min(idx, 8) * 0.07 : 0;
+        flippingIds.current.add(id);
+        el.style.transition = "none";
+        el.style.transform = `translateY(${dy}px) scale(0.96)`;
+        el.style.opacity = "0";
+        el.getBoundingClientRect(); // commit before paint
+        animateTo(el, `transform 0.5s ${EASE} ${delay}s, opacity 0.3s ease ${delay}s`, "translateY(0) scale(1)", "1");
+      } else {
+        const delta = prev - cur;
+        if (Math.abs(delta) > 1) {
+          flippingIds.current.add(id);
+          el.style.transition = "none";
+          el.style.transform = `translateY(${delta}px)`;
+          el.getBoundingClientRect(); // commit the invert before paint
+          animateTo(el, `transform 0.45s ${EASE}`, "translateY(0)", null);
+        }
+      }
+    });
+    if (container.querySelector("[data-row-id]")) enteredRef.current = true;
+  });
+
+  const toggleFavorite = async (id) => {
+    const current = players.find((p) => p.id === id);
+    const nextVal = !current?.favorite;
+    if (navigator.vibrate) navigator.vibrate(8);
+    setPoppedId(id);
+    setTimeout(() => setPoppedId((cur) => (cur === id ? null : cur)), 500);
+    setPlayers((prev) => prev.map((p) => (p.id === id ? { ...p, favorite: nextVal } : p)));
+    try {
+      await db.players.update(id, { favorite: nextVal });
+    } catch (e) {
+      console.error("Failed to update favorite:", e);
+    }
+  };
+
   const handleSave = async ({ id, name, color, emoji }) => {
     if (id) {
       await db.players.update(id, { name, color, emoji });
@@ -105,6 +186,74 @@ export default function Players({ onBack, onModalChange }) {
     setPlayers((prev) => prev.filter((p) => p.id !== id));
     setEditing(null);
     await db.players.delete(id);
+  };
+
+  // One row, fully manual: plain outer div ([data-row-id]) owns the entrance +
+  // FLIP transform (driven by the effect above); plain inner button owns tap.
+  // The only framer left is the isolated star/check pop — it scales an icon and
+  // never affects layout, so it can't fight the FLIP.
+  const renderRow = (p, idx) => {
+    const isSelected = selectedIds.has(p.id);
+    return (
+      <div key={p.id} data-row-id={p.id} data-idx={idx} className="mb-2">
+        <button
+          onClick={() => {
+            if (longPressFiredRef.current) { longPressFiredRef.current = false; return; }
+            if (selectMode) toggleSelect(p.id); else setEditing(p);
+          }}
+          onPointerDown={(e) => startLongPress(e, p)}
+          onContextMenu={(e) => e.preventDefault()}
+          className={`w-full rounded-lg border bg-card overflow-hidden flex items-center gap-3 pl-3 pr-1 py-2.5 text-left transition-colors active:scale-[0.99] ${
+            isSelected ? "border-accent-red bg-accent-red/5" : "border-border"
+          }`}
+        >
+          <div
+            className="w-9 h-9 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"
+            style={{ backgroundColor: p.color }}
+          >
+            {p.emoji && <FluentEmoji emoji={p.emoji} size={22} />}
+          </div>
+          <span className="flex-1 text-foreground text-base">{p.name}</span>
+          {!selectMode && (
+            <span
+              role="button"
+              tabIndex={0}
+              aria-label={p.favorite ? "Remove from favorites" : "Add to favorites"}
+              onClick={(e) => { e.stopPropagation(); toggleFavorite(p.id); }}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="flex-shrink-0 w-11 h-11 flex items-center justify-center"
+            >
+              <motion.span
+                animate={poppedId === p.id ? { scale: [1, p.favorite ? 1.4 : 1.18, 1] } : { scale: 1 }}
+                transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
+                style={{ display: "inline-flex" }}
+              >
+                <Star
+                  size={18}
+                  strokeWidth={2}
+                  style={{
+                    fill: p.favorite ? "#FFC93C" : "transparent",
+                    color: p.favorite ? "#FFC93C" : "hsl(var(--muted-foreground))",
+                  }}
+                />
+              </motion.span>
+            </span>
+          )}
+          {selectMode && (
+            <motion.span
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={SPRING_SHEET}
+              className={`w-6 h-6 mr-2 rounded-full flex-shrink-0 flex items-center justify-center border-2 transition-colors ${
+                isSelected ? "bg-accent-red border-accent-red text-white" : "border-border text-transparent"
+              }`}
+            >
+              <Check size={14} strokeWidth={3} />
+            </motion.span>
+          )}
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -162,7 +311,7 @@ export default function Players({ onBack, onModalChange }) {
 
         <div
           ref={scrollRef}
-          className="h-full overflow-y-auto px-5 py-4 space-y-2"
+          className="h-full overflow-y-auto px-5 py-4"
           style={{ paddingBottom: "calc(56px + 16px + 16px + env(safe-area-inset-bottom))" }}
         >
           {loading ? (
@@ -176,65 +325,30 @@ export default function Players({ onBack, onModalChange }) {
               <p className="text-muted-foreground/60 text-xs mt-1">Tap + to add one.</p>
             </div>
           ) : (
-            <AnimatePresence>
-              {players.map((p, idx) => {
-                const isSelected = selectedIds.has(p.id);
-                // Same rise + settle as the scoreboard, 70ms apart; capped so
-                // long lists don't keep staggering below the fold. Delay lives
-                // on `animate` only — exits stay instant.
-                const delay = Math.min(idx, 8) * 0.07;
-                return (
-                  <motion.button
-                    key={p.id}
-                    initial={{ opacity: 0, y: 48, scale: 0.95 }}
-                    animate={{
-                      opacity: 1, y: 0, scale: 1,
-                      transition: {
-                        y: { ...SPRING_SHEET, delay },
-                        scale: { ...SPRING_SHEET, delay },
-                        opacity: { duration: DUR_MEDIUM, delay },
-                      },
-                    }}
-                    exit={{ opacity: 0, height: 0 }}
-                    whileTap={{ scale: 0.99 }}
-                    onClick={() => {
-                      if (longPressFiredRef.current) { longPressFiredRef.current = false; return; }
-                      if (selectMode) toggleSelect(p.id); else setEditing(p);
-                    }}
-                    onPointerDown={(e) => startLongPress(e, p)}
-                    onContextMenu={(e) => e.preventDefault()}
-                    // transition-colors, NOT transition-all: a CSS transition on
-                    // transform would re-interpolate every frame framer-motion
-                    // writes during the entrance spring, making it look choppy.
-                    // The tap squish moved to whileTap for the same reason.
-                    className={`w-full rounded-lg border bg-card overflow-hidden flex items-center gap-3 px-3 py-2.5 text-left transition-colors ${
-                      isSelected ? "border-accent-red bg-accent-red/5" : "border-border"
-                    }`}
-                  >
-                    <div
-                      className="w-9 h-9 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"
-                      style={{ backgroundColor: p.color }}
-                    >
-                      {p.emoji && <FluentEmoji emoji={p.emoji} size={22} />}
-                    </div>
-                    <span className="flex-1 text-foreground text-base">{p.name}</span>
-                    {selectMode && (
-                      <motion.span
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0, opacity: 0 }}
-                        transition={SPRING_SHEET}
-                        className={`w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center border-2 transition-colors ${
-                          isSelected ? "bg-accent-red border-accent-red text-white" : "border-border text-transparent"
-                        }`}
-                      >
-                        <Check size={14} strokeWidth={3} />
-                      </motion.span>
-                    )}
-                  </motion.button>
-                );
-              })}
-            </AnimatePresence>
+            (() => {
+              // Recency order within each group (players is created_date-desc).
+              const favs = players.filter((p) => p.favorite);
+              const others = players.filter((p) => !p.favorite);
+              // Headers only when there's an actual split (both groups present).
+              const hasSplit = favs.length > 0 && others.length > 0;
+              // Plain header divs — they mount/unmount instantly. The rows'
+              // manual FLIP glides everything below when a header appears or
+              // disappears, so there's no snap and nothing for framer to fight.
+              const header = (key, label) => (
+                <div
+                  key={key}
+                  className="px-1 pt-1 pb-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest"
+                >
+                  {label}
+                </div>
+              );
+              const items = [];
+              if (hasSplit) items.push(header("hdr-fav", "Favorites"));
+              favs.forEach((p, i) => items.push(renderRow(p, i)));
+              if (hasSplit) items.push(header("hdr-all", "All Players"));
+              others.forEach((p, i) => items.push(renderRow(p, favs.length + i)));
+              return items;
+            })()
           )}
         </div>
       </div>

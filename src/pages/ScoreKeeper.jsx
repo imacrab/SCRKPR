@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { db } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import PlayerSetup from "@/components/scorekeeper/PlayerSetup";
@@ -148,17 +148,22 @@ export default function ScoreKeeper() {
     if (players.length === 0) return;
     const hasScores = players.some((p) => p.scores.length > 0);
     if (hasScores) {
-      await base44.entities.GameHistory.create({
-        played_at: new Date().toISOString(),
-        win_mode: winMode,
-        players: players.map((p) => ({
-          name: p.name,
-          color: p.color,
-          emoji: p.emoji || "",
-          total: p.scores.reduce((s, n) => s + n, 0),
-          scores: p.scores,
-        })),
-      });
+      try {
+        await db.games.create({
+          played_at: new Date().toISOString(),
+          win_mode: winMode,
+          players: players.map((p) => ({
+            name: p.name,
+            color: p.color,
+            emoji: p.emoji || "",
+            total: p.scores.reduce((s, n) => s + n, 0),
+            scores: p.scores,
+          })),
+        });
+      } catch (e) {
+        // Saving history should never block ending the game.
+        console.error("Failed to save game to history:", e);
+      }
     }
     clearGameState();
     setPlayers([]);

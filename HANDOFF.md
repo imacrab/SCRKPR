@@ -1,7 +1,7 @@
 # SCRKPR — Session Handoff
 
 > Context doc for continuing work on a new machine / new Claude session.
-> Last updated: June 13, 2026
+> Last updated: June 13, 2026 (local-first migration — phase 1)
 
 ## What this project is
 
@@ -66,6 +66,43 @@ Without `.env.local`, backend calls fail silently (e.g. adding a player does not
 - **Players select mode = "edit mode" frame** — a 4px accent-blue border (`#2DC5F8`) with inner glow fades in around the whole screen while selecting (`Players.jsx`, gated on `selectMode`). Swap to `accent-red` if you want it to match the delete pill.
 - **Single-list player reorder + manual FLIP** (the big one — see Conventions): replaced the two-list (selected Droppable + separate unselected list) with ONE `Droppable`. Selected players sit on top and are re-orderable; unselected sit below as `isDragDisabled` `Draggable`s. This killed the toggle remount AND a drop "snap". Toggling a player now *flies* it between segments; dnd owns drag/drop natively.
 
+### 6. Session June 13 (pt. 2) — local-first migration (phase 1)
+
+Made the app **local-first**: device storage is now the source of truth for players + history; Base44 is deferred behind a single flag. The app loads instantly, needs no account, and makes **zero network calls** offline (verified).
+
+- **`src/lib/store.js`** (new) — localStorage-backed CRUD for players + games, exposed as `db.players.{list,create,update,delete}` and `db.games.{list,create,delete}` plus `db.clearAll()`. The method/argument shape mirrors the old `base44.entities.*` surface (e.g. `list("-created_date", 100)`), so call sites barely changed and a future sync layer can slot in behind the same methods. Reads are resilient (corrupt JSON → `[]`); writes fail soft (quota/private-mode logs, doesn't throw). Exports **`SYNC_ENABLED = false`** — the master switch for all Base44/auth/cloud paths.
+- **Repointed every entity call** off Base44 onto `db`: `Players.jsx`, `History.jsx` (delete/clearAll already had try/catch), `ScoreKeeper.jsx` (end-game save, now wrapped so a save failure never blocks ending the game), `ScoreBoard.jsx` (streak fetch, added `.catch`), and **`PlayerSetup.jsx`** (saved-player list + add). No `base44.entities.*` remain in code.
+- **Auth deferred (v1).** `AuthContext` short-circuits its boot-time app-state/`auth.me` network checks when `!SYNC_ENABLED` (resolves to unauthenticated, no spinner, no error). `base44Client.js` no longer instantiates the real SDK when sync is off — it returns a tiny **stub** (`auth.me` rejects, `logout`/`redirect` no-op). This is what removed the last boot-time network call (the SDK was firing `auth.me` on instantiation).
+- **`AccountSettings.jsx` reworked** for local data: titled "Settings"; a calm "**Saved on this device**" status card (the honest local-first indicator the plan called for); "Delete Account" → "**Clear All Data**" wired to `db.clearAll()`; the Sign Out card only renders when `SYNC_ENABLED`.
+- **Async error handling** (the other open item) is largely **subsumed** by this: local reads/writes don't hit the network, so the silent-offline-failure problem is gone on the happy path. Remaining promise rejections (e.g. local quota) are caught + logged.
+- **Polish items** from the old open list were already shipped before this session: History stagger-on-load and Players "Select all" both exist in code; edit-mode frame **kept blue** (`#2DC5F8`) per decision.
+
+**Not done (next phases of the plan):** the actual Base44 **sync layer** (write-through queue + reconnect flush, last-write-wins) and the **one-time migration** that pulls an existing user's Base44 players/history into the local store on first local-first launch. Both gated to build behind `SYNC_ENABLED`. A live online/offline pill is moot while local-only (offline isn't an error state); revisit when sync lands.
+
+**Verified this session (no backend):** `npm run lint` clean; `vite build` exit 0 (build to a temp `--outDir`; building into the repo's own `dist/` still hits the EPERM unlink quirk noted below); store unit tests (CRUD/ordering/limit/clearAll/corrupt-JSON); and a jsdom render of the production bundle with **all network blocked** — app mounts the home screen offline with 0 network calls, and a seeded `/history` renders a saved game ("Winner Adrian 99 pts"). Test scripts are in the scratch outputs dir (not committed): `store.test.mjs`, `render.test.mjs`, `render-history.test.mjs`.
+
+### 7. Session June 13 (pt. 3) — FTUE first draft
+
+First-time user experience, shown once on first launch (the natural moment now that local-first means no login wall). **First draft — built to be refined.**
+
+- **`src/lib/onboarding.js`** (new) — `hasOnboarded()` / `setOnboarded()` / `resetOnboarding()`, keyed `scrkpr_onboarded` with an `ONBOARDING_VERSION` (bump to re-show after a redesign). Exposes `window.scrkprReplayIntro()` for console replay during iteration.
+- **`src/components/Onboarding.jsx`** (new) — full-screen, on-brand welcome. Three swipeable slides (logo welcome → "Set up your players" with app-style player chips → "Just tap to keep score" with a mini scoreboard + leader 👑), animated progress dots, Skip, and a primary CTA (`Next` → `Start scoring`). Uses the motion tokens, `FluentEmoji`, accent-blue, Syne/Geist. Drag-to-swipe via framer `drag="x"` with an 80px threshold.
+- **Wired in `App.jsx`** — gated above the routed app inside the `ErrorBoundary`, in its own `AnimatePresence`; `useState(() => !hasOnboarded())`. On finish it sets the flag and animates out (fade + blur + slight scale) revealing the home screen.
+- **Settings → "Replay Welcome"** row resets the flag and reloads `/` so the flow can be cycled.
+- Verified: lint clean, build exit 0, jsdom render — FTUE shows on first launch (0 network), is skipped once onboarded, returning user lands on home.
+
+**Persistent header + logo morph:** the SCRKPR logo lives in a top header (logo left `h-6`, Skip right), persistent across slides. On finish (Skip or "Start scoring") the header logo morphs into the home-screen logo slot: `finish()` measures the header logo rect + the home `[data-logo-anchor]` rect and animates a `fixed` flyer between them while the rest of the FTUE fades (`exiting` state), then `dismiss()` (set flag + onDone) unmounts the overlay — revealing ScoreKeeper's identical persistent logo already sitting at that spot, so the handoff is seamless. Fallback: if rects can't be measured, dismiss immediately. (jsdom can't measure rects, so tests cover the fallback path; the fly itself is browser-only.)
+
+**Gotcha (fixed):** `<AnimatePresence initial={false}>` on the slide carousel cascades to ALL descendants, suppressing their mount-initial animations — so the S1 score chips snapped into place with no entrance. Fix: `ScoreStack` flips a `play` flag via `requestAnimationFrame` after mount and the chips/crown/CountUp animate off `play` (`animate={play ? show : hidden}`, `initial={false}`) instead of mount-initial. Re-plays when you swipe back to S1. If you add other mount animations inside a slide, drive them the same way.
+
+**Slide heroes:** S1 `ScoreStack` = scores land SCATTERED (not a column): each `ScoreChip` is absolutely positioned at a loose rotation (`left/top/rotate/z/delay` in `STACK`) and pops+fades in (`SPRING_POP`) at uneven, non-sequential beats; score counts up (`CountUp` via `useMotionValue`/`animate`); crown pops onto the `leader` chip. Conveys spontaneity per Adrian (a game in motion, not a regimented reveal). S2 `PlayerChips` (3 color+emoji chips). S3 `MiniScoreboard` (2-row board, leader crown). Body copy is plain `text-white/70` (the frosted scrim was tried and removed — Adrian preferred clean text over the gradient).
+
+**Copy (locked w/ Adrian):** S1 "Welcome to SCRKPR!" / "The simplest, most delightful way to prove who's better than the other". S2 "Set up the culprits" / "Give everyone a color and an emoji to match their confidence." S3 "Just tap to keep score" / "Settle the debate once and for all. We tally the points and keep the receipts — no account, no mercy."
+
+**Living gradient background** (`src/components/OnboardingBackground.jsx`) — heavily-blurred radial color blobs (`currentColor` in the gradient so framer can tween color per slide), drifting on infinite mirrored loops; palette shifts per slide (S0 brand blue/violet/teal → S1 chip colors → S2 blue/gold/red). Reacts to interaction: **swipe parallax** via a shared `swipeX` MotionValue (the slide's `onDrag` sets it; springs back to 0 on release) and a **tap ripple** bloom (captured at the Onboarding root via `onPointerDownCapture`, rendered from the touch point). `mixBlendMode: screen` over the dark bg for glow; a radial vignette keeps text legible. Honors `useReducedMotion` (freezes drift). All transform/opacity/color → GPU-composited.
+
+**Refinement levers (open):** blob count/size/placement, drift speeds, palette, glow intensity (`opacity 0.6`) and blur radius (72px), ripple size/feel, parallax depth (`parallax` per blob); the morphing welcome-logo → home-logo shared-element transition (not done); slide count/order; light vs. dark-only.
+
 ### 5. Bug fixes worth knowing about
 
 - **Stacking-context trap**: page wrappers are transformed (`motion.div` page transitions), so fixed overlays at app level paint over modals regardless of modal z-index. The tab-bar gradient fade in `ScoreKeeper.jsx` now hides whenever `navHidden` is true (same signal pages send via `onModalChange` when any modal opens). If you add fixed overlays, follow this pattern.
@@ -97,11 +134,11 @@ The setup player list is the trickiest component. Hard-won rules:
 ## Open items
 
 - [ ] **Device-test the player-list drag + toggle (highest priority).** The single-list reorder, drag cinch, and toggle fly were all verified in headless Chromium (mouse), but touch timing differs and earlier drag "snaps" only showed on-device. Feel it on a real phone before trusting it; a screen recording is the fastest way to debug if something's off.
-- [ ] **Go local-first / migrate off Base44** (the bigger thread) — see the "Local-first plan" section below for the full shape. Everything in `src/` that still references base44 is the backend SDK itself (auth, `Player`/`GameHistory` entities in `src/api/base44Client.js`, `AuthContext`, the pages). Assets/branding are already de-Base44'd.
-- [ ] **Async/network error handling** — the `ErrorBoundary` only catches *render* crashes, not rejected promises. `base44.entities.*` reads/writes are currently unguarded and fail silently offline. Largely subsumed by the local-first plan (local becomes source of truth, sync is best-effort), but until then a caught-promise + toast pass would help.
+- [~] **Go local-first / migrate off Base44** — **phase 1 done June 13 (see §6).** Local store is the source of truth, all entity calls repointed, auth deferred behind `SYNC_ENABLED`, zero network offline. **Remaining:** the Base44 sync layer (write-through queue + reconnect flush) and the one-time first-launch migration that pulls an existing user's cloud data into the local store. Build both behind `SYNC_ENABLED`.
+- [x] ~~**Async/network error handling**~~ — largely resolved by §6 (local reads/writes don't touch the network; remaining rejections caught + logged). A toast-on-failure pass is now only relevant once the sync layer exists.
 - [ ] App Store wrapper (Capacitor or similar), icons, splash screens — not started. Generate a proper app icon (currently `public/favicon.png` is derived from the wordmark).
-- [ ] Open PRs / merge strategy for the branches (Base44 syncs from the repo).
-- [ ] Optional polish offered but not done: extend stagger-on-load to History cards; "Select all" in Players select mode; decide blue vs red for the edit-mode frame.
+- [ ] Open PRs / merge strategy for the branches (Base44 syncs from the repo). **Note:** Base44 syncs the repo and publishing happens from Base44 — with auth deferred + the SDK stubbed when `SYNC_ENABLED=false`, confirm the Base44 Builder/publish flow still behaves before merging to `main`.
+- [x] ~~Optional polish~~ — History stagger-on-load and Players "Select all" already shipped; edit-mode frame kept blue per decision (June 13).
 - [x] ~~Visual pass over both branches.~~ Done June 12.
 - [x] ~~`FluentEmoji` unicode fallback.~~ Fixed (see §4).
 - [x] ~~Bundle the logo locally / de-Base44 assets.~~ Done (see §4).

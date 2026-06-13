@@ -61,6 +61,12 @@ export default function Players({ onBack, onModalChange }) {
     setSelectedIds(new Set());
   };
 
+  const allSelected = players.length > 0 && selectedIds.size === players.length;
+  const toggleSelectAll = () => {
+    if (navigator.vibrate) navigator.vibrate(10);
+    setSelectedIds(allSelected ? new Set() : new Set(players.map((p) => p.id)));
+  };
+
   const handleBulkDelete = async () => {
     const ids = [...selectedIds];
     setShowBulkConfirm(false);
@@ -99,6 +105,25 @@ export default function Players({ onBack, onModalChange }) {
 
   return (
     <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
+      {/* Edit-mode frame — a 4px brand border around the whole screen that
+          fades in while selecting, signalling a distinct "edit mode". Sits
+          above content but is click-through; portaled modals (body-level)
+          still render above it. */}
+      <AnimatePresence>
+        {selectMode && (
+          <motion.div
+            key="edit-frame"
+            aria-hidden="true"
+            className="fixed inset-0 z-30 pointer-events-none rounded-[44px]"
+            style={{ border: "4px solid #2DC5F8", boxShadow: "inset 0 0 26px -8px rgba(45,197,248,0.6)" }}
+            initial={{ opacity: 0, scale: 1.015 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.015 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+          />
+        )}
+      </AnimatePresence>
+
       <div className="pt-10 pb-2 px-5 flex items-center flex-shrink-0 relative" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         {players.length > 0 && (
           <button
@@ -115,6 +140,14 @@ export default function Players({ onBack, onModalChange }) {
             className="absolute right-5 top-10 text-sm font-medium text-foreground hover:text-foreground transition-colors px-2 py-1 flex items-center gap-1"
           >
             <Plus size={20} strokeWidth={2} />
+          </button>
+        )}
+        {selectMode && players.length > 0 && (
+          <button
+            onClick={toggleSelectAll}
+            className="absolute right-5 top-10 text-sm font-medium text-accent-blue hover:opacity-80 transition-opacity px-2 py-1"
+          >
+            {allSelected ? "Deselect all" : "Select all"}
           </button>
         )}
       </div>

@@ -21,6 +21,8 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [sortDesc, setSortDesc] = useState(true);
   const [sortLocked, setSortLocked] = useState(false);
+  const [editingPlayer, setEditingPlayer] = useState(null);
+  const [showEndGame, setShowEndGame] = useState(false);
   const scrollContainerRef = useRef(null);
 
   useEffect(() => {
@@ -47,8 +49,6 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     });
   }, []);
   const [editingScore, setEditingScore] = useState(null);
-  const [editingPlayer, setEditingPlayer] = useState(null);
-  const [showEndGame, setShowEndGame] = useState(false);
 
   // For bestof: first to ceil(N/2) wins. For phase10: complete all 10 phases.
   const winsNeeded = bestOf ?

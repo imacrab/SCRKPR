@@ -258,7 +258,7 @@ export default function ScoreKeeper() {
         )}
 
         {view === "/" && (
-          <motion.div key="setup" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
+          <motion.div key="setup" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} onAnimationComplete={measureLogo} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
             <PlayerSetup
               onStart={handleStartGame}
               onShowHistory={() => navigate("/history")}
@@ -269,7 +269,7 @@ export default function ScoreKeeper() {
         )}
 
         {view === "/game" && (
-          <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh" }}>
+          <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} onAnimationComplete={measureLogo} className="w-screen overflow-hidden" style={{ height: "100dvh" }}>
             <ScoreBoard
               players={players}
               winMode={winMode}

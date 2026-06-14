@@ -29,3 +29,11 @@ dist-ssr
 
 .env
 .vite
+
+# Capacitor / iOS native (the ios/ project is committed; these build artifacts are not)
+ios/App/Pods
+ios/App/App/public
+ios/App/output
+ios/App/build
+ios/DerivedData
+*.xcuserstate

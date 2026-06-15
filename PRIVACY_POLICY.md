@@ -35,3 +35,5 @@ If this policy ever changes, the updated version will be posted at this URL with
 ## Contact
 
 Questions? Contact: **illudcrab@gmail.com**
+
+© 2026 Adrian Crabtree — All Rights Reserved, not open source

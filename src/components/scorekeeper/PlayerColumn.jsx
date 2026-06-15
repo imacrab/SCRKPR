@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Plus, Minus } from "lucide-react";
 import { readableTextColor } from "@/lib/contrast";
 import FluentEmoji from "./FluentEmoji";
 import { SPRING_POP, SPRING_SNAPPY } from "@/lib/motion";
@@ -64,42 +63,13 @@ function AnimatedTotal({ value, color }) {
 
 }
 
-export default function PlayerColumn({ player, isLeader = false, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, onAddScore, onQuickScore, onEditScore, onEditPlayer }) {
+export default function PlayerColumn({ player, isLeader = false, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, onAddScore, onEditScore, onEditPlayer }) {
   const baseTotal = player.scores.reduce((s, n) => s + n, 0);
   const isBestOf = winsNeeded !== null;
   const lastIdx = player.scores.length - 1;
   const lastScore = lastIdx >= 0 ? player.scores[lastIdx] : null;
 
-  // Batch rapid +/- taps within 1.5s into a single score entry
-  const [pendingDelta, setPendingDelta] = useState(0);
-  const commitTimerRef = useRef(null);
-  const pendingRef = useRef(0);
-
-  useEffect(() => () => {
-    if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
-  }, []);
-
-  const handleQuickTap = (delta) => {
-    if (navigator.vibrate) navigator.vibrate(10);
-    if (isBestOf) {
-      onQuickScore?.(delta);
-      return;
-    }
-    pendingRef.current += delta;
-    setPendingDelta(pendingRef.current);
-
-    if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
-    commitTimerRef.current = setTimeout(() => {
-      const finalDelta = pendingRef.current;
-      pendingRef.current = 0;
-      setPendingDelta(0);
-      commitTimerRef.current = null;
-      if (finalDelta !== 0) onQuickScore?.(finalDelta);
-    }, 1500);
-  };
-
-  const total = baseTotal + pendingDelta;
-  const showPending = pendingDelta !== 0;
+  const total = baseTotal;
 
   // Convert player color to rgba(...,0.2) for the card background tint
   const bgTint = useMemo(() => {
@@ -114,7 +84,6 @@ export default function PlayerColumn({ player, isLeader = false, isHighlighted =
   // WCAG 2.2 — pick text color that contrasts with the player's background
   const textColor = useMemo(() => readableTextColor(player.color || "#000000"), [player.color]);
   const isDarkText = textColor === "#111111";
-  const buttonBg = "rgba(255,255,255,0.08)";
   const streakBg = isDarkText ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.25)";
   const subtleText = isDarkText ? "rgba(17,17,17,0.65)" : "rgba(255,255,255,0.75)";
 
@@ -199,19 +168,7 @@ export default function PlayerColumn({ player, isLeader = false, isHighlighted =
                 </motion.span>
               }
             </div>
-            {!isBestOf && showPending &&
-            <motion.span
-              key="pending"
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={SPRING_SNAPPY}
-              className="text-sm font-semibold leading-none"
-              style={{ color: textColor }}>
-              
-                ({pendingDelta > 0 ? `+${pendingDelta}` : pendingDelta})
-              </motion.span>
-            }
-            {!isBestOf && !showPending && lastScore !== null &&
+            {!isBestOf && lastScore !== null &&
             <motion.span
               key={lastIdx}
               initial={{ opacity: 0, y: -4 }}
@@ -235,34 +192,6 @@ export default function PlayerColumn({ player, isLeader = false, isHighlighted =
             
             <AnimatedTotal value={total} color="#FFFFFF" />
           </button>
-
-          {/* Minus (±1) — hidden in bestof mode */}
-          {!isBestOf &&
-          <motion.button
-            onClick={() => handleQuickTap(-1)}
-            whileTap={{ scale: 0.75 }}
-            transition={SPRING_POP}
-            className="flex items-center justify-center flex-shrink-0"
-            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor, backdropFilter: "blur(2.5px)", WebkitBackdropFilter: "blur(2.5px)" }}
-            aria-label={`Subtract 1 from ${player.name}`}>
-            
-              <Minus size={20} strokeWidth={2.5} />
-            </motion.button>
-          }
-
-          {/* Plus (±1) — hidden in bestof mode */}
-          {!isBestOf &&
-          <motion.button
-            onClick={() => handleQuickTap(1)}
-            whileTap={{ scale: 0.75 }}
-            transition={SPRING_POP}
-            className="flex items-center justify-center flex-shrink-0 bg-[#ffffff]/20"
-            style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: buttonBg, color: textColor, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
-            aria-label={`Add 1 to ${player.name}`}>
-            
-              <Plus size={20} strokeWidth={2.5} />
-            </motion.button>
-          }
         </div>
       </div>
 

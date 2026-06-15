@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { Shuffle, UserPlus, RotateCcw, Lock, Unlock } from "lucide-react";
+import { UserPlus, RotateCcw, Lock, Unlock } from "lucide-react";
 import { motion, LayoutGroup } from "framer-motion";
 import { db } from "@/lib/store";
 import FluentEmoji from "./FluentEmoji";
@@ -19,7 +19,6 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [gameStartTime] = useState(new Date());
   const [scrollPos, setScrollPos] = useState(0);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [sortDesc, setSortDesc] = useState(true);
   const [sortLocked, setSortLocked] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [showEndGame, setShowEndGame] = useState(false);
@@ -70,15 +69,17 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     return ranked[0].id;
   }, [players, winMode]);
 
-  // Sort players by total score — direction toggled by user; locking preserves setup order
+  // Sort players by total — direction follows the mode (low-wins → ascending,
+  // otherwise descending). Locking preserves the current order (e.g. seating).
   const sortedPlayers = useMemo(() => {
     if (sortLocked) return players;
+    const lowWins = isLowMode(winMode);
     return [...players].sort((a, b) => {
       const totalA = a.scores.reduce((s, n) => s + n, 0);
       const totalB = b.scores.reduce((s, n) => s + n, 0);
-      return sortDesc ? totalB - totalA : totalA - totalB;
+      return lowWins ? totalA - totalB : totalB - totalA;
     });
-  }, [players, sortDesc, sortLocked]);
+  }, [players, winMode, sortLocked]);
 
   // Track whether we've auto-triggered the end-game modal for the current game.
   // Without this guard, the effect re-fires on every score change after the threshold
@@ -182,14 +183,6 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             
             {sortLocked ? <Lock size={22} strokeWidth={2} /> : <Unlock size={22} strokeWidth={2} />}
           </button>
-          <button
-            onClick={() => setSortDesc((v) => !v)}
-            disabled={sortLocked}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:text-foreground hover:bg-accent transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground text-[hsl(var(--foreground))]"
-            aria-label={sortDesc ? "Sort lowest to highest" : "Sort highest to lowest"}>
-            
-            <Shuffle size={22} strokeWidth={2} />
-          </button>
           {players.length < 20 &&
           <button
             onClick={onAddPlayer}
@@ -251,7 +244,6 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
                 isFirst={idx === 0}
                 isLast={idx === sortedPlayers.length - 1}
                 onAddScore={() => handleOpenScore(player)}
-                onQuickScore={(delta) => onAddScore(player.id, delta)}
                 onEditScore={(i) => handleEditScore(player, i)}
                 onEditPlayer={() => setEditingPlayer(player)} />
               

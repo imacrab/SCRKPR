@@ -2,7 +2,7 @@
 
 Everything in `capacitor.config.json` + `assets/` + the `.icon` is scaffolded. These steps run on **macOS** (Xcode/CocoaPods can't run in the cloud sandbox).
 
-- **App ID:** `com.illudcrab.scrkpr`  ·  **Name:** SCRKPR  ·  **webDir:** `dist`
+- **App ID:** `com.illudcrab.scrkpr`  ·  **Name:** SCRKPR  ·  **webDir:** `dist`  ·  **Team ID:** `8RJXUWMLNF`
 - **Prereqs:** macOS, **Xcode 26+** (required for the Liquid Glass `.icon`), CocoaPods (`sudo gem install cocoapods` or `brew install cocoapods`), an Apple Developer account.
 
 ## One-time setup
@@ -29,7 +29,7 @@ npx cap sync ios              # copies web build + plugins into the iOS project
 
 - **Bundle Identifier:** `com.illudcrab.scrkpr` (Capacitor sets this from `appId`; confirm under Signing & Capabilities).
 - **Display Name:** SCRKPR.
-- **Signing:** select your Team (automatic signing is easiest).
+- **Signing:** Signing & Capabilities → check **Automatically manage signing** → select your Team (**`8RJXUWMLNF`**). Xcode creates the provisioning profile for you. (For CLI/CI later, this is the `DEVELOPMENT_TEAM = 8RJXUWMLNF` build setting.)
 - **Deployment target:** iOS 15+ is fine; the glass icon lights up on iOS 26, older falls back.
 - Confirm `viewport-fit=cover` is doing its job: the UI should respect the notch/home-indicator (safe-area padding is already in the CSS).
 

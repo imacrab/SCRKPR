@@ -140,6 +140,15 @@ App Store track started (iOS-only). See **`APP_STORE_READINESS.md`** (review + p
 - **`cap add ios` / Xcode / device test = on Adrian's Mac** (can't run macOS tooling here). Runbook has the ordered commands.
 - **⚠️ Test-harness caveat:** adding Capacitor makes Vite **code-split** the build (a `web` chunk), so the scratch jsdom render tests (`render*.test.mjs`, `players-seg`, `regulars`) — which `eval` a single classic-script bundle — no longer work; they choke on inter-chunk `import`s. The **store/fav-store** unit tests and a new **`cap-web`** no-op check still work. For full render regression now, use a real browser/device or a single-file test build (`manualChunks` override). Device testing supersedes this for the native track anyway.
 
+### 11. Session June 14 (pt. 7) — core-loop simplification (pre-ship deep-think)
+
+A product pass on the core interactions (grilled w/ Adrian). Three changes:
+
+- **Scoring is number-pad-only.** Removed the ± quick buttons + the 1.5s batching (`pendingDelta`/`handleQuickTap`) from `PlayerColumn`. Every mode is now one uniform action: **tap a player → number pad → enter the round**. Best Of still adds +1 per tap (ScoreBoard `handleOpenScore` short-circuits in `circleMode`). Rationale: one obvious input; "safer to add back than remove later." `onQuickScore` plumbing dropped.
+- **Generic game modes.** Picker is now just **High Score / Low Score / Best Of** (no named games). High/Low take an **optional target** ("End at score") — reaching it auto-ends the game (logic already existed in ScoreBoard). This covers the old presets generically: **Gin = High + 100**, **"Swish" = Low + 500** (first to 500 ends it, *lowest* total wins — verified). `GameModeModal` rewritten (mode chips + target input + Done); `PlayerSetup` carries `targetScore` state → `onStart(..., targetScore)`. `gameModes.js` keeps the legacy `ginrummy`/`swish` entries for old-history display, but they're gone from the picker. Default mode is now `high`.
+- **Scoreboard sort follows the mode.** Removed the manual asc/desc toggle (its icon was a misleading `Shuffle` glyph; it was never a randomizer) + `sortDesc` state. Direction now derives from `isLowMode(winMode)`. **Lock** stays (freeze order). No real shuffle existed; a true "shuffle turn order" is a clean future add.
+- Verified: lint, build, `modes.test.mjs` (metadata + Swish/Gin semantics + legacy lookups), store/fav-store. (Render-harness still chunk-limited from Capacitor — fine.)
+
 ### 5. Bug fixes worth knowing about
 
 - **Stacking-context trap**: page wrappers are transformed (`motion.div` page transitions), so fixed overlays at app level paint over modals regardless of modal z-index. The tab-bar gradient fade in `ScoreKeeper.jsx` now hides whenever `navHidden` is true (same signal pages send via `onModalChange` when any modal opens). If you add fixed overlays, follow this pattern.

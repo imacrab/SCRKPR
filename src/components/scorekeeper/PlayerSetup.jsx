@@ -17,7 +17,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [canScrollPlayers, setCanScrollPlayers] = useState(false);
-  const [winMode, setWinMode] = useState("ginrummy");
+  const [winMode, setWinMode] = useState("high");
+  const [targetScore, setTargetScore] = useState(null); // optional end-at score for high/low
   const [showBestOf, setShowBestOf] = useState(false);
   const [showGameMode, setShowGameMode] = useState(false);
   const [tappedId, setTappedId] = useState(null);
@@ -262,8 +263,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       setShowBestOf(true);
       onModalChange?.(true);
     } else {
-      const meta = getModeMeta(winMode);
-      onStart(selectedPlayers, winMode, null, meta.targetScore);
+      onStart(selectedPlayers, winMode, null, targetScore);
     }
   };
 
@@ -500,7 +500,9 @@ export default function PlayerSetup({ onStart, onModalChange }) {
               return (
                 <>
                   <FluentEmoji emoji={emoji} size={18} />
-                  <span className="text-sm font-medium text-foreground">{label}</span>
+                  <span className="text-sm font-medium text-foreground">
+                    {label}{targetScore ? ` · to ${targetScore}` : ""}
+                  </span>
                 </>);
 
             })()}
@@ -539,7 +541,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       <GameModeModal
         isOpen={showGameMode}
         winMode={winMode}
-        onSelect={setWinMode}
+        targetScore={targetScore}
+        onSelect={(mode, target) => { setWinMode(mode); setTargetScore(target); }}
         onClose={() => {setShowGameMode(false);onModalChange?.(false);}} />
       
 

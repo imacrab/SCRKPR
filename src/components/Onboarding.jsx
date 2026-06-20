@@ -7,9 +7,6 @@ import { SPRING_SHEET, SPRING_SNAPPY, SPRING_POP, DUR_MEDIUM } from "@/lib/motio
 import { setOnboarded } from "@/lib/onboarding";
 import logoDark from "@/assets/SCRKPR_dark_mode.png";
 
-// Ripple color per slide — matches the gradient field's emphasis.
-const STEP_ACCENT = ["#2DC5F8", "#A855F7", "#EAB308"];
-
 // ─── First-time user experience ──────────────────────────────────────────────
 // Shown once on first launch (gated in App.jsx). The SCRKPR logo lives in a
 // persistent top header across all slides, then morphs into the home-screen
@@ -213,23 +210,12 @@ export default function Onboarding({ onDone }) {
   const [[step, dir], setStep] = useState([0, 0]);
   const isLast = step === SLIDES.length - 1;
 
-  // Live swipe offset (drives the background parallax) + tap ripples.
+  // Live swipe offset drives the background parallax.
   const swipeX = useMotionValue(0);
-  const rootRef = useRef(null);
   const logoRef = useRef(null);
-  const [ripples, setRipples] = useState([]);
   // Completion morph: the header logo flies into the home-screen logo slot.
   const [flying, setFlying] = useState(null); // { from:{x,y,w}, to:{x,y,w} } | null
   const exiting = flying !== null;
-
-  const spawnRipple = (e) => {
-    if (exiting) return;
-    const rect = rootRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const id = Date.now() + Math.random();
-    setRipples((rs) => [...rs.slice(-4), { id, x: e.clientX - rect.left, y: e.clientY - rect.top }]);
-  };
-  const removeRipple = (id) => setRipples((rs) => rs.filter((r) => r.id !== id));
 
   const go = (next) => {
     if (next < 0 || next >= SLIDES.length) return;
@@ -271,8 +257,6 @@ export default function Onboarding({ onDone }) {
 
   return (
     <motion.div
-      ref={rootRef}
-      onPointerDownCapture={spawnRipple}
       className="fixed inset-0 z-[60] bg-background overflow-hidden"
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -288,13 +272,7 @@ export default function Onboarding({ onDone }) {
         transition={{ duration: 0.3 }}
       >
         {/* Living gradient field, behind everything */}
-        <OnboardingBackground
-          step={step}
-          swipeX={swipeX}
-          ripples={ripples}
-          accent={STEP_ACCENT[step] ?? STEP_ACCENT[0]}
-          onRippleDone={removeRipple}
-        />
+        <OnboardingBackground step={step} swipeX={swipeX} />
 
         {/* Persistent header — logo left, Skip right */}
         <div className="relative z-20 flex items-center justify-between px-5 pt-4 h-14 flex-shrink-0">
@@ -374,7 +352,7 @@ export default function Onboarding({ onDone }) {
 
           <Button
             onClick={() => (isLast ? finish() : go(step + 1))}
-            className="w-full h-12 rounded-full text-base font-semibold bg-accent-blue hover:bg-accent-blue/90 text-[#111111]"
+            className="w-full h-12 rounded-full text-base font-semibold bg-white hover:bg-white/90 text-[#111111]"
           >
             {isLast ? "Start scoring" : "Next"}
           </Button>

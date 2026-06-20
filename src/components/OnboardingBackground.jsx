@@ -66,7 +66,7 @@ function Blob({ cfg, color, swipeX, reduce }) {
   );
 }
 
-export default function OnboardingBackground({ step, swipeX, ripples = [], accent = "#2DC5F8", onRippleDone }) {
+export default function OnboardingBackground({ step, swipeX }) {
   const reduce = useReducedMotion();
   const palette = PALETTES[step] ?? PALETTES[0];
 
@@ -78,29 +78,6 @@ export default function OnboardingBackground({ step, swipeX, ripples = [], accen
           <Blob key={i} cfg={cfg} color={palette[i]} swipeX={swipeX} reduce={reduce} />
         ))}
       </div>
-
-      {/* Tap ripples — a bloom from the touch point */}
-      {ripples.map((r) => (
-        <motion.div
-          key={r.id}
-          initial={{ scale: 0.2, opacity: 0.5 }}
-          animate={{ scale: 2.6, opacity: 0 }}
-          transition={{ duration: 0.95, ease: "easeOut" }}
-          onAnimationComplete={() => onRippleDone?.(r.id)}
-          style={{
-            position: "absolute",
-            left: r.x - 110,
-            top: r.y - 110,
-            width: 220,
-            height: 220,
-            borderRadius: "50%",
-            color: accent,
-            background: "radial-gradient(circle at center, currentColor 0%, transparent 60%)",
-            filter: "blur(10px)",
-            mixBlendMode: "screen",
-          }}
-        />
-      ))}
 
       {/* Subtle vignette so the content stays legible over the glow */}
       <div

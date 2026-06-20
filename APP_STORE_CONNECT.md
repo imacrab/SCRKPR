@@ -2,7 +2,7 @@
 
 Everything you'll paste/answer in App Store Connect (ASC). The binary upload itself happens from Xcode on your Mac (see `CAPACITOR_iOS.md`); this doc is the rest.
 
-> **Your details:** support email `illudcrab@gmail.com` · support URL `https://scrkpr.base44.app` · copyright `© 2026 Adrian Crabtree` _(change if you want an entity)_. Still TODO: **host the privacy policy** at a public URL (see §6).
+> **Your details:** support email `illudcrab@gmail.com` · support URL `https://scrkpr.base44.app` · copyright `© 2026 Adrian Crabtree` · privacy policy hosted at the gist below (verified public). All fields ready — nothing left to fill.
 
 ---
 
@@ -59,11 +59,7 @@ First release. Keep score for any game — on your device, no account needed.
 ## 6. URLs
 
 - **Support URL (required):** `https://scrkpr.base44.app`
-- **Privacy Policy URL (required):** **still needs hosting.** `PRIVACY_POLICY.md` is written (support email already filled in) — publish it at a public URL and paste the link. Easiest options:
-  - **GitHub Pages** on the repo (Settings → Pages), then link the rendered page; or
-  - if the repo is public, the rendered file URL works: `https://github.com/<you>/SCRKPR/blob/main/PRIVACY_POLICY.md`; or
-  - paste it into a free Notion page and "Share to web."
-  Apple just needs a reachable URL that shows this text.
+- **Privacy Policy URL (required):** `https://gist.github.com/imacrab/a4cea9602fed7e31bdb30f32299d36e4` (public gist — verified reachable logged-out. The main repo can stay private.)
 - **Marketing URL (optional):** `https://scrkpr.base44.app` or leave blank.
 
 ## 7. Screenshots (required)

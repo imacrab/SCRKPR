@@ -15,7 +15,7 @@
     "ios": "vite build && cap sync ios && cap open ios"
   },
   "dependencies": {
-    "@base44/sdk": "^0.8.32",
+    "@base44/sdk": "^0.8.34",
     "@base44/vite-plugin": "^1.0.23",
     "@capacitor/core": "^8.4.0",
     "@capacitor/ios": "^8.4.0",

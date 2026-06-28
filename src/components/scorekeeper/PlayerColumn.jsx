@@ -194,18 +194,24 @@ export default function PlayerColumn({ player, isLeader = false, isHighlighted =
                 </motion.span>
               }
             </div>
-            {!isBestOf && lastScore !== null &&
-            <motion.span
-              key={lastIdx}
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={SPRING_SNAPPY}
-              onClick={(e) => {e.stopPropagation();onEditScore?.(lastIdx);}}
-              className="text-sm leading-none cursor-pointer [font-family:'Geist',_sans-serif] font-medium"
-              style={{ color: subtleText }}>
-              
-                ({lastScore > 0 ? `+${lastScore}` : lastScore})
-              </motion.span>
+            {/* Reserve the subtext line always (high/low) so logging a score
+                doesn't change the card's height. */}
+            {!isBestOf &&
+            <div className="h-[18px] flex items-center">
+              {lastScore !== null &&
+              <motion.span
+                key={lastIdx}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={SPRING_SNAPPY}
+                onClick={(e) => {e.stopPropagation();onEditScore?.(lastIdx);}}
+                className="text-sm leading-none cursor-pointer [font-family:'Geist',_sans-serif] font-medium"
+                style={{ color: subtleText }}>
+
+                  ({lastScore > 0 ? `+${lastScore}` : lastScore})
+                </motion.span>
+              }
+            </div>
             }
           </button>
 

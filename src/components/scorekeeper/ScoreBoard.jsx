@@ -64,6 +64,13 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   null;
   const circleMode = isCircleMode(winMode);
 
+  // A "round" is the lowest score-count across players. A player who has logged
+  // the current round is "checked"; the round only advances once everyone has.
+  const currentRound = useMemo(
+    () => (players.length ? Math.min(...players.map((p) => p.scores.length)) : 0),
+    [players]
+  );
+
   // Current leader — gets the crown 👑. No crown on ties or before any scores.
   const leaderId = useMemo(() => {
     const isLowWin = isLowMode(winMode);
@@ -137,7 +144,10 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
       return;
     }
     setActivePlayer(player);
-    setEditingScore(null);
+    // If they've already logged this round, tapping edits that entry (keeping
+    // everyone on the same round) rather than pushing them a round ahead.
+    const scored = player.scores.length > currentRound;
+    setEditingScore(scored ? { playerId: player.id, scoreIndex: currentRound } : null);
   };
 
   const handleEditScore = (player, scoreIndex) => {
@@ -301,6 +311,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
                       winsNeeded={winsNeeded}
                       isFirst={idx === 0}
                       isLast={idx === sortedPlayers.length - 1}
+                      scoredThisRound={!circleMode && player.scores.length > currentRound}
                       onAddScore={() => handleOpenScore(player)}
                       onEditScore={(i) => handleEditScore(player, i)}
                       onEditPlayer={() => setEditingPlayer(player)} />

@@ -63,7 +63,7 @@ function AnimatedTotal({ value, color }) {
 
 }
 
-export default function PlayerColumn({ player, isLeader = false, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, onAddScore, onEditScore, onEditPlayer }) {
+export default function PlayerColumn({ player, isLeader = false, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, scoredThisRound = false, onAddScore, onEditScore, onEditPlayer }) {
   const baseTotal = player.scores.reduce((s, n) => s + n, 0);
   const isBestOf = winsNeeded !== null;
   const lastIdx = player.scores.length - 1;
@@ -115,19 +115,45 @@ export default function PlayerColumn({ player, isLeader = false, isHighlighted =
           )}
         </AnimatePresence>
 
-        {/* Flourish — oversized tilted player emoji bleeding off the left edge */}
-        {player.emoji &&
+        {/* Flourish — oversized tilted player emoji bleeding off the left edge.
+            Once the player has logged this round it morphs into a green check;
+            it morphs back when the round resets. */}
+        {(player.emoji || scoredThisRound) &&
         <div
           className="absolute pointer-events-none select-none"
           style={{
             left: -12,
             top: "50%",
-            transform: "rotate(-20deg) translateY(-50%) scaleX(-1)",
+            transform: "rotate(-20deg) translateY(-50%)",
             opacity: 0.95,
             zIndex: 0
           }}
           aria-hidden="true">
-            <FluentEmoji emoji={player.emoji} size={96} />
+            <AnimatePresence mode="wait" initial={false}>
+              {scoredThisRound ? (
+                <motion.div
+                  key="check"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={SPRING_POP}
+                >
+                  <FluentEmoji emoji="✅" size={96} />
+                </motion.div>
+              ) : player.emoji ? (
+                <motion.div
+                  key="emoji"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={SPRING_POP}
+                >
+                  <span className="block" style={{ transform: "scaleX(-1)" }}>
+                    <FluentEmoji emoji={player.emoji} size={96} />
+                  </span>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
           </div>
         }
 

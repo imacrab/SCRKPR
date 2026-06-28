@@ -144,10 +144,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
       return;
     }
     setActivePlayer(player);
-    // If they've already logged this round, tapping edits that entry (keeping
-    // everyone on the same round) rather than pushing them a round ahead.
-    const scored = player.scores.length > currentRound;
-    setEditingScore(scored ? { playerId: player.id, scoreIndex: currentRound } : null);
+    setEditingScore(null);
   };
 
   const handleEditScore = (player, scoreIndex) => {
@@ -159,9 +156,17 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const handleSubmit = (value) => {
     if (!activePlayer) return;
     if (editingScore !== null) {
+      // Correcting a specific past entry (tapped the "(+X)") — replace it.
       onEditScore(editingScore.playerId, editingScore.scoreIndex, value);
     } else {
-      onAddScore(activePlayer.id, value);
+      // Tapping the player: if they've already logged this round, ADD to that
+      // round's entry (so +2 then +4 tallies as +6); otherwise log a fresh one.
+      const p = players.find((x) => x.id === activePlayer.id) || activePlayer;
+      if (!circleMode && p.scores.length > currentRound) {
+        onEditScore(activePlayer.id, currentRound, p.scores[currentRound] + value);
+      } else {
+        onAddScore(activePlayer.id, value);
+      }
     }
     setActivePlayer(null);
     setEditingScore(null);

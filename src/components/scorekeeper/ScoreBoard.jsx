@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { UserPlus, RotateCcw, Lock, Unlock } from "lucide-react";
-import { motion, LayoutGroup } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { db } from "@/lib/store";
 import FluentEmoji from "./FluentEmoji";
 import PlayerColumn from "./PlayerColumn";
@@ -10,7 +10,7 @@ import EndGameModal from "./EndGameModal";
 import ResetConfirmModal from "./ResetConfirmModal";
 import ScoreHistoryPanel from "./ScoreHistoryPanel";
 import { isLowMode, isCircleMode } from "@/lib/gameModes";
-import { SPRING_POP, SPRING_SHEET } from "@/lib/motion";
+import { SPRING_POP, SPRING_SHEET, SPRING_SNAPPY, TRANSITION_PANEL } from "@/lib/motion";
 import logoDark from "@/assets/SCRKPR_dark_mode.png";
 
 export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
@@ -22,7 +22,16 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [sortLocked, setSortLocked] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [showEndGame, setShowEndGame] = useState(false);
+  const [view, setView] = useState("board"); // "board" | "rounds"
   const scrollContainerRef = useRef(null);
+
+  // The Rounds tab only makes sense once rounds exist and not in circle (best-of)
+  // modes. Snap back to the board if it stops being available.
+  const maxRounds = Math.max(0, ...players.map((p) => p.scores.length));
+  const showTabs = !isCircleMode(winMode) && maxRounds > 0;
+  useEffect(() => {
+    if (view === "rounds" && !showTabs) setView("board");
+  }, [view, showTabs]);
 
   useEffect(() => {
     db.games.list("-played_at", 20).then((games) => {
@@ -202,6 +211,38 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         </div>
       </div>
 
+      {/* Scoreboard / Rounds tabs — appear once rounds have been logged */}
+      {showTabs && (
+        <div className="px-4 pb-2 flex-shrink-0">
+          <div className="relative flex rounded-full bg-secondary border border-border p-1">
+            {[
+              { id: "board", label: "Scoreboard" },
+              { id: "rounds", label: "Rounds" },
+            ].map(({ id, label }) => {
+              const active = view === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => setView(id)}
+                  className="relative flex-1 h-9 rounded-full text-sm font-medium"
+                >
+                  {active && (
+                    <motion.div
+                      layoutId="board-tab-pill"
+                      transition={SPRING_SNAPPY}
+                      className="absolute inset-0 rounded-full bg-card border border-border shadow-sm"
+                    />
+                  )}
+                  <span className={`relative z-10 transition-colors ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                    {label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Rows — one player per row, sorted by total */}
       <div className="flex-1 px-4 pb-4 overflow-hidden w-full relative">
         {/* Bottom fade — players that scroll near the End Game button fade out */}
@@ -212,51 +253,65 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             background: "linear-gradient(to top, hsl(var(--background)) 30%, hsl(var(--background) / 0) 100%)"
           }} />
         
-        {/* paddingBottom just clears the fixed End Game button + its 120px
-            bottom fade so the last player isn't hidden behind them — NOT the old
-            flat 200px, which left a scrollable void below the button on short games. */}
-        <div
-          ref={scrollContainerRef}
-          className="flex flex-col h-full gap-2 w-full overflow-y-auto relative z-0"
-          style={{ WebkitOverflowScrolling: "touch", paddingBottom: "calc(env(safe-area-inset-bottom) + 120px)" }}>
-          
-          <LayoutGroup>
-            {sortedPlayers.map((player, idx) =>
+        <AnimatePresence mode="wait" initial={false}>
+          {view === "rounds" ? (
             <motion.div
-              key={player.id}
-              layout
-              initial={{ opacity: 0, y: 48, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{
-                layout: SPRING_SHEET,
-                y: { ...SPRING_SHEET, delay: idx * 0.07 },
-                scale: { ...SPRING_SHEET, delay: idx * 0.07 },
-                opacity: { duration: 0.25, delay: idx * 0.07 },
-              }}
-              className="w-full flex-shrink-0">
-              
-                <PlayerColumn
-                player={player}
-                isLeader={player.id === leaderId}
-                isHighlighted={player.id === lastAddedPlayerId}
-                streak={streakMap[player.name] || 0}
-                winsNeeded={winsNeeded}
-                isFirst={idx === 0}
-                isLast={idx === sortedPlayers.length - 1}
-                onAddScore={() => handleOpenScore(player)}
-                onEditScore={(i) => handleEditScore(player, i)}
-                onEditPlayer={() => setEditingPlayer(player)} />
-              
-              </motion.div>
-            )}
-          </LayoutGroup>
-
-          {!circleMode &&
-          <div className="flex-shrink-0">
+              key="rounds"
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 24 }}
+              transition={TRANSITION_PANEL}
+              className="h-full overflow-y-auto relative z-0"
+              style={{ WebkitOverflowScrolling: "touch", paddingBottom: "calc(env(safe-area-inset-bottom) + 120px)" }}>
               <ScoreHistoryPanel players={sortedPlayers} />
-            </div>
-          }
-        </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="board"
+              initial={{ opacity: 0, x: -24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={TRANSITION_PANEL}
+              className="h-full">
+              {/* paddingBottom clears the fixed End Game button + its 120px fade. */}
+              <div
+                ref={scrollContainerRef}
+                className="flex flex-col h-full gap-2 w-full overflow-y-auto relative z-0"
+                style={{ WebkitOverflowScrolling: "touch", paddingBottom: "calc(env(safe-area-inset-bottom) + 120px)" }}>
+                <LayoutGroup>
+                  {sortedPlayers.map((player, idx) =>
+                  <motion.div
+                    key={player.id}
+                    layout
+                    initial={{ opacity: 0, y: 48, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{
+                      layout: SPRING_SHEET,
+                      y: { ...SPRING_SHEET, delay: idx * 0.07 },
+                      scale: { ...SPRING_SHEET, delay: idx * 0.07 },
+                      opacity: { duration: 0.25, delay: idx * 0.07 },
+                    }}
+                    className="w-full flex-shrink-0">
+
+                      <PlayerColumn
+                      player={player}
+                      isLeader={player.id === leaderId}
+                      isHighlighted={player.id === lastAddedPlayerId}
+                      streak={streakMap[player.name] || 0}
+                      winsNeeded={winsNeeded}
+                      isFirst={idx === 0}
+                      isLast={idx === sortedPlayers.length - 1}
+                      onAddScore={() => handleOpenScore(player)}
+                      onEditScore={(i) => handleEditScore(player, i)}
+                      onEditPlayer={() => setEditingPlayer(player)} />
+
+                    </motion.div>
+                  )}
+                </LayoutGroup>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* End Game — fixed at bottom of scoreboard, centered */}
         <div

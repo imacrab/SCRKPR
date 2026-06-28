@@ -60,7 +60,7 @@ export const PLAYER_EMOJI_LIBRARY = [
   ["🥷", "ninja stealth fight sneaky"],
   ["🦸", "hero superhero powerful cape"],
   ["🦹", "villain evil supervillain"],
-  ["🤠", "cowboy hat western"],
+  ["🤠", "cowboy cowgirl hat western rodeo"],
   ["💪", "muscle strong flex gym power"],
   ["🙌", "hands praise yay celebrate"],
   ["🤝", "handshake deal partner agree"],
@@ -162,6 +162,7 @@ export const PLAYER_EMOJI_LIBRARY = [
   ["❄️", "snowflake cold winter ice"],
   ["💧", "drop water tear"],
   ["🌊", "wave ocean sea water"],
+  ["🌋", "volcano lava eruption mountain erupt fire"],
 
   // Food
   ["🍕", "pizza food slice italian"],
@@ -206,6 +207,8 @@ export const PLAYER_EMOJI_LIBRARY = [
   ["🏓", "ping pong table tennis sport"],
   ["🏸", "badminton sport"],
   ["🥊", "boxing glove fight sport"],
+  ["🏄", "surfer surf wave beach ocean board cowabunga"],
+  ["🏇", "horse rider racing jockey equestrian riding cowgirl cowboy derby"],
   ["🎯", "dart bullseye target aim"],
   ["🎲", "dice game roll"],
   ["🃏", "joker card game playing"],

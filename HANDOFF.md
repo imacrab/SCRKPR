@@ -1,33 +1,39 @@
 # SCRKPR — Session Handoff
 
 > Context doc for continuing work on a new machine / new Claude session.
-> Last updated: June 13, 2026 (local-first migration — phase 1)
+> Last updated: June 15, 2026 (App Store prep + core-loop rework)
 
 ## What this project is
 
-SCRKPR is a scorekeeping app (React 18 + Vite + Tailwind + framer-motion, shadcn/ui components) built on **Base44** (hosted backend: auth, `Player` and `GameHistory` entities). Repo: `imacrab/SCRKPR` on GitHub. The Base44 GitHub integration syncs the repo with the Base44 Builder; publishing happens from Base44. Goal: polish the app for an eventual App Store release (will need a native wrapper, e.g. Capacitor — not started).
+SCRKPR is a delightful, **local-first** scorekeeping app for in-person game night (React 18 + Vite + Tailwind + framer-motion, shadcn/ui). Repo: `imacrab/SCRKPR` on GitHub. Players, scores, and history live **on-device** (localStorage via `src/lib/store.js`) — **no account, no network on the happy path.** Base44 (the original hosted backend) is fully **dormant behind `SYNC_ENABLED = false`** in `lib/store.js`: the SDK/auth are stubbed (`src/api/base44Client.js`) so the app boots offline with zero network calls. Goal: ship to the **iOS App Store** via a Capacitor wrapper — scaffolded; see **`CAPACITOR_iOS.md`** (Mac runbook) + **`APP_STORE_CONNECT.md`** (submission kit, fully filled) + **`APP_STORE_READINESS.md`**.
 
 ## Local setup
 
 ```bash
 npm install
-# create .env.local (gitignored — must be recreated on each machine):
-# VITE_BASE44_APP_ID=69ea763700078809357a164a
-# VITE_BASE44_APP_BASE_URL=https://scrkpr.base44.app
-npm run dev      # Vite dev server, usually :5173
-npm run lint     # eslint --quiet (clean as of last commit)
-npm run build    # passes as of last commit
+npm run dev      # Vite dev server, :5173 — works fully offline, no .env needed
+npm run lint     # eslint --quiet (clean)
+npm run build    # vite build (passes)
+npm run cap:sync # vite build && cap sync   (iOS)
 ```
 
-Without `.env.local`, backend calls fail silently (e.g. adding a player does nothing) and the build logs `[base44] Proxy not enabled`.
-
-> Sandbox/CI note: headless Chromium on arm64 may need `@rollup/rollup-linux-arm64-gnu` and a stub `libXdamage.so.1`; Vite needs file-delete permission for its `.vite` cache. Real-device testing is still required for touch drag — headless mouse events don't reproduce dnd's touch timing (see Open items).
+- **No `.env.local` needed** — the app is local-first; Base44 is off. (Old Base44 key rotated; nothing sensitive is committed — repo is public.)
+- **npm optional-dep gotcha:** install/uninstall cycles can drop `@rollup/rollup-linux-arm64-gnu` (npm bug #4828) → `vite build` fails with "Cannot find module @rollup/rollup-linux-arm64-gnu". In-sandbox fix: `npm install @rollup/rollup-linux-arm64-gnu --no-save` (do NOT add to package.json — it's platform-specific; a fresh `npm install` on macOS pulls the darwin binary).
+- **Tests:** scratch node/jsdom tests in the outputs dir (not committed) — `store`, `fav-store`, `modes`, `round`, `accum`. Capacitor code-splits the build, so the old `render*` bundle-eval tests no longer run; rely on logic unit tests + real-device for UI.
 
 ## Branches
 
-- `main` — untouched Base44-synced code.
-- `standardize-design-tokens` — design-token standardization (details below).
-- `delight-pass` — branched off the token branch; all subsequent feature/polish work. **This is the active branch.**
+- `main` — **the release line now;** `delight-pass` merged in via PR #10, so `main` has everything below. Base44 still syncs from the repo (confirm the Builder/publish flow tolerates the stubbed SDK before relying on it).
+- `delight-pass` — active working branch (at/ahead of `main`).
+- `standardize-design-tokens` — original token branch (see §1).
+
+## Current state (June 15) — quick snapshot
+
+- **Scoring model:** tap a player → number pad → enter the round (no ± buttons). A "round" = the lowest score-count across players. A player who's logged the current round shows a green ✅ (emoji morphs to check); **re-tapping accumulates onto that round's entry** (+2 then +4 = +6), and the round only advances once everyone's logged — no skip-ahead. Tapping the small "(+X)" subtext replaces/corrects that entry.
+- **Game modes:** generic **High / Low / Best Of**, with an optional **target** on High/Low (reach it → game auto-ends). Covers Gin (High+100) and "Swish" (Low+500). Sort follows the mode.
+- **Scoreboard** has a History-style segmented pill: **Scoreboard ↔ Rounds** (the per-round table; appears once a round is logged, hidden in Best Of).
+- **FTUE, regulars (favorites), End Game hero, History** all shipped (see sections below).
+- **App Store:** Capacitor v8 scaffolded (`capacitor.config.json`, appId `com.illudcrab.scrkpr`, Team `8RJXUWMLNF`); `ios/` project generated on the Mac. Privacy policy hosted at a public gist. **Blocked on the app icon** (see §12 — rebrand in progress).
 
 ## What was done
 
@@ -149,6 +155,17 @@ A product pass on the core interactions (grilled w/ Adrian). Three changes:
 - **Scoreboard sort follows the mode.** Removed the manual asc/desc toggle (its icon was a misleading `Shuffle` glyph; it was never a randomizer) + `sortDesc` state. Direction now derives from `isLowMode(winMode)`. **Lock** stays (freeze order). No real shuffle existed; a true "shuffle turn order" is a clean future add.
 - Verified: lint, build, `modes.test.mjs` (metadata + Swish/Gin semantics + legacy lookups), store/fav-store. (Render-harness still chunk-limited from Capacitor — fine.)
 
+### 12. Session June 14–15 (pt. 8) — scoreboard tabs, round guard, FTUE/nav polish, icon rebrand
+
+- **Scoreboard tabs.** Replaced the inline "Show Score History" collapsible with a History-style segmented pill on `ScoreBoard`: **Scoreboard ↔ Rounds**. `ScoreHistoryPanel` is now an always-on table (toggle removed) shown in the Rounds tab; body swaps via `AnimatePresence mode="wait"`. Tabs only render when `!isCircleMode(winMode) && maxRounds > 0`; `view` snaps back to board if they disappear.
+- **Round-completion guard + accumulate (`ScoreBoard` + `PlayerColumn`).** `currentRound = min(scores.length)`. `scoredThisRound = scores.length > currentRound`. A scored player's flourish emoji morphs to ✅ (`PlayerColumn`, `scoredThisRound` prop, AnimatePresence swap). Tapping the player body when already scored **accumulates** onto `scores[currentRound]` (`handleSubmit`: `onEditScore(id, currentRound, existing + value)`) — no new entry, no skip-ahead; round advances only when all logged. Tapping the tiny "(+X)" subtext still **replaces** that entry (correction). Verified by `round`/`accum` tests.
+- **PlayerColumn card no longer grows** when a score is logged — the "(+X)" subtext line is always reserved (`h-[18px]`) for high/low modes.
+- **Emojis added** (`EmojiPicker`): 🌋 volcano, 🏄 surfer, 🏇 horse-with-rider/jockey. No dedicated cowgirl emoji exists → "cowgirl" keyword added to 🤠 + 🏇.
+- **FTUE polish:** CTA button is now **white** (was accent-blue); the **tap ripple was removed** (state/handlers/props cleaned out — gradient drift + swipe parallax remain).
+- **Bottom nav spacing:** `BottomNavigationBar` bottom padding `safe-area + 24px` → **`+ 32px`** (matches the 88px the Players/History lists reserve).
+- **⚠️ APP ICON — in flux (this is the live blocker).** The original Liquid Glass `.icon` (`src/assets/SCRKPR-Icon.icon`, geometric S monogram) was scrapped — the S read too much like a swastika in isolation (rotational bladed form). Adrian pivoted the brand to a **hand-painted brush wordmark** (`SCRKPR!`). Plan: a brush letterform can't have that problem; **cut a single glyph (the "S", and/or the "!") out of the real brush wordmark** and center it on the `#111` tile = a **classic raster 1024² PNG icon** (NOT Liquid Glass — brush texture is raster, doesn't fit the layered-glass `.icon` model). **Next step:** Adrian drops the high-res brush `SCRKPR!` PNG into `src/assets/`; then cut S + ! candidates, pick one, generate the icon set, update manifest/apple-touch-icon + the Xcode app icon, retire the `.icon`. (Old `SCRKPR-Icon.icon` + `AppIcon.png` 288px can be deleted.)
+- **iPad:** brainstormed (not built) — the big idea is "iPad = communal center-of-table board": landscape columnar scoreboard, glanceable from across the table, persistent rounds side-panel. Ship iPhone first, then iPad as its own update (same codebase, responsive). Parked.
+
 ### 5. Bug fixes worth knowing about
 
 - **Stacking-context trap**: page wrappers are transformed (`motion.div` page transitions), so fixed overlays at app level paint over modals regardless of modal z-index. The tab-bar gradient fade in `ScoreKeeper.jsx` now hides whenever `navHidden` is true (same signal pages send via `onModalChange` when any modal opens). If you add fixed overlays, follow this pattern.
@@ -177,18 +194,37 @@ The setup player list is the trickiest component. Hard-won rules:
 - **Do NOT use framer `layout`/`layoutId` on these rows.** It deadlocks the page-level `AnimatePresence mode="wait"` exit and breaks navigation to the scoreboard (verified across blur/scale/opacity variants). The persistent-logo and crown still use `layoutId` because they're not inside that exiting list.
 - A separate FLIP *wrapper* element inside the Draggable breaks dnd's drag *pickup* (extra nesting throws off its measurements) — that's why the FLIP transform lives on the row's existing outer div, with the dnd node as a direct child.
 
+### 13. Session June 27 — pre-submission code review + cleanup
+
+A review/tidy pass (no feature changes). Repo confirmed green: `npm run lint` clean, `vite build` exit 0 (temp `--outDir`), and 18 recreated logic tests pass (store CRUD/ordering/limit/merge/clearAll/corrupt-JSON + mode metadata incl. Gin/Swish + round/accumulate/Swish-low-wins).
+
+- **Dead code removed:** `GameMenuModal.jsx` was unreferenced (only its own definition existed) — deleted.
+- **Unused deps removed** (zero references anywhere in `src/`, incl. cross-`ui/`): `lodash`, `zod`, `@hookform/resolvers`, `react-hot-toast` (only a comment in `use-toast.jsx`), `@radix-ui/react-toast` (`ui/toast.jsx` uses `cva`, not the Radix primitive). `package.json` + `package-lock.json` updated; re-installed, re-linted, re-built — all green. (False positives kept: `@capacitor/{status-bar,splash-screen}` are dynamic-imported in `main.jsx`; `@capacitor/ios` is native-only; `@base44/vite-plugin` + `tailwindcss-animate` are config-file deps.)
+- **Clean review signals:** no `base44.entities.*` calls remain (only comments in `store.js`); no `media.base44.com` URLs; no `TODO/FIXME`; all `console.*` are legit fail-soft catch-block logging.
+
+**`ui/` prune — DONE (June 27):** only 5 of 42 shadcn components were reachable (`button`, `input`, `toast`, `toaster`, `use-toast` + `button`'s `@radix-ui/react-slot`). Deleted the other 37 unreferenced starter components and removed the **28** deps they orphaned (24 `@radix-ui/*` + `next-themes`, `react-hook-form`, `sonner`). `package.json` went **53 → 20** dependencies. Re-installed, lint clean, `vite build` exit 0, 18 logic tests pass, and `npm run dev` boots clean (served `/`, `main.jsx`, `App.jsx`, `toaster.jsx` all 200, log clean). Since the bundle was already tree-shaken this is audit-surface / node_modules / npm-audit-noise reduction, not a runtime change.
+
+**`npm audit` — reviewed (June 27), `npm audit fix` NOT run:** 16 advisories (8 high, 7 moderate, 1 low), **all auto-fixable / non-breaking**. The pruned Radix deps weren't the source, so the count is unchanged. Categories: (a) **build-time only** — vite (direct), rollup, postcss, @babel/core, js-yaml, ajv, brace-expansion, minimatch, flatted, picomatch — don't ship in the iOS bundle; (b) **dormant `@base44/sdk` socket transport** — ws, socket.io-parser, engine.io-client, form-data — never execute while `SYNC_ENABLED=false` (stub client); (c) **live app runtime** — `react-router`/`react-router-dom` — the only ones that actually ship + run. Recommend `npm audit fix` (esp. for router) + a quick device retest before submission.
+
+**Still open (recommendations):**
+- **`@base44/sdk` still bundled:** `base44Client.js`/`AuthContext.jsx` statically import it even though the stub is what runs offline, so the SDK (and its dormant socket deps) ship in the bundle. Fully dropping it is a phase-2 task (tied to the sync decision), not a safe pre-submission edit.
+- **Minor:** stale `phase10` references in `ScoreBoard.jsx` comments (no longer a mode) — harmless. Stale icon assets (`SCRKPR-Icon.icon`, `AppIcon.png`) left in place pending the icon-direction decision.
+
 ## Open items
 
-- [ ] **Device-test the player-list drag + toggle (highest priority).** The single-list reorder, drag cinch, and toggle fly were all verified in headless Chromium (mouse), but touch timing differs and earlier drag "snaps" only showed on-device. Feel it on a real phone before trusting it; a screen recording is the fastest way to debug if something's off.
-- [~] **Go local-first / migrate off Base44** — **phase 1 done June 13 (see §6).** Local store is the source of truth, all entity calls repointed, auth deferred behind `SYNC_ENABLED`, zero network offline. **Remaining:** the Base44 sync layer (write-through queue + reconnect flush) and the one-time first-launch migration that pulls an existing user's cloud data into the local store. Build both behind `SYNC_ENABLED`.
-- [x] ~~**Async/network error handling**~~ — largely resolved by §6 (local reads/writes don't touch the network; remaining rejections caught + logged). A toast-on-failure pass is now only relevant once the sync layer exists.
-- [ ] App Store wrapper (Capacitor or similar), icons, splash screens — not started. Generate a proper app icon (currently `public/favicon.png` is derived from the wordmark).
-- [ ] Open PRs / merge strategy for the branches (Base44 syncs from the repo). **Note:** Base44 syncs the repo and publishing happens from Base44 — with auth deferred + the SDK stubbed when `SYNC_ENABLED=false`, confirm the Base44 Builder/publish flow still behaves before merging to `main`.
-- [x] ~~Optional polish~~ — History stagger-on-load and Players "Select all" already shipped; edit-mode frame kept blue per decision (June 13).
-- [x] ~~Visual pass over both branches.~~ Done June 12.
-- [x] ~~`FluentEmoji` unicode fallback.~~ Fixed (see §4).
-- [x] ~~Bundle the logo locally / de-Base44 assets.~~ Done (see §4).
-- [x] ~~Rotate the Base44 API key.~~ Rotated June 12, 2026.
+- [ ] **APP ICON (active blocker for submission)** — **brush-wordmark approach dropped (June 27, Adrian); icon direction is now open/TBD.** Still need a 1024² raster icon → generate the set → wire into Xcode + manifest/apple-touch-icon. The geometric Liquid-Glass `S` was scrapped earlier (read as a swastika in isolation); the brush "cut a glyph from `SCRKPR!`" plan is also now off. Pick a new direction before generating. See §12 for history.
+- [ ] **Finish the iOS submission** — on the Mac: `CAPACITOR_iOS.md` runbook (set icon, sign w/ team `8RJXUWMLNF`, set iPhone-only, `ITSAppUsesNonExemptEncryption=NO`, device-test, Archive → upload), then paste `APP_STORE_CONNECT.md` into App Store Connect + submit.
+- [ ] **Device-test on a real iPhone (high priority).** The player-list drag/toggle + favorites FLIP + the round-guard morph + safe-area insets were all verified in headless DOM / logic only. Feel them on hardware. If the nav still hugs the bottom on-device, the safe-area inset may not be reaching the webview (`viewport-fit`/`contentInset`).
+- [~] **Local-first** — phase 1 done (§6). Remaining (only if/when cross-device wanted): the Base44 sync layer + first-launch migration, both behind `SYNC_ENABLED`.
+- [ ] **iPad version** — scoped/brainstormed (§12), not built. Ship iPhone first.
+- [ ] **Merge/publish caution** — Base44 syncs `main`; confirm its Builder/publish flow tolerates the stubbed SDK (`SYNC_ENABLED=false`) before relying on it.
+- [ ] **`npm audit fix` (from §13, not run):** 16 non-breaking advisories; only `react-router`/`react-router-dom` actually ship + run — bump + device-retest before submission. Rest are build-time or dormant base44-SDK socket deps.
+- [ ] **Drop `@base44/sdk` from the bundle (phase 2):** still statically imported though the stub runs offline; removing it clears the dormant socket-dep advisories. Tied to the sync decision.
+- [x] ~~Pre-submission code review + cleanup~~ — green build/lint/tests; dead `GameMenuModal` + 5 dead deps removed, then full `ui/` prune (37 components, deps 53→20), dev server verified (§13).
+- [x] ~~App Store readiness pass / quick wins~~ — viewport-fit, head metas, dep prune, package rename, Capacitor scaffold all done (§10).
+- [x] ~~Core-loop rework~~ — generic modes, number-pad-only scoring, sort-follows-mode, round guard + accumulate (§11, §12).
+- [x] ~~Async/network error handling~~ — resolved by local-first (§6).
+- [x] ~~Optional polish / visual pass / FluentEmoji fallback / local logo / rotate Base44 key~~ — all done (§4, earlier).
 
 ## Verification harness (for the next session)
 

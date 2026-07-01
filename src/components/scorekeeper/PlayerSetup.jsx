@@ -407,7 +407,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   className="w-7 h-7 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"
                   style={{ backgroundColor: player.color }}>
                   
-                      {player.emoji && <FluentEmoji emoji={player.emoji} size={18} />}
+                      {player.emoji && <FluentEmoji emoji={player.emoji} size={18} style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.35))" }} />}
                     </div>
                     <span className="flex-1 text-base [font-family:'Geist',_sans-serif] font-semibold" style={{ color: rowText }}>{player.name}</span>
                     <button

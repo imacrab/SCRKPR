@@ -275,7 +275,6 @@ export const PLAYER_EMOJI_LIBRARY = [
   ["✅", "check mark yes correct done"],
   ["❌", "cross x no wrong"],
   ["⛔", "no entry stop forbidden"],
-  ["💯", "perfect hundred score"],
   ["❤️", "heart love red"],
   ["🧡", "heart love orange"],
   ["💛", "heart love yellow"],
@@ -291,10 +290,88 @@ export const PLAYER_EMOJI_LIBRARY = [
   ["🎈", "balloon party celebrate"],
   ["🎉", "party popper celebrate confetti"],
   ["🎊", "confetti ball celebrate party"],
+
+  // Mythical / fantasy
+  ["🐉", "dragon mythical fantasy fire lucky"],
+  ["🐲", "dragon face mythical fantasy"],
+  ["🧚", "fairy magic wings fantasy pixie"],
+  ["🧜", "mermaid merman sea fantasy"],
+  ["🧝", "elf fantasy pointy ears"],
+  ["🧌", "troll ogre fantasy monster"],
+  ["👹", "ogre monster oni demon mask"],
+  ["👺", "goblin tengu mask monster"],
+  ["🪄", "magic wand spell wizard sparkle"],
+  ["🔱", "trident poseidon neptune emblem"],
+
+  // More animals / creatures
+  ["🦥", "sloth slow lazy animal"],
+  ["🦦", "otter animal cute river"],
+  ["🦫", "beaver animal dam teeth"],
+  ["🦡", "badger honey animal"],
+  ["🦨", "skunk animal stinky stripe"],
+  ["🦧", "orangutan ape animal"],
+  ["🦣", "mammoth elephant prehistoric tusks"],
+  ["🦬", "bison buffalo animal wild"],
+  ["🦭", "seal sea animal ocean"],
+  ["🦩", "flamingo bird pink tropical"],
+  ["🦚", "peacock bird feathers pretty"],
+  ["🦜", "parrot bird tropical talk"],
+  ["🦢", "swan bird elegant lake"],
+  ["🦃", "turkey bird thanksgiving"],
+  ["🐓", "rooster chicken farm cockerel"],
+  ["🦔", "hedgehog spiky animal cute"],
+  ["🐿️", "squirrel chipmunk animal nuts"],
+  ["🐄", "cow bull farm animal"],
+  ["🐖", "pig hog farm animal"],
+  ["🦂", "scorpion sting desert arachnid"],
+  ["🕷️", "spider web arachnid creepy"],
+  ["🦗", "cricket grasshopper insect bug"],
+  ["🐛", "caterpillar bug insect worm"],
+  ["🐡", "pufferfish blowfish sea ocean"],
+  ["🦪", "oyster shell pearl sea"],
+
+  // Fun objects / party
+  ["🎃", "pumpkin jackolantern halloween spooky"],
+  ["🧸", "teddy bear toy plush cute"],
+  ["🪅", "pinata party celebrate fiesta"],
+  ["🪩", "disco ball party dance mirror"],
+  ["🛹", "skateboard skate trick"],
+  ["🪃", "boomerang throw return"],
+  ["🥁", "drum music beat rhythm"],
+  ["🪕", "banjo music strings country"],
+  ["🎷", "saxophone sax music jazz"],
+  ["🧲", "magnet attract pull"],
+  ["🧭", "compass direction explore adventure"],
+  ["🗿", "moai statue stone head"],
+  ["🌀", "cyclone swirl spiral dizzy"],
 ];
 
 // Build the simple emoji list for back-compat callers.
 export const PLAYER_EMOJIS = PLAYER_EMOJI_LIBRARY.map(([e]) => e);
+
+// Curated pool for RANDOM auto-fill on new players. The full library above is
+// always searchable/pickable, but auto-assignment should feel intentional — so
+// we bias toward characterful avatars (animals, creatures, fun faces) and skip
+// things that read oddly as a "player": ✅ ❌ ⛔ 💩 hearts, card suits, money,
+// music notes, food, plain symbols, etc.
+export const AUTOFILL_EMOJIS = [
+  // Fun faces / characters
+  "😎", "🤓", "🥳", "😈", "🤡", "👻", "👽", "👾", "🤖", "💀",
+  // People / roles
+  "👑", "🧙", "🧛", "🧟", "🥷", "🦸", "🦹", "🤠", "🧚", "🧜", "🧝",
+  // Mammals
+  "🐶", "🐱", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮", "🐷", "🐵",
+  "🐰", "🐹", "🐭", "🐺", "🐗", "🦄", "🦥", "🦦", "🦫", "🦨", "🦧",
+  "🦣", "🦬", "🦔", "🐿️", "🐘", "🦛", "🦏", "🦒", "🦌", "🐆", "🦓",
+  // Birds
+  "🐧", "🦉", "🦅", "🦩", "🦚", "🦜", "🦢", "🦃", "🐓", "🦆",
+  // Sea / reptiles / bugs
+  "🐢", "🐙", "🦑", "🦀", "🦈", "🐬", "🐳", "🐊", "🐍", "🦎",
+  "🦖", "🐝", "🦋", "🐞", "🦂", "🕷️", "🐡",
+  // Mythical / cool objects
+  "🐉", "🐲", "👹", "👺", "🗿", "🔥", "⚡", "🌟", "💎", "🚀",
+  "🎯", "🎲", "🏆", "🎸", "🎃", "🧸",
+];
 
 function matchesQuery(keywords, q) {
   if (!q) return true;

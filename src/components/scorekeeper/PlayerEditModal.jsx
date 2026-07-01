@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BottomSheetModal from "./BottomSheetModal";
-import EmojiPicker, { PLAYER_EMOJIS } from "./EmojiPicker";
+import EmojiPicker, { AUTOFILL_EMOJIS } from "./EmojiPicker";
 import FluentEmoji from "./FluentEmoji";
 import DeletePlayerConfirmModal from "./DeletePlayerConfirmModal";
 import { getPaletteForTone, readableTextColor, toLightBg } from "@/lib/contrast";
@@ -38,7 +38,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
     } else {
       setName("");
       setColor(pickRandomUnused(palette, usedColors));
-      setEmoji(pickRandomUnused(PLAYER_EMOJIS, usedEmojis));
+      setEmoji(pickRandomUnused(AUTOFILL_EMOJIS, usedEmojis));
     }
     setTimeout(() => inputRef.current?.focus(), 120);
   }, [isOpen, player, usedColors, usedEmojis, palette, tone]);

@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { readableTextColor } from "@/lib/contrast";
 import FluentEmoji from "./FluentEmoji";
-import { SPRING_POP, SPRING_SNAPPY } from "@/lib/motion";
+import { SPRING_POP, SPRING_POP_SNAPPY, SPRING_SNAPPY, TRANSITION_SLIDE_OUT } from "@/lib/motion";
 
 function AnimatedTotal({ value, color }) {
   const [displayValue, setDisplayValue] = useState(value);
@@ -128,27 +128,34 @@ export default function PlayerColumn({ player, isLeader = false, isHighlighted =
             top: "50%",
             transform: "rotate(-20deg) translateY(-50%)",
             opacity: 0.95,
+            // Soft shadow lifts the emoji off the vivid card color (separation,
+            // not opacity) so the 3D art reads crisply on saturated backgrounds.
+            filter: "drop-shadow(0 3px 7px rgba(0,0,0,0.40))",
             zIndex: 0
           }}
           aria-hidden="true">
-            <AnimatePresence mode="wait" initial={false}>
+            <AnimatePresence mode="popLayout" initial={false}>
               {scoredThisRound ? (
+                // Check lives on the TOP: slides down from above into place on
+                // capture, slides back up and out when the round resets.
                 <motion.div
                   key="check"
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0, opacity: 0 }}
-                  transition={SPRING_POP}
+                  initial={{ y: -104, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -104, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
+                  transition={SPRING_POP_SNAPPY}
                 >
                   <FluentEmoji emoji="✅" size={96} />
                 </motion.div>
               ) : player.emoji ? (
+                // Emoji lives on the BOTTOM: slides down and out on capture,
+                // slides back up into place from below on the next round.
                 <motion.div
                   key="emoji"
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0, opacity: 0 }}
-                  transition={SPRING_POP}
+                  initial={{ y: 104, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 104, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
+                  transition={SPRING_POP_SNAPPY}
                 >
                   <span className="block" style={{ transform: "scaleX(-1)" }}>
                     <FluentEmoji emoji={player.emoji} size={96} />
@@ -172,7 +179,7 @@ export default function PlayerColumn({ player, isLeader = false, isHighlighted =
               e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
             }}
             className="flex-1 flex flex-col items-start gap-1 min-w-0 text-left"
-            style={{ marginLeft: isBestOf ? 8 : 60 }}>
+            style={{ marginLeft: isBestOf ? 8 : 68 }}>
             
             <div className="flex items-center gap-2 w-full min-w-0">
               <span className="font-bold truncate leading-tight text-xl" title={player.name} style={{ color: textColor }}>

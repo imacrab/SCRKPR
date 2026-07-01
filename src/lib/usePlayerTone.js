@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "scorekeeper_player_tone";
-const DEFAULT_TONE = "dark"; // dark backgrounds + white text (existing look)
+const DEFAULT_TONE = "dark"; // deep vivid backgrounds + white text (emojis pop)
 
 export function usePlayerTone() {
   const [tone, setToneState] = useState(() => {

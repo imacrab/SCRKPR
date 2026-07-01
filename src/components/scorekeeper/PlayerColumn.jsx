@@ -71,14 +71,16 @@ export default function PlayerColumn({ player, isLeader = false, isHighlighted =
 
   const total = baseTotal;
 
-  // Convert player color to rgba(...,0.2) for the card background tint
+  // Full-opacity player color for the card background — bright & playful.
+  // (Was 0.7 alpha over the near-black page, which muted the color into a
+  // muddy tint; full opacity lets the light palette read as intended.)
   const bgTint = useMemo(() => {
     const hex = (player.color || "#000000").replace("#", "");
     const full = hex.length === 3 ? hex.split("").map((c) => c + c).join("") : hex;
     const r = parseInt(full.slice(0, 2), 16);
     const g = parseInt(full.slice(2, 4), 16);
     const b = parseInt(full.slice(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, 0.7)`;
+    return `rgb(${r}, ${g}, ${b})`;
   }, [player.color]);
 
   // WCAG 2.2 — pick text color that contrasts with the player's background
@@ -222,7 +224,7 @@ export default function PlayerColumn({ player, isLeader = false, isHighlighted =
             style={{ marginRight: 8 }}
             aria-label={`Add score for ${player.name}`}>
             
-            <AnimatedTotal value={total} color="#FFFFFF" />
+            <AnimatedTotal value={total} color={textColor} />
           </button>
         </div>
       </div>

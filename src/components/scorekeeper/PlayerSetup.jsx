@@ -9,6 +9,7 @@ import GameModeModal from "./GameModeModal";
 import PlayerEditModal from "./PlayerEditModal";
 import FluentEmoji from "./FluentEmoji";
 import { getModeMeta } from "@/lib/gameModes";
+import { readableTextColor } from "@/lib/contrast";
 import { DUR_MEDIUM } from "@/lib/motion";
 import logoDark from "@/assets/SCRKPR_dark_mode.png";
 
@@ -340,6 +341,13 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 const isDragging = snapshot?.isDragging;
                 const isDropAnimating = snapshot?.isDropAnimating;
 
+                // On a selected (color-filled) row, pick text that contrasts
+                // with the player's color; otherwise use the theme foreground.
+                const rowText = selected ? readableTextColor(player.color) : "hsl(var(--foreground))";
+                const rowTextMuted = selected
+                  ? (readableTextColor(player.color) === "#111111" ? "rgba(17,17,17,0.55)" : "rgba(255,255,255,0.65)")
+                  : "hsl(var(--muted-foreground))";
+
                 // Derive tilt from the dnd transform's Y offset so the card leans into its drag direction
                 let tiltDeg = 0;
                 if (isDragging && baseStyle.transform) {
@@ -378,7 +386,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 onClick={() => toggleSelected(player.id)}
                 className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left cursor-pointer"
                 style={{
-                  backgroundColor: selected ? hexToRgba(player.color, 0.7) : "hsl(var(--card))",
+                  backgroundColor: selected ? hexToRgba(player.color, 1) : "hsl(var(--card))",
                   borderColor: selected ? "transparent" : "hsl(var(--border))",
                   boxShadow: isLifted ? "0 20px 35px -8px rgba(0,0,0,0.45)" : "none",
                   transform: cinch,
@@ -389,7 +397,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 }}>
 
                     {draggable ?
-                <div className="flex-shrink-0 touch-none flex items-center justify-center w-6 h-7 text-[hsl(var(--foreground))]">
+                <div className="flex-shrink-0 touch-none flex items-center justify-center w-6 h-7" style={{ color: rowText }}>
                         <GripVertical size={18} strokeWidth={2} />
                       </div> :
 
@@ -401,7 +409,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   
                       {player.emoji && <FluentEmoji emoji={player.emoji} size={18} />}
                     </div>
-                    <span className="flex-1 text-foreground text-base [font-family:'Geist',_sans-serif] font-semibold">{player.name}</span>
+                    <span className="flex-1 text-base [font-family:'Geist',_sans-serif] font-semibold" style={{ color: rowText }}>{player.name}</span>
                     <button
                   type="button"
                   onClick={(e) => toggleFavorite(player.id, e)}
@@ -417,17 +425,17 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                       strokeWidth={2}
                       style={{
                         fill: player.favorite ? "#FFC93C" : "transparent",
-                        color: player.favorite ? "#FFC93C" : selected ? "rgba(255,255,255,0.65)" : "hsl(var(--muted-foreground))",
+                        color: player.favorite ? "#FFC93C" : rowTextMuted,
                       }} />
                       </motion.span>
                     </button>
                     <div
                   className="w-6 h-6 rounded-full flex items-center justify-center transition-colors"
                   style={{
-                    backgroundColor: selected ? "#FFFFFF" : "transparent",
+                    backgroundColor: selected ? rowText : "transparent",
                     border: selected ? "none" : "2px solid hsl(var(--border))"
                   }}>
-                  
+
                       {selected && <Check size={16} strokeWidth={3} style={{ color: player.color }} />}
                     </div>
                   </div>

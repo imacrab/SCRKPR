@@ -31,62 +31,117 @@ export function readableTextColor(bg) {
     : "#111111";
 }
 
-// Dark palette → pairs with WHITE text. Each color tested ≥ 4.5:1 vs #FFFFFF.
+// --- HSL helpers (for lightening) -------------------------------------------
+function rgbToHsl({ r, g, b }) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  let h = 0, s = 0;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h /= 6;
+  }
+  return { h, s, l };
+}
+
+function hslToHex({ h, s, l }) {
+  const hue = (p, q, t) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+  let r, g, b;
+  if (s === 0) {
+    r = g = b = l;
+  } else {
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hue(p, q, h + 1 / 3);
+    g = hue(p, q, h);
+    b = hue(p, q, h - 1 / 3);
+  }
+  const to255 = (v) => Math.round(v * 255).toString(16).padStart(2, "0");
+  return `#${to255(r)}${to255(g)}${to255(b)}`.toUpperCase();
+}
+
+// Convert any color into a bright, playful pastel that pairs with #111 text.
+// Keeps the hue, forces a high lightness and caps saturation so a dark color
+// (e.g. a legacy player color) becomes a light-mode-friendly version of itself.
+// Colors that are already light are returned essentially unchanged.
+export function toLightBg(hex) {
+  const hsl = rgbToHsl(hexToRgb(hex));
+  const light = { h: hsl.h, s: Math.min(hsl.s, 0.9), l: Math.max(hsl.l, 0.75) };
+  return hslToHex(light);
+}
+
+// Dark palette → pairs with WHITE text. Vivid jewel-tone 25-hue wheel: high
+// saturation (S90), lightness pushed as bright as AA-vs-white allows so the
+// colorful emojis pop. Every color tested ≥ 4.5:1 vs #FFFFFF. (The yellow/green
+// arc is necessarily deep — a bright yellow can't hold white text at AA.)
 export const DARK_BG_COLORS = [
-  "#B91C1C", // red
-  "#9F1239", // rose
-  "#BE185D", // pink
-  "#A21CAF", // fuchsia
-  "#86198F", // magenta
-  "#6D28D9", // violet
-  "#4338CA", // indigo
-  "#1D4ED8", // blue
-  "#1E40AF", // royal blue
-  "#0369A1", // sky
-  "#0E7490", // cyan
-  "#0F766E", // teal
-  "#047857", // emerald
-  "#15803D", // green
-  "#4D7C0F", // lime
-  "#65A30D", // olive
-  "#A16207", // amber
-  "#C2410C", // orange
-  "#9A3412", // burnt orange
-  "#78350F", // brown
-  "#57534E", // stone
-  "#374151", // slate
-  "#1F2937", // dark slate
-  "#0F172A", // navy
-  "#000000", // black
+  "#ED0C0C", // red
+  "#DA3D0B", // vermillion
+  "#B85D0A", // orange
+  "#966E08", // amber-olive
+  "#7E7907", // olive
+  "#667E07", // moss
+  "#4C8307", // green-olive
+  "#308807", // green
+  "#128A07", // grass
+  "#078A1C", // forest
+  "#07883B", // emerald
+  "#078558", // jade
+  "#078576", // teal
+  "#088191", // cyan
+  "#0A7BBB", // sky
+  "#1970F3", // blue
+  "#3B59F5", // royal blue
+  "#4A3BF5", // indigo
+  "#763BF5", // violet
+  "#A33BF5", // purple
+  "#C20DF0", // magenta
+  "#D00BC8", // fuchsia
+  "#DC0CA2", // pink
+  "#E40C74", // rose
+  "#EB0C42", // crimson
 ];
 
-// Light palette → pairs with NEAR-BLACK text. Each color tested ≥ 4.5:1 vs #111111.
+// Light palette → pairs with NEAR-BLACK text. Vibrant generic 25-hue wheel
+// (evenly-stepped hues at S85 / ~L65). Every color tested ≥ 4.5:1 vs #111111;
+// the blue-violets are nudged lighter just enough to keep dark text readable.
 export const LIGHT_BG_COLORS = [
-  "#FCA5A5", // red 300
-  "#FDA4AF", // rose 300
-  "#F9A8D4", // pink 300
-  "#F0ABFC", // fuchsia 300
-  "#E9D5FF", // purple 200
-  "#C4B5FD", // violet 300
-  "#A5B4FC", // indigo 300
-  "#93C5FD", // blue 300
-  "#7DD3FC", // sky 300
-  "#67E8F9", // cyan 300
-  "#5EEAD4", // teal 300
-  "#6EE7B7", // emerald 300
-  "#86EFAC", // green 300
-  "#BEF264", // lime 300
-  "#D9F99D", // lime 200
-  "#FDE047", // yellow 300
-  "#FCD34D", // amber 300
-  "#FDBA74", // orange 300
-  "#FCA5A5", // coral
-  "#D6D3D1", // stone 300
-  "#E5E7EB", // gray 200
-  "#FECACA", // soft red
-  "#C7D2FE", // soft indigo
-  "#FBCFE8", // soft pink
-  "#FFFFFF", // white
+  "#F25A5A", // red
+  "#F27E5A", // vermillion
+  "#F2A35A", // orange
+  "#F2C75A", // amber
+  "#F2EC5A", // yellow
+  "#D3F25A", // lime
+  "#AFF25A", // yellow-green
+  "#8AF25A", // green
+  "#66F25A", // grass
+  "#5AF272", // spring
+  "#5AF297", // mint
+  "#5AF2BB", // aqua-green
+  "#5AF2DF", // turquoise
+  "#5ADFF2", // cyan
+  "#5ABBF2", // sky
+  "#5A97F2", // azure
+  "#5A72F2", // blue
+  "#786DF3", // indigo (nudged)
+  "#8E5FF2", // violet (nudged)
+  "#AF5AF2", // purple
+  "#D35AF2", // magenta
+  "#F25AEC", // fuchsia
+  "#F25AC7", // pink
+  "#F25AA3", // rose
+  "#F25A7E", // coral-pink
 ];
 
 export function getPaletteForTone(tone) {

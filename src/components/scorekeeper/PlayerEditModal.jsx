@@ -2,10 +2,10 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BottomSheetModal from "./BottomSheetModal";
-import EmojiPicker, { PLAYER_EMOJIS } from "./EmojiPicker";
+import EmojiPicker, { AUTOFILL_EMOJIS } from "./EmojiPicker";
 import FluentEmoji from "./FluentEmoji";
 import DeletePlayerConfirmModal from "./DeletePlayerConfirmModal";
-import { getPaletteForTone, readableTextColor } from "@/lib/contrast";
+import { getPaletteForTone, readableTextColor, toLightBg } from "@/lib/contrast";
 import { usePlayerTone } from "@/lib/usePlayerTone";
 
 function pickRandomUnused(options, used = []) {
@@ -29,15 +29,19 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
     if (!isOpen) return;
     if (player?.id) {
       setName(player.name || "");
-      setColor(player.color || palette[0]);
+      // In light tone, brighten a legacy dark color so editing lightens the
+      // player (and the pre-selected swatch matches the light palette).
+      const stored = player.color || palette[0];
+      const needsLightening = tone === "light" && readableTextColor(stored) === "#FFFFFF";
+      setColor(needsLightening ? toLightBg(stored) : stored);
       setEmoji(player.emoji || "");
     } else {
       setName("");
       setColor(pickRandomUnused(palette, usedColors));
-      setEmoji(pickRandomUnused(PLAYER_EMOJIS, usedEmojis));
+      setEmoji(pickRandomUnused(AUTOFILL_EMOJIS, usedEmojis));
     }
     setTimeout(() => inputRef.current?.focus(), 120);
-  }, [isOpen, player, usedColors, usedEmojis, palette]);
+  }, [isOpen, player, usedColors, usedEmojis, palette, tone]);
 
   const handleSubmit = () => {
     const trimmed = name.trim();

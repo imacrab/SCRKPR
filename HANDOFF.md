@@ -1,7 +1,7 @@
 # SCRKPR — Session Handoff
 
 > Context doc for continuing work on a new machine / new Claude session.
-> Last updated: June 15, 2026 (App Store prep + core-loop rework)
+> Last updated: June 27, 2026 (pre-submission code review + dependency/ui cleanup — see §13)
 
 ## What this project is
 
@@ -19,7 +19,7 @@ npm run cap:sync # vite build && cap sync   (iOS)
 
 - **No `.env.local` needed** — the app is local-first; Base44 is off. (Old Base44 key rotated; nothing sensitive is committed — repo is public.)
 - **npm optional-dep gotcha:** install/uninstall cycles can drop `@rollup/rollup-linux-arm64-gnu` (npm bug #4828) → `vite build` fails with "Cannot find module @rollup/rollup-linux-arm64-gnu". In-sandbox fix: `npm install @rollup/rollup-linux-arm64-gnu --no-save` (do NOT add to package.json — it's platform-specific; a fresh `npm install` on macOS pulls the darwin binary).
-- **Tests:** scratch node/jsdom tests in the outputs dir (not committed) — `store`, `fav-store`, `modes`, `round`, `accum`. Capacitor code-splits the build, so the old `render*` bundle-eval tests no longer run; rely on logic unit tests + real-device for UI.
+- **Tests:** scratch node/jsdom tests are NOT committed, so they don't survive a fresh session — recreate as needed. June 27 reused an 18-check logic suite (store CRUD/ordering/limit/merge/clearAll/corrupt-JSON + mode metadata incl. Gin/Swish + round/accumulate/Swish-low-wins) via a `localStorage` shim importing the real `store.js`/`gameModes.js`. Capacitor code-splits the build, so the old `render*` bundle-eval tests no longer run; rely on logic unit tests + real-device for UI.
 
 ## Branches
 
@@ -27,13 +27,14 @@ npm run cap:sync # vite build && cap sync   (iOS)
 - `delight-pass` — active working branch (at/ahead of `main`).
 - `standardize-design-tokens` — original token branch (see §1).
 
-## Current state (June 15) — quick snapshot
+## Current state (June 27) — quick snapshot
 
 - **Scoring model:** tap a player → number pad → enter the round (no ± buttons). A "round" = the lowest score-count across players. A player who's logged the current round shows a green ✅ (emoji morphs to check); **re-tapping accumulates onto that round's entry** (+2 then +4 = +6), and the round only advances once everyone's logged — no skip-ahead. Tapping the small "(+X)" subtext replaces/corrects that entry.
 - **Game modes:** generic **High / Low / Best Of**, with an optional **target** on High/Low (reach it → game auto-ends). Covers Gin (High+100) and "Swish" (Low+500). Sort follows the mode.
 - **Scoreboard** has a History-style segmented pill: **Scoreboard ↔ Rounds** (the per-round table; appears once a round is logged, hidden in Best Of).
 - **FTUE, regulars (favorites), End Game hero, History** all shipped (see sections below).
-- **App Store:** Capacitor v8 scaffolded (`capacitor.config.json`, appId `com.illudcrab.scrkpr`, Team `8RJXUWMLNF`); `ios/` project generated on the Mac. Privacy policy hosted at a public gist. **Blocked on the app icon** (see §12 — rebrand in progress).
+- **App Store:** Capacitor v8 scaffolded (`capacitor.config.json`, appId `com.illudcrab.scrkpr`, Team `8RJXUWMLNF`); `ios/` project generated on the Mac. Privacy policy hosted at a public gist. **Blocked on the app icon — direction now open/TBD** (geometric Liquid-Glass `S` and brush-wordmark approaches both dropped; see §12–§13).
+- **Codebase (post June-27 cleanup):** dependencies trimmed **53 → 20** (removed dead `GameMenuModal` + the unused shadcn `ui/` library — only `button`/`input`/`toast`/`toaster`/`use-toast` remain — and all orphaned Radix/`sonner`/`next-themes`/`react-hook-form` deps). Lint/build/18-test/dev-server all green. `npm audit`: 16 non-breaking advisories outstanding (build-time + dormant base44-SDK; only `react-router` ships+runs). See §13.
 
 ## What was done
 

@@ -5,7 +5,7 @@ import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 import OnboardingBackground from "@/components/OnboardingBackground";
 import { SPRING_SHEET, SPRING_SNAPPY, SPRING_POP, DUR_MEDIUM } from "@/lib/motion";
 import { setOnboarded } from "@/lib/onboarding";
-import logoDark from "@/assets/SCRKPR_dark_mode.png";
+import logoDark from "@/assets/scrkpr-logo.svg";
 
 // ─── First-time user experience ──────────────────────────────────────────────
 // Shown once on first launch (gated in App.jsx). The SCRKPR logo lives in a

@@ -11,7 +11,7 @@ import ResetConfirmModal from "./ResetConfirmModal";
 import ScoreHistoryPanel from "./ScoreHistoryPanel";
 import { isLowMode, isCircleMode } from "@/lib/gameModes";
 import { SPRING_POP, SPRING_SHEET, SPRING_SNAPPY, TRANSITION_PANEL } from "@/lib/motion";
-import logoDark from "@/assets/SCRKPR_dark_mode.png";
+import logoDark from "@/assets/scrkpr-logo.svg";
 
 export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);

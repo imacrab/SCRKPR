@@ -33,7 +33,7 @@ npm run cap:sync # vite build && cap sync   (iOS)
 - **Game modes:** generic **High / Low / Best Of**, with an optional **target** on High/Low (reach it → game auto-ends). Covers Gin (High+100) and "Swish" (Low+500). Sort follows the mode.
 - **Scoreboard** has a History-style segmented pill: **Scoreboard ↔ Rounds** (the per-round table; appears once a round is logged, hidden in Best Of).
 - **FTUE, regulars (favorites), End Game hero, History** all shipped (see sections below).
-- **App Store:** Capacitor v8 scaffolded (`capacitor.config.json`, appId `com.illudcrab.scrkpr`, Team `8RJXUWMLNF`); `ios/` project generated on the Mac. Privacy policy hosted at a public gist. **Blocked on the app icon — direction now open/TBD** (geometric Liquid-Glass `S` and brush-wordmark approaches both dropped; see §12–§13).
+- **App Store:** Capacitor v8 scaffolded (`capacitor.config.json`, appId `com.illudcrab.scrkpr`, Team `8RJXUWMLNF`); `ios/` project generated on the Mac. Privacy policy hosted at a public gist. **Icon RESOLVED (July 5):** coral tile + four white circles (one hollow) — Icon Composer bundle at `assets/Icons/SCRKPR.icon` + SVG variants in `assets/Icons/SVG/`; 1024² raster wired into the Xcode asset catalog. See §14.
 - **Codebase (post June-27 cleanup):** dependencies trimmed **53 → 20** (removed dead `GameMenuModal` + the unused shadcn `ui/` library — only `button`/`input`/`toast`/`toaster`/`use-toast` remain — and all orphaned Radix/`sonner`/`next-themes`/`react-hook-form` deps). Lint/build/18-test/dev-server all green. `npm audit`: 16 non-breaking advisories outstanding (build-time + dormant base44-SDK; only `react-router` ships+runs). See §13.
 
 ## What was done
@@ -179,7 +179,7 @@ A product pass on the core interactions (grilled w/ Adrian). Three changes:
 - Modals use `BottomSheetModal` (which portals to `document.body`); player editing uses `PlayerEditModal` everywhere.
 - Pages signal modal-open via `onModalChange` so `ScoreKeeper` hides nav + gradient.
 - Emojis render through `FluentEmoji` (Microsoft Fluent 3D via CDN, unicode `<span>` fallback).
-- The SCRKPR logo is local (`@/assets/SCRKPR_dark_mode.png`) — never re-add the media.base44.com URL.
+- The SCRKPR logo is local (`@/assets/scrkpr-logo.svg`, white `SCRKPR!` wordmark) — never re-add the media.base44.com URL.
 - **Error handling:** `src/components/ErrorBoundary.jsx` wraps the app (in `App.jsx`, *outside* the transformed page `motion.div` so its fixed fallback is viewport-relative). Any page crash shows a calm "We had a little hiccup / your games are still saved" screen with a "Back to Home" button that hard-reloads `/`. Prefer to also fail-soft at the source (e.g. `safeFormat` in `History.jsx` guards bad dates) so the boundary stays a last resort. Game data persists in localStorage + Base44, so a reload is safe.
 
 ### Player list reorder/animation architecture (PlayerSetup) — read before touching
@@ -211,9 +211,19 @@ A review/tidy pass (no feature changes). Repo confirmed green: `npm run lint` cl
 - **`@base44/sdk` still bundled:** `base44Client.js`/`AuthContext.jsx` statically import it even though the stub is what runs offline, so the SDK (and its dormant socket deps) ship in the bundle. Fully dropping it is a phase-2 task (tied to the sync decision), not a safe pre-submission edit.
 - **Minor:** stale `phase10` references in `ScoreBoard.jsx` comments (no longer a mode) — harmless. Stale icon assets (`SCRKPR-Icon.icon`, `AppIcon.png`) left in place pending the icon-direction decision.
 
+### 14. Session July 5 — logo + icon pass (`logo-icon-pass`) — icon blocker RESOLVED
+
+Adrian delivered the final brand assets; this branch wires them through everything.
+
+- **New icon (final direction):** coral `#FA5845` tile + four white circles, bottom-right one hollow (a score-dot/tally motif). Sources: **`assets/Icons/SCRKPR.icon`** (Icon Composer / Liquid Glass bundle — coral gradient fill, translucent Circles layer, dark/tinted-aware) + flat SVG variants in `assets/Icons/SVG/` (`SCRKPR - Color/Dark/Light.svg` 1024², `Circles.svg`). Rasterized `Color.svg` → `public/favicon.png` (512²) and `ios/.../AppIcon.appiconset/AppIcon-512@2x.png` (1024²), so the app has a working icon everywhere NOW. **Remaining Mac step:** in Xcode 26, set `assets/Icons/SCRKPR.icon` as the app icon to get the full Liquid Glass treatment (the raster in the appiconset is the fallback until then).
+- **New logo:** groovy `SCRKPR!` wordmark, **`src/assets/scrkpr-logo.svg`** (659×150, white fill — the app is forced dark). All 5 `logoDark` imports (`ScoreKeeper`, `ScoreBoard`, `PlayerSetup`, `Onboarding`, `ErrorBoundary`) repointed from the old `SCRKPR_dark_mode.png`; source copy also at `assets/scrkpr-logo.svg`.
+- **Splash regenerated from the new wordmark:** 2732² ink `#111111` bg + white wordmark centered at ~45% width → `assets/splash.png` + `assets/splash-dark.png` AND all 9 PNGs in `ios/.../Splash.imageset/` (so no `@capacitor/assets` run is needed; if you do run it, it reads the same `assets/splash*.png`).
+- **Retired (deleted):** `src/assets/SCRKPR_{dark,light}_mode.png`, `SCRKPR-Icon.icon` (old geometric S), `AppIcon.png`, `SplashScreen.png`.
+- PNGs were rasterized with `sharp` in a scratch dir (not a repo dep). Verified: lint clean, `vite build` exit 0, SVG logo lands in `dist/`.
+
 ## Open items
 
-- [ ] **APP ICON (active blocker for submission)** — **brush-wordmark approach dropped (June 27, Adrian); icon direction is now open/TBD.** Still need a 1024² raster icon → generate the set → wire into Xcode + manifest/apple-touch-icon. The geometric Liquid-Glass `S` was scrapped earlier (read as a swastika in isolation); the brush "cut a glyph from `SCRKPR!`" plan is also now off. Pick a new direction before generating. See §12 for history.
+- [x] ~~APP ICON (was the active blocker)~~ — **RESOLVED July 5** (§14): coral-circles direction final; favicon + Xcode raster + splash all wired. Only Mac step left: set `assets/Icons/SCRKPR.icon` in Xcode 26 for Liquid Glass.
 - [ ] **Finish the iOS submission** — on the Mac: `CAPACITOR_iOS.md` runbook (set icon, sign w/ team `8RJXUWMLNF`, set iPhone-only, `ITSAppUsesNonExemptEncryption=NO`, device-test, Archive → upload), then paste `APP_STORE_CONNECT.md` into App Store Connect + submit.
 - [ ] **Device-test on a real iPhone (high priority).** The player-list drag/toggle + favorites FLIP + the round-guard morph + safe-area insets were all verified in headless DOM / logic only. Feel them on hardware. If the nav still hugs the bottom on-device, the safe-area inset may not be reaching the webview (`viewport-fit`/`contentInset`).
 - [~] **Local-first** — phase 1 done (§6). Remaining (only if/when cross-device wanted): the Base44 sync layer + first-launch migration, both behind `SYNC_ENABLED`.

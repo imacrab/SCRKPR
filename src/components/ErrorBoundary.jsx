@@ -1,5 +1,5 @@
 import React from "react";
-import logoDark from "@/assets/SCRKPR_dark_mode.png";
+import logoDark from "@/assets/scrkpr-logo.svg";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 
 /**

@@ -1,7 +1,7 @@
 # SCRKPR — Session Handoff
 
 > Context doc for continuing work on a new machine / new Claude session.
-> Last updated: July 5, 2026 (last-10% interaction polish — see §15)
+> Last updated: July 6, 2026 (modal unification + white modal text + Reset slide-down — see §16)
 
 ## What this project is
 
@@ -235,6 +235,20 @@ Small but visible motion/feel fixes while testing the live app at `http://127.0.
 - **Emoji picker duplicate-key warning (`EmojiPicker.jsx`).** Duplicate emoji entries can exist for search aliases; list keys now include the index so React does not warn on repeated emoji values.
 
 **Verified this pass:** `npm run lint` clean; `npm run build` passes. In-app browser geometry checks confirmed the History tab stretch state stays inside the wrapper and the main nav pill glides from Players to History without spring bounce.
+
+### 16. Session July 6 — one unified modal + white modal text + Reset slide-down (`fix-odd-ends` working tree)
+
+> ⚠️ **Git state for the next session:** branch is **`fix-odd-ends`** (fast-forwarded to `origin/main` @ `b6db430` at the start of this session — it had been 2 commits behind). The changes below are **UNCOMMITTED in the working tree** — nothing from §16 is committed yet. `.claude/launch.json` is also modified (dev port repointed `5174 → 5176 --strictPort` to avoid colliding with a locally-run dev server; revert to `5174` if you prefer). Decide whether to commit §16 on `fix-odd-ends` or a fresh branch.
+
+**Goal (Adrian): one modal primitive for the whole app — "the app is way too simple to justify multiple modal types."** Plus: all modal text/characters white, and the End-Game slide control should retract when Reset opens (matching the Add-Score behavior).
+
+- **Unified on `BottomSheetModal` (killed the two hand-rolled confirm modals).** History "Clear All Games?" (`History.jsx`) and Settings "Clear All Data?" (`AccountSettings.jsx`) each had their own inline `AnimatePresence` + backdrop + partial `y:120` slide — replaced both with `<BottomSheetModal>`. Removed the now-orphaned imports (`History`: `TRANSITION_PAGE`; `AccountSettings`: `motion`/`AnimatePresence`/`SPRING_SHEET`). Both now inherit the shared slide-down + blur-fade-out exit and drag-to-dismiss for free. `BottomSheetModal` is now the **only** modal implementation; `ResetConfirmModal`/`DeletePlayerConfirmModal`/`PlayerEditModal`/`GameModeModal`/`BestOfModal`/`ScoreInputModal`/`EndGameModal` are all thin prop-config wrappers around it (not separate modal types).
+- **New `icon` prop on `BottomSheetModal`.** Optional slot rendered centered above the eyebrow/title in the header, wrapped in `text-white` so a lucide icon inherits white via `currentColor`. The two confirm modals pass `<AlertTriangle size={32} strokeWidth={2} />` (no color class) → renders white (was `text-accent-red`).
+- **White modal text, app-wide (via the shared shell).** In `BottomSheetModal` the header text moved to: title `text-white` (was `text-foreground`/93%), eyebrow `text-white/60`, description `text-white/70` (both were `text-muted-foreground`). Since every modal routes through the shell, this lands everywhere. (Adrian's spec: white text, muted secondary text → white at reduced opacity, keep red *fills*.)
+- **Named red triggers → white (red fills kept).** Settings "Clear" button (`text-accent-red` → `text-white`, keeps `bg-accent-red/10`); History "Clear All" header trigger (`text-muted-foreground hover:text-accent-red` → `text-white/70 hover:text-white`); `PlayerEditModal` delete/trash trigger (`text-accent-red` → `text-white`, keeps `bg-accent-red/15`). The filled destructive confirm buttons ("Delete", "Reset", "Yes, Clear", "Yes, Clear All") keep their red background — their text was already white.
+- **Reset Scores now retracts the slide-to-end control (`ScoreBoard.jsx`).** Added `|| showResetConfirm` to the two conditions already driving `SlideToEndGame`'s wrapper (`y: … ? 120 : 0` and `pointerEvents`). So tapping the ↺ Reset button slides the control down/offscreen (and disables it) exactly like opening the Add-Score pad or End-Game modal; it springs back up on Cancel/dismiss.
+
+**Verified this pass:** `npm run lint` clean; `npm run build` exit 0. In-browser (preview on `:5176`, mobile viewport): History "Clear All Games?" renders as the unified sheet with confirmed computed colors — title `rgb(255,255,255)`, description `rgba(255,255,255,0.7)`, ⚠️ icon `rgb(255,255,255)` — and dismisses on tap-outside; the History "Clear All" trigger reads `rgba(255,255,255,0.7)`. Reset flow: tapping ↺ set the slide control's `pointerEvents:none` and animated `y` 0→120 while the "Reset all scores?" sheet rose; Cancel returned it to `y:0`/`pointerEvents:auto` (all measured). Settings "Clear All Data?" verified by code parity (identical `BottomSheetModal` invocation) + clean of dangling refs + lint/build — a live screenshot wasn't captured because the backgrounded preview tab froze framer's page-transition (`requestAnimationFrame` pauses in hidden tabs; every page went blank, proving it's environmental, same rAF freeze noted in §15).
 
 ## Open items
 

@@ -365,14 +365,14 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         <motion.div
           className="absolute inset-x-0 bottom-0 z-30 flex justify-center"
           animate={{
-            y: showEndGame || scoreModalOpen ? 120 : 0,
+            y: showEndGame || scoreModalOpen || showResetConfirm ? 120 : 0,
           }}
           transition={SPRING_SHEET}
           style={{
             paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)",
             paddingLeft: 48,
             paddingRight: 48,
-            pointerEvents: showEndGame || scoreModalOpen ? "none" : "auto",
+            pointerEvents: showEndGame || scoreModalOpen || showResetConfirm ? "none" : "auto",
           }}>
 
           <SlideToEndGame onComplete={() => setShowEndGame(true)} />

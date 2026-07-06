@@ -17,6 +17,7 @@ import { SPRING_SHEET, TRANSITION_FADE } from "@/lib/motion";
 export default function BottomSheetModal({
   isOpen,
   onClose,
+  icon,
   eyebrow,
   title,
   description,
@@ -92,18 +93,21 @@ export default function BottomSheetModal({
                 <div className="w-10 h-1 bg-border rounded-full mx-auto" />
               </div>
 
-              {(eyebrow || title) && (
+              {(icon || eyebrow || title) && (
                 <div className="text-center px-5 pt-2 pb-5">
+                  {icon && (
+                    <div className="flex justify-center mb-3 text-white">{icon}</div>
+                  )}
                   {eyebrow && (
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-0.5">
+                    <p className="text-xs font-medium text-white/60 uppercase tracking-widest mb-0.5">
                       {eyebrow}
                     </p>
                   )}
                   {title && (
-                    <h2 className="font-display text-2xl font-bold text-foreground">{title}</h2>
+                    <h2 className="font-display text-2xl font-bold text-white">{title}</h2>
                   )}
                   {description && (
-                    <p className="text-sm text-muted-foreground mt-2">{description}</p>
+                    <p className="text-sm text-white/70 mt-2">{description}</p>
                   )}
                 </div>
               )}

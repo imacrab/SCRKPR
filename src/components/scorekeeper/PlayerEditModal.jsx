@@ -62,7 +62,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
             {isEditing && onDelete && (
               <Button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="h-11 bg-accent-red/15 hover:bg-accent-red/25 text-accent-red border-0 shadow-none"
+                className="h-11 bg-accent-red/15 hover:bg-accent-red/25 text-white border-0 shadow-none"
               >
                 <FluentEmoji emoji="🗑️" size={20} />
               </Button>

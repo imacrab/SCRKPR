@@ -3,6 +3,15 @@
 > Context doc for continuing work on a new machine / new Claude session.
 > Last updated: July 6, 2026 (modal unification + white modal text + Reset slide-down — see §16)
 
+## TL;DR (start here)
+
+- **What:** SCRKPR — a delightful **local-first** scorekeeping app for in-person game night. React 18 + Vite + Tailwind + framer-motion. Data lives on-device (localStorage via `src/lib/store.js`); Base44 backend is dormant behind `SYNC_ENABLED = false`. Repo `imacrab/SCRKPR`, app is **forced dark**.
+- **Run it:** `npm install` → `npm run dev` (works fully offline, no `.env`). `npm run lint` and `npm run build` both pass. Full app is feature-complete and green.
+- **Where we are:** UI/UX is essentially done through §16. App icon **resolved** (coral circles, §14). Currently on branch **`fix-clean-house`** (cut from `main`, which has everything merged).
+- **What's next (the actual blockers):** ship to the **iOS App Store** — all Mac-side: (1) finish the Xcode/submission runbook in `CAPACITOR_iOS.md` (set the `.icon`, sign w/ team `8RJXUWMLNF`, iPhone-only, upload) + paste `APP_STORE_CONNECT.md`; (2) **real-iPhone device test** (drag/FLIP/safe-area only verified headlessly); (3) `npm audit fix`; (4) phase-2: drop `@base44/sdk` from the bundle. See **Open items**.
+- **Conventions that bite if ignored:** one modal only — `BottomSheetModal` (§16); animation values from `@/lib/motion`, colors from `@/lib/colors` (no inline hex/springs); emojis via `FluentEmoji`; logo is `@/assets/scrkpr-logo.svg`. The player-list reorder in `PlayerSetup` is a minefield — read its architecture note before touching. Preview/dev animations can look frozen in a backgrounded browser tab (rAF pauses) — an environmental artifact, not a bug.
+- **Read next:** "Current state" snapshot below for the fuller picture, then §16 → §14 for the most recent work; **Open items** for the punch list.
+
 ## What this project is
 
 SCRKPR is a delightful, **local-first** scorekeeping app for in-person game night (React 18 + Vite + Tailwind + framer-motion, shadcn/ui). Repo: `imacrab/SCRKPR` on GitHub. Players, scores, and history live **on-device** (localStorage via `src/lib/store.js`) — **no account, no network on the happy path.** Base44 (the original hosted backend) is fully **dormant behind `SYNC_ENABLED = false`** in `lib/store.js`: the SDK/auth are stubbed (`src/api/base44Client.js`) so the app boots offline with zero network calls. Goal: ship to the **iOS App Store** via a Capacitor wrapper — scaffolded; see **`CAPACITOR_iOS.md`** (Mac runbook) + **`APP_STORE_CONNECT.md`** (submission kit, fully filled) + **`APP_STORE_READINESS.md`**.
@@ -23,9 +32,9 @@ npm run cap:sync # vite build && cap sync   (iOS)
 
 ## Branches
 
-- `main` — **the release line now;** `delight-pass` merged in via PR #10, so `main` has everything below. Base44 still syncs from the repo (confirm the Builder/publish flow tolerates the stubbed SDK before relying on it).
-- `delight-pass` — active working branch (at/ahead of `main`).
-- `standardize-design-tokens` — original token branch (see §1).
+- `main` — **the release line;** has everything through §16 (logo/icon PR #21, modal updates, and the modal-unification + Reset slide-down PR #22 all merged). Base44 still syncs from the repo (confirm the Builder/publish flow tolerates the stubbed SDK before relying on it).
+- `fix-clean-house` — current working branch (cut from `main` after PR #22; where new work continues).
+- Historical (merged): `delight-pass`, `logo-icon-pass`, `fix-odd-ends`, `standardize-design-tokens` (original token branch, §1).
 
 ## Current state (July 5) — quick snapshot
 
@@ -224,7 +233,7 @@ Adrian delivered the final brand assets; this branch wires them through everythi
 
 ### 15. Session July 5 — last-10% interaction polish (`SCRKPR` working tree)
 
-Small but visible motion/feel fixes while testing the live app at `http://127.0.0.1:5174` (dev server was on `:5174`, not the default `:5173`). Current working tree is intentionally dirty with these edits; do not revert unrelated user/session changes.
+Small but visible motion/feel fixes while testing the live app at `http://127.0.0.1:5174` (dev server was on `:5174`, not the default `:5173`). Committed and merged to `main` (this section's edits are no longer in the working tree).
 
 - **Shared modal exit animation (`BottomSheetModal.jsx`, `EndGameModal.jsx`).** Bottom sheets now stay mounted long enough to animate down on close/tap-outside, and the backdrop blur fades out instead of disappearing. `BottomSheetModal` owns the render delay (`shouldRender`, ~420ms) and animates `isOpen` state directly. `EndGameModal` no longer wraps the sheet in an outer `AnimatePresence`; it always renders the shared sheet with `isOpen`.
 - **Score modal close path (`ScoreBoard.jsx`, `ScoreInputModal.jsx`).** The Add Score modal used to vanish instantly because `activePlayer` was cleared as soon as close fired. `ScoreBoard` now separates `scoreModalOpen` from `activePlayer`, delays clearing player/editing state until after the sheet exit, and `ScoreInputModal` keeps the last player/edit index in refs during exit.
@@ -236,9 +245,9 @@ Small but visible motion/feel fixes while testing the live app at `http://127.0.
 
 **Verified this pass:** `npm run lint` clean; `npm run build` passes. In-app browser geometry checks confirmed the History tab stretch state stays inside the wrapper and the main nav pill glides from Players to History without spring bounce.
 
-### 16. Session July 6 — one unified modal + white modal text + Reset slide-down (`fix-odd-ends` working tree)
+### 16. Session July 6 — one unified modal + white modal text + Reset slide-down
 
-> ⚠️ **Git state for the next session:** branch is **`fix-odd-ends`** (fast-forwarded to `origin/main` @ `b6db430` at the start of this session — it had been 2 commits behind). The changes below are **UNCOMMITTED in the working tree** — nothing from §16 is committed yet. `.claude/launch.json` is also modified (dev port repointed `5174 → 5176 --strictPort` to avoid colliding with a locally-run dev server; revert to `5174` if you prefer). Decide whether to commit §16 on `fix-odd-ends` or a fresh branch.
+> **Git state:** committed as `bdf90b6` and **merged into `main`** via PR #22. Working tree is clean; `.claude/launch.json` stays at the committed `--port 5174`. (During the session it was branched on `fix-odd-ends`; that's now merged.)
 
 **Goal (Adrian): one modal primitive for the whole app — "the app is way too simple to justify multiple modal types."** Plus: all modal text/characters white, and the End-Game slide control should retract when Reset opens (matching the Add-Score behavior).
 

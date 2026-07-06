@@ -5,6 +5,7 @@ import { RefreshCw, Handshake, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
+import BottomSheetModal from "@/components/scorekeeper/BottomSheetModal";
 
 // Guard against malformed/missing dates — never let a bad value crash the page.
 const safeFormat = (value, fmt) => {
@@ -14,7 +15,7 @@ const safeFormat = (value, fmt) => {
 import HistoryStats from "@/components/scorekeeper/HistoryStats";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 import StretchTabPill from "@/components/scorekeeper/StretchTabPill";
-import { TRANSITION_PAGE, TRANSITION_PANEL, SPRING_SNAPPY } from "@/lib/motion";
+import { TRANSITION_PANEL, SPRING_SNAPPY } from "@/lib/motion";
 
 const HISTORY_TABS = [
   { id: "games", label: "Games", emoji: "🎲" },
@@ -130,7 +131,7 @@ export default function History({ onBack, onModalChange }) {
           {games.length > 0 &&
           <button
             onClick={() => setShowConfirm(true)}
-            className="text-xs font-medium text-muted-foreground hover:text-accent-red transition-colors px-2 py-1">
+            className="text-xs font-medium text-white/70 hover:text-white transition-colors px-2 py-1">
             
               Clear All
             </button>
@@ -380,49 +381,28 @@ export default function History({ onBack, onModalChange }) {
         </div>
       </div>
 
-      {/* Confirm modal */}
-      <AnimatePresence>
-        {showConfirm &&
-        <>
-            <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-            onClick={() => !clearing && setShowConfirm(false)} />
-          
-            <motion.div
-            initial={{ y: 120, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 120, opacity: 0 }}
-            transition={TRANSITION_PAGE}
-            className="fixed inset-x-0 z-50 bg-card border border-border rounded-sheet shadow-2xl"
-            style={{ bottom: "8px", left: "8px", right: "8px", paddingBottom: "env(safe-area-inset-bottom)" }}>
-            
-              <div className="px-5 pt-5 pb-16">
-                <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
-                <div className="flex flex-col items-center text-center mb-6">
-                  <AlertTriangle size={32} strokeWidth={2} className="mb-3 text-accent-red" />
-                  <h2 className="font-display text-xl font-bold text-foreground mb-1">Clear All Games?</h2>
-                  <p className="text-sm text-muted-foreground">This will permanently delete all {games.length} game record{games.length !== 1 ? 's' : ''}.<br />This cannot be undone.</p>
-                </div>
-                <div className="flex gap-3">
-                  <Button onClick={() => setShowConfirm(false)} variant="outline" className="flex-1 h-11" disabled={clearing}>
-                    Cancel
-                  </Button>
-                  <Button
-                  onClick={clearAllGames}
-                  disabled={clearing}
-                  className="flex-1 h-11 font-semibold bg-accent-red hover:bg-accent-red/90 text-white">
-                  
-                    {clearing ? "Clearing..." : "Yes, Clear All"}
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          </>
+      {/* Confirm modal — shared BottomSheetModal shell */}
+      <BottomSheetModal
+        isOpen={showConfirm}
+        onClose={() => !clearing && setShowConfirm(false)}
+        icon={<AlertTriangle size={32} strokeWidth={2} />}
+        title="Clear All Games?"
+        description={`This will permanently delete all ${games.length} game record${games.length !== 1 ? "s" : ""}. This cannot be undone.`}
+        footer={
+          <div className="flex gap-3">
+            <Button onClick={() => setShowConfirm(false)} variant="outline" className="flex-1 h-11" disabled={clearing}>
+              Cancel
+            </Button>
+            <Button
+              onClick={clearAllGames}
+              disabled={clearing}
+              className="flex-1 h-11 font-semibold bg-accent-red hover:bg-accent-red/90 text-white"
+            >
+              {clearing ? "Clearing..." : "Yes, Clear All"}
+            </Button>
+          </div>
         }
-      </AnimatePresence>
+      />
     </div>);
 
 }

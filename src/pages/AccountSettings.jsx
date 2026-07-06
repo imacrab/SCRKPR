@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { db, SYNC_ENABLED } from "@/lib/store";
 import { resetOnboarding } from "@/lib/onboarding";
 import { base44 } from "@/api/base44Client";
-import { motion, AnimatePresence } from "framer-motion";
-import { SPRING_SHEET } from "@/lib/motion";
+import BottomSheetModal from "@/components/scorekeeper/BottomSheetModal";
 
 export default function AccountSettings({ onBack, onModalChange }) {
   const [showConfirm, setShowConfirm] = useState(false);
@@ -105,7 +104,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
              </div>
              <button
                onClick={() => setShowConfirm(true)}
-               className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors text-accent-red bg-accent-red/10 hover:bg-accent-red/20"
+               className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors text-white bg-accent-red/10 hover:bg-accent-red/20"
              >
                Clear
              </button>
@@ -113,47 +112,28 @@ export default function AccountSettings({ onBack, onModalChange }) {
          </div>
        </div>
 
-      {/* Confirm modal */}
-      <AnimatePresence>
-        {showConfirm && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-              onClick={() => !clearing && setShowConfirm(false)}
-            />
-            <motion.div
-              initial={{ y: "100%", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: "100%", opacity: 0 }}
-              transition={SPRING_SHEET}
-              className="fixed inset-x-0 bottom-0 z-50 bg-card border-t border-border rounded-t-sheet shadow-2xl"
-              style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      {/* Confirm modal — shared BottomSheetModal shell */}
+      <BottomSheetModal
+        isOpen={showConfirm}
+        onClose={() => !clearing && setShowConfirm(false)}
+        icon={<AlertTriangle size={32} strokeWidth={2} />}
+        title="Clear All Data?"
+        description="This will permanently delete all saved players and game history from this device. This cannot be undone."
+        footer={
+          <div className="flex gap-3">
+            <Button onClick={() => setShowConfirm(false)} variant="outline" className="flex-1 h-11" disabled={clearing}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleClearData}
+              disabled={clearing}
+              className="flex-1 h-11 font-semibold bg-accent-red hover:bg-accent-red/90 text-white"
             >
-              <div className="px-5 pt-5 pb-8">
-                <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
-                <div className="flex flex-col items-center text-center mb-6">
-                  <AlertTriangle size={32} strokeWidth={2} className="mb-3 text-accent-red" />
-                  <h2 className="font-display text-xl font-bold text-foreground mb-1">Clear All Data?</h2>
-                  <p className="text-sm text-muted-foreground">This will permanently delete all saved players and game history from this device. This cannot be undone.</p>
-                </div>
-                <div className="flex gap-3">
-                  <Button onClick={() => setShowConfirm(false)} variant="outline" className="flex-1 h-11" disabled={clearing}>
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleClearData}
-                    disabled={clearing}
-                    className="flex-1 h-11 font-semibold bg-accent-red hover:bg-accent-red/90 text-white"
-                  >
-                    {clearing ? "Clearing..." : "Yes, Clear"}
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+              {clearing ? "Clearing..." : "Yes, Clear"}
+            </Button>
+          </div>
+        }
+      />
     </div>
   );
 }

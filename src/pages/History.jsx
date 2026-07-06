@@ -13,7 +13,13 @@ const safeFormat = (value, fmt) => {
 };
 import HistoryStats from "@/components/scorekeeper/HistoryStats";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
+import StretchTabPill from "@/components/scorekeeper/StretchTabPill";
 import { TRANSITION_PAGE, TRANSITION_PANEL, SPRING_SNAPPY } from "@/lib/motion";
+
+const HISTORY_TABS = [
+  { id: "games", label: "Games", emoji: "🎲" },
+  { id: "stats", label: "Stats", emoji: "📊" },
+];
 
 export default function History({ onBack, onModalChange }) {
   const [games, setGames] = useState([]);
@@ -24,6 +30,7 @@ export default function History({ onBack, onModalChange }) {
   const [clearing, setClearing] = useState(false);
   const [canScroll, setCanScroll] = useState(false);
   const [tab, setTab] = useState("games"); // "games" | "stats"
+  const [previousTab, setPreviousTab] = useState("games");
   const scrollRef = useRef(null);
   const touchStartY = useRef(null);
   const PULL_THRESHOLD = 64;
@@ -105,6 +112,14 @@ export default function History({ onBack, onModalChange }) {
     onModalChange?.(showConfirm);
   }, [showConfirm, onModalChange]);
 
+  const activeTabIndex = HISTORY_TABS.findIndex((item) => item.id === tab);
+  const previousTabIndex = HISTORY_TABS.findIndex((item) => item.id === previousTab);
+  const handleTabChange = (id) => {
+    if (id === tab) return;
+    setPreviousTab(tab);
+    setTab(id);
+  };
+
   return (
     <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* Header */}
@@ -127,24 +142,19 @@ export default function History({ onBack, onModalChange }) {
       {!loading && games.length > 0 && (
         <div className="px-5 pt-2 pb-2 flex-shrink-0">
           <div className="relative flex rounded-full bg-secondary border border-border p-1">
-            {[
-              { id: "games", label: "Games", emoji: "🎲" },
-              { id: "stats", label: "Stats", emoji: "📊" },
-            ].map(({ id, label, emoji }) => {
+            <StretchTabPill
+              activeIndex={activeTabIndex}
+              previousIndex={previousTabIndex}
+              onSettle={() => setPreviousTab(tab)}
+            />
+            {HISTORY_TABS.map(({ id, label, emoji }) => {
               const active = tab === id;
               return (
                 <button
                   key={id}
-                  onClick={() => setTab(id)}
+                  onClick={() => handleTabChange(id)}
                   className="relative flex-1 h-9 rounded-full text-sm font-medium"
                 >
-                  {active && (
-                    <motion.div
-                      layoutId="history-tab-pill"
-                      transition={SPRING_SNAPPY}
-                      className="absolute inset-0 rounded-full bg-card border border-border shadow-sm"
-                    />
-                  )}
                   <span className={`relative z-10 inline-flex items-center gap-1.5 transition-colors ${active ? "text-foreground" : "text-muted-foreground"}`}>
                     <FluentEmoji emoji={emoji} size={15} />
                     {label}

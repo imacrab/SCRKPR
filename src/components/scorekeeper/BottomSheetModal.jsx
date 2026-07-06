@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence, useDragControls } from "framer-motion";
+import { motion, useDragControls } from "framer-motion";
 import { SPRING_SHEET, TRANSITION_FADE } from "@/lib/motion";
 
 /**
@@ -27,6 +27,17 @@ export default function BottomSheetModal({
 }) {
   const dragControls = useDragControls();
   const [scrolled, setScrolled] = useState(false);
+  const [shouldRender, setShouldRender] = useState(isOpen);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      return undefined;
+    }
+
+    const timeout = setTimeout(() => setShouldRender(false), 420);
+    return () => clearTimeout(timeout);
+  }, [isOpen]);
 
   const handleDragEnd = (_, info) => {
     if (info.offset.y > 120 || info.velocity.y > 500) {
@@ -36,38 +47,40 @@ export default function BottomSheetModal({
 
   const backdropZ = zIndex - 10;
 
+  if (!shouldRender) return null;
+
   // Portal to <body> so the modal escapes the page wrapper's stacking context
   // (the page is transformed/blurred during transitions, which traps any
   // z-index inside it). At the document root the backdrop/sheet sit above the
   // app-level persistent logo, so the backdrop dims it naturally.
   return createPortal(
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={TRANSITION_FADE}
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
-            style={{ zIndex: backdropZ }}
-            onClick={onClose}
-          />
-          <motion.div
-            initial={{ y: "100%", opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: "100%", opacity: 0 }}
-            transition={SPRING_SHEET}
-            drag="y"
-            dragControls={dragControls}
-            dragListener={false}
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0, bottom: 0.6 }}
-            dragSnapToOrigin
-            onDragEnd={handleDragEnd}
-            className="fixed inset-x-0 bg-card border border-border rounded-sheet shadow-2xl flex flex-col"
-            style={{ zIndex, bottom: "8px", left: "8px", right: "8px", maxHeight: "calc(100dvh - 48px)" }}
-          >
+    <>
+      <motion.div
+        initial={{ opacity: 0, backdropFilter: "blur(0px)", WebkitBackdropFilter: "blur(0px)" }}
+        animate={{
+          opacity: isOpen ? 1 : 0,
+          backdropFilter: isOpen ? "blur(4px)" : "blur(0px)",
+          WebkitBackdropFilter: isOpen ? "blur(4px)" : "blur(0px)",
+        }}
+        transition={TRANSITION_FADE}
+        className="fixed inset-0 bg-black/60"
+        style={{ zIndex: backdropZ, pointerEvents: isOpen ? "auto" : "none" }}
+        onClick={onClose}
+      />
+      <motion.div
+        initial={{ y: "100%", opacity: 0 }}
+        animate={{ y: isOpen ? 0 : "100%", opacity: isOpen ? 1 : 0 }}
+        transition={SPRING_SHEET}
+        drag="y"
+        dragControls={dragControls}
+        dragListener={false}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0, bottom: 0.6 }}
+        dragSnapToOrigin
+        onDragEnd={handleDragEnd}
+        className="fixed inset-x-0 bg-card border border-border rounded-sheet shadow-2xl flex flex-col"
+        style={{ zIndex, bottom: "8px", left: "8px", right: "8px", maxHeight: "calc(100dvh - 48px)" }}
+      >
             {/* Drag handle + Header (both draggable) — border fades in once the body scrolls */}
             <div
               onPointerDown={(e) => dragControls.start(e)}
@@ -114,10 +127,8 @@ export default function BottomSheetModal({
                 {footer}
               </div>
             )}
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>,
+      </motion.div>
+    </>,
     document.body
   );
 }

@@ -11,7 +11,7 @@ import Players from "./Players";
 import AccountSettings from "./AccountSettings";
 import { TRANSITION_PAGE, SPRING_SHEET } from "@/lib/motion";
 import { ACCENT_BLUE } from "@/lib/colors";
-import logoDark from "@/assets/SCRKPR_dark_mode.png";
+import logoDark from "@/assets/scrkpr-logo.svg";
 
 // Game state persists across route transitions and page refreshes via module scope + localStorage
 let _players = [];

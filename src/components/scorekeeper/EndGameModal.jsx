@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
@@ -88,13 +88,11 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
   const seconds = Math.floor((elapsedMs % 60000) / 1000);
 
   return (
-    <AnimatePresence>
-      {hasPlayers && (
-        <BottomSheetModal
-          isOpen={hasPlayers}
-          onClose={onCancel}
-          scrollable
-          footer={
+    <BottomSheetModal
+      isOpen={hasPlayers}
+      onClose={onCancel}
+      scrollable
+      footer={
             <div className="flex gap-3">
               <Button onClick={onCancel} variant="outline" className="flex-1 h-11">
                 Keep Playing
@@ -107,8 +105,8 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
                 End Game
               </Button>
             </div>
-          }
-        >
+      }
+    >
           {/* Winner hero — mirrors the History "Latest Game" card: winner-color
               gradient, hairline border, oversized ghosted winner emoji, big
               avatar, display name + pts·mode. */}
@@ -220,8 +218,6 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
               <span className="text-sm font-semibold text-foreground">{minutes}m {seconds}s</span>
             </div>
           </div>
-        </BottomSheetModal>
-      )}
-    </AnimatePresence>
+    </BottomSheetModal>
   );
 }

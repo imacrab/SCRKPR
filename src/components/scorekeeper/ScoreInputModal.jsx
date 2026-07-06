@@ -8,7 +8,14 @@ import { SPRING_SNAPPY } from "@/lib/motion";
 export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit, onClose }) {
   const [value, setValue] = useState("");
   const prevValue = useRef("");
+  const renderedPlayer = useRef(null);
+  const renderedEditingIndex = useRef(null);
   const [digitKey, setDigitKey] = useState(0);
+
+  if (player) {
+    renderedPlayer.current = player;
+    renderedEditingIndex.current = editingIndex;
+  }
 
   const handleChange = (newVal) => {
     if (newVal !== prevValue.current) {
@@ -33,17 +40,19 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
     setValue("");
   };
 
-  const isEditing = editingIndex !== null && editingIndex !== undefined;
+  const displayPlayer = player || renderedPlayer.current;
+  const displayEditingIndex = player ? editingIndex : renderedEditingIndex.current;
+  const isEditing = displayEditingIndex !== null && displayEditingIndex !== undefined;
   const isValid = value !== "" && value !== "-" && !isNaN(parseFloat(value));
 
-  if (!player) return null;
+  if (!displayPlayer) return null;
 
   return (
     <BottomSheetModal
       isOpen={isOpen}
       onClose={onClose}
       eyebrow={isEditing ? "Edit Score" : "Add Score"}
-      title={player.name}
+      title={displayPlayer.name}
       footer={
         <div className="flex gap-3">
           <Button onClick={onClose} variant="outline" className="flex-1 h-11">

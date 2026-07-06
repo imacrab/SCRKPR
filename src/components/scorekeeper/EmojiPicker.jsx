@@ -419,9 +419,9 @@ export default function EmojiPicker({ selected, onChange }) {
         >
           None
         </button>
-        {filtered.map(([emoji]) => (
+        {filtered.map(([emoji], index) => (
           <button
-            key={emoji}
+            key={`${emoji}-${index}`}
             type="button"
             onPointerDown={(e) => { e.preventDefault(); onChange(emoji); }}
             className="w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-90"

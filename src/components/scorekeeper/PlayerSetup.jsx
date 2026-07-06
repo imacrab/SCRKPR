@@ -11,7 +11,7 @@ import FluentEmoji from "./FluentEmoji";
 import { getModeMeta } from "@/lib/gameModes";
 import { readableTextColor } from "@/lib/contrast";
 import { DUR_MEDIUM } from "@/lib/motion";
-import logoDark from "@/assets/SCRKPR_dark_mode.png";
+import logoDark from "@/assets/scrkpr-logo.svg";
 
 export default function PlayerSetup({ onStart, onModalChange }) {
   const [allPlayers, setAllPlayers] = useState(null); // null = loading

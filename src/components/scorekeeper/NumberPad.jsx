@@ -35,7 +35,7 @@ export default function NumberPad({ value, onChange }) {
             <button
               key={key}
               onPointerDown={(e) => { e.preventDefault(); handleKey(key); }}
-              className="flex-1 h-12 rounded-full bg-secondary hover:bg-accent text-foreground font-semibold text-lg transition-colors active:scale-95 select-none border border-border"
+              className="flex-1 h-12 rounded-full bg-secondary hover:bg-accent text-white font-semibold text-lg transition-colors active:scale-95 select-none border border-border"
             >
               {key}
             </button>
@@ -46,13 +46,13 @@ export default function NumberPad({ value, onChange }) {
       <div className="flex gap-2">
         <button
           onPointerDown={(e) => { e.preventDefault(); onChange(""); }}
-          className="flex-1 h-12 rounded-full bg-secondary hover:bg-accent text-muted-foreground hover:text-foreground font-medium text-sm transition-colors active:scale-95 select-none border border-border"
+          className="flex-1 h-12 rounded-full bg-secondary hover:bg-accent text-white font-medium text-sm transition-colors active:scale-95 select-none border border-border"
         >
           Clear
         </button>
         <button
           onPointerDown={(e) => { e.preventDefault(); handleKey("⌫"); }}
-          className="flex-1 h-12 rounded-full bg-secondary hover:bg-accent text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors active:scale-95 select-none border border-border"
+          className="flex-1 h-12 rounded-full bg-secondary hover:bg-accent text-white flex items-center justify-center transition-colors active:scale-95 select-none border border-border"
           aria-label="Backspace"
         >
           <Delete size={17} />

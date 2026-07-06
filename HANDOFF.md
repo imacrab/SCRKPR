@@ -1,7 +1,7 @@
 # SCRKPR — Session Handoff
 
 > Context doc for continuing work on a new machine / new Claude session.
-> Last updated: June 27, 2026 (pre-submission code review + dependency/ui cleanup — see §13)
+> Last updated: July 5, 2026 (last-10% interaction polish — see §15)
 
 ## What this project is
 
@@ -11,7 +11,7 @@ SCRKPR is a delightful, **local-first** scorekeeping app for in-person game nigh
 
 ```bash
 npm install
-npm run dev      # Vite dev server, :5173 — works fully offline, no .env needed
+npm run dev      # Vite dev server, usually :5173; may auto-pick :5174 if busy — works fully offline, no .env needed
 npm run lint     # eslint --quiet (clean)
 npm run build    # vite build (passes)
 npm run cap:sync # vite build && cap sync   (iOS)
@@ -27,11 +27,12 @@ npm run cap:sync # vite build && cap sync   (iOS)
 - `delight-pass` — active working branch (at/ahead of `main`).
 - `standardize-design-tokens` — original token branch (see §1).
 
-## Current state (June 27) — quick snapshot
+## Current state (July 5) — quick snapshot
 
 - **Scoring model:** tap a player → number pad → enter the round (no ± buttons). A "round" = the lowest score-count across players. A player who's logged the current round shows a green ✅ (emoji morphs to check); **re-tapping accumulates onto that round's entry** (+2 then +4 = +6), and the round only advances once everyone's logged — no skip-ahead. Tapping the small "(+X)" subtext replaces/corrects that entry.
 - **Game modes:** generic **High / Low / Best Of**, with an optional **target** on High/Low (reach it → game auto-ends). Covers Gin (High+100) and "Swish" (Low+500). Sort follows the mode.
 - **Scoreboard** has a History-style segmented pill: **Scoreboard ↔ Rounds** (the per-round table; appears once a round is logged, hidden in Best Of).
+- **Last-10% polish pass is active:** bottom sheets animate both in and out (including backdrop blur), the slide-to-end-game control tucks away behind score/end-game modals, and tab/nav highlights now use calmer bounded ease-in-out motion instead of bouncy shared-layout springs.
 - **FTUE, regulars (favorites), End Game hero, History** all shipped (see sections below).
 - **App Store:** Capacitor v8 scaffolded (`capacitor.config.json`, appId `com.illudcrab.scrkpr`, Team `8RJXUWMLNF`); `ios/` project generated on the Mac. Privacy policy hosted at a public gist. **Icon RESOLVED (July 5):** coral tile + four white circles (one hollow) — Icon Composer bundle at `assets/Icons/SCRKPR.icon` + SVG variants in `assets/Icons/SVG/`; 1024² raster wired into the Xcode asset catalog. See §14.
 - **Codebase (post June-27 cleanup):** dependencies trimmed **53 → 20** (removed dead `GameMenuModal` + the unused shadcn `ui/` library — only `button`/`input`/`toast`/`toaster`/`use-toast` remain — and all orphaned Radix/`sonner`/`next-themes`/`react-hook-form` deps). Lint/build/18-test/dev-server all green. `npm audit`: 16 non-breaking advisories outstanding (build-time + dormant base44-SDK; only `react-router` ships+runs). See §13.
@@ -52,14 +53,14 @@ npm run cap:sync # vite build && cap sync   (iOS)
 - **End Game modal** — winner's-own-emoji confetti finale (guarded `confetti.shapeFromText`), trophy pop + wiggle, standings stagger in with 🥇🥈🥉 medals.
 - **Player cards stagger on load** — rise + settle, 70ms apart; entrance delay scoped to y/scale/opacity so layout reorders stay instant.
 - **Streak badge** — Fluent 🔥 emoji (was lucide Flame), continuous flicker.
-- **Bottom nav** — springy active pill (`layoutId="nav-active-pill"`), icon lift, tap squish.
+- **Bottom nav** — active pill now uses a persistent transform-based ease-in-out glide (no shared-layout spring bounce); icon lift/tap feedback is softened.
 - Score digits scale-pop on change; emoji picker selection wiggle; score-history rows cascade.
 
 ### 3. Features
 
 - **Players page bulk delete** — "Select" header toggle OR long-press a card (0.5s) to enter select mode with that card selected. Check badges, floating red "Delete N players" pill (takes the nav's spot — nav slides down during select mode), count-aware confirm sheet, optimistic delete via `Promise.allSettled`.
 - **New-player auto-fill** — `PlayerEditModal` auto-picks a random *unused* color and emoji (`usedColors`/`usedEmojis` props passed from all 4 call sites; falls back to full pool if everything is taken).
-- **History (Past Rounds) page** — Games/Stats segmented tabs (springy pill) replace the old stats dropdown. Latest game gets a hero card: winner-color gradient + border, big emoji avatar, display-font name, oversized ghosted winner emoji, medal podium with per-player emoji chips. Older games sit under an "Earlier" divider. Stats tab is a full panel with emoji avatars, 👑 on the win leader, staggered rows.
+- **History (Past Rounds) page** — Games/Stats segmented tabs replace the old stats dropdown. The tab highlight now elongates then constricts with bounded ease-in-out motion (no bounce/overshoot). Latest game gets a hero card: winner-color gradient + border, big emoji avatar, display-font name, oversized ghosted winner emoji, medal podium with per-player emoji chips. Older games sit under an "Earlier" divider. Stats tab is a full panel with emoji avatars, 👑 on the win leader, staggered rows.
 
 ### 4. Session June 13 — polish, de-Base44 assets, reorder rewrite
 
@@ -209,7 +210,7 @@ A review/tidy pass (no feature changes). Repo confirmed green: `npm run lint` cl
 
 **Still open (recommendations):**
 - **`@base44/sdk` still bundled:** `base44Client.js`/`AuthContext.jsx` statically import it even though the stub is what runs offline, so the SDK (and its dormant socket deps) ship in the bundle. Fully dropping it is a phase-2 task (tied to the sync decision), not a safe pre-submission edit.
-- **Minor:** stale `phase10` references in `ScoreBoard.jsx` comments (no longer a mode) — harmless. Stale icon assets (`SCRKPR-Icon.icon`, `AppIcon.png`) left in place pending the icon-direction decision.
+- **Minor:** stale `phase10` references in `ScoreBoard.jsx` comments (no longer a mode) — harmless. The stale icon assets mentioned in earlier review notes were resolved in §14.
 
 ### 14. Session July 5 — logo + icon pass (`logo-icon-pass`) — icon blocker RESOLVED
 
@@ -220,6 +221,20 @@ Adrian delivered the final brand assets; this branch wires them through everythi
 - **Splash regenerated from the new wordmark:** 2732² ink `#111111` bg + white wordmark centered at ~45% width → `assets/splash.png` + `assets/splash-dark.png` AND all 9 PNGs in `ios/.../Splash.imageset/` (so no `@capacitor/assets` run is needed; if you do run it, it reads the same `assets/splash*.png`).
 - **Retired (deleted):** `src/assets/SCRKPR_{dark,light}_mode.png`, `SCRKPR-Icon.icon` (old geometric S), `AppIcon.png`, `SplashScreen.png`.
 - PNGs were rasterized with `sharp` in a scratch dir (not a repo dep). Verified: lint clean, `vite build` exit 0, SVG logo lands in `dist/`.
+
+### 15. Session July 5 — last-10% interaction polish (`SCRKPR` working tree)
+
+Small but visible motion/feel fixes while testing the live app at `http://127.0.0.1:5174` (dev server was on `:5174`, not the default `:5173`). Current working tree is intentionally dirty with these edits; do not revert unrelated user/session changes.
+
+- **Shared modal exit animation (`BottomSheetModal.jsx`, `EndGameModal.jsx`).** Bottom sheets now stay mounted long enough to animate down on close/tap-outside, and the backdrop blur fades out instead of disappearing. `BottomSheetModal` owns the render delay (`shouldRender`, ~420ms) and animates `isOpen` state directly. `EndGameModal` no longer wraps the sheet in an outer `AnimatePresence`; it always renders the shared sheet with `isOpen`.
+- **Score modal close path (`ScoreBoard.jsx`, `ScoreInputModal.jsx`).** The Add Score modal used to vanish instantly because `activePlayer` was cleared as soon as close fired. `ScoreBoard` now separates `scoreModalOpen` from `activePlayer`, delays clearing player/editing state until after the sheet exit, and `ScoreInputModal` keeps the last player/edit index in refs during exit.
+- **Number pad contrast (`NumberPad.jsx`).** All Add Score controls are white now, including `Clear` and Back/Delete; before they were gray while digits were white.
+- **Slide-to-end-game control (`SlideToEndGame.jsx`, `ScoreBoard.jsx`).** The old End Game pill was replaced by a slide-to-confirm control. It slides down/offscreen whenever the End Game modal or Add Score modal opens, then slides back up when the modal closes/Keep Playing is tapped. The release-state copy now centers in the full control (`Release to End Game` no longer has the old right padding). The label text uses title case in code: `Slide to End Game` / `Release to End Game`.
+- **Tab highlight motion (`StretchTabPill.jsx`, `History.jsx`, `ScoreBoard.jsx`, `index.css`).** History `Games ↔ Stats` and scoreboard `Scoreboard ↔ Rounds` no longer use `layoutId`/spring pills. A new shared `StretchTabPill` drives a bounded elongate-then-constrict effect with CSS keyframes (`stretch-tab-pill`): it stretches within the wrapper, never leaves the track, and avoids the accidental bounce. Important: this intentionally uses CSS keyframes because Framer keyframes for the earlier `left`/`width` and transform attempts were observed snapping in the in-app browser.
+- **Main bottom nav (`BottomNavigationBar.jsx`).** Removed the bouncy shared-layout `nav-active-pill`. The active background is now one persistent absolute wrapper that glides via `transform 250ms cubic-bezier(0.4, 0, 0.2, 1)`. Icon/tap motion now uses the calmer panel transition and a smaller tap scale.
+- **Emoji picker duplicate-key warning (`EmojiPicker.jsx`).** Duplicate emoji entries can exist for search aliases; list keys now include the index so React does not warn on repeated emoji values.
+
+**Verified this pass:** `npm run lint` clean; `npm run build` passes. In-app browser geometry checks confirmed the History tab stretch state stays inside the wrapper and the main nav pill glides from Players to History without spring bounce.
 
 ## Open items
 

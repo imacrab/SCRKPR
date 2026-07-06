@@ -2,19 +2,26 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { UserPlus, RotateCcw, Lock, Unlock } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { db } from "@/lib/store";
-import FluentEmoji from "./FluentEmoji";
+import SlideToEndGame from "./SlideToEndGame";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
 import PlayerEditModal from "./PlayerEditModal";
 import EndGameModal from "./EndGameModal";
 import ResetConfirmModal from "./ResetConfirmModal";
 import ScoreHistoryPanel from "./ScoreHistoryPanel";
+import StretchTabPill from "./StretchTabPill";
 import { isLowMode, isCircleMode } from "@/lib/gameModes";
-import { SPRING_POP, SPRING_SHEET, SPRING_SNAPPY, TRANSITION_PANEL } from "@/lib/motion";
+import { SPRING_SHEET, TRANSITION_PANEL } from "@/lib/motion";
 import logoDark from "@/assets/scrkpr-logo.svg";
+
+const SCOREBOARD_TABS = [
+  { id: "board", label: "Scoreboard" },
+  { id: "rounds", label: "Rounds" },
+];
 
 export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
   const [activePlayer, setActivePlayer] = useState(null);
+  const [scoreModalOpen, setScoreModalOpen] = useState(false);
   const [streakMap, setStreakMap] = useState({});
   const [gameStartTime] = useState(new Date());
   const [scrollPos, setScrollPos] = useState(0);
@@ -23,15 +30,34 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [showEndGame, setShowEndGame] = useState(false);
   const [view, setView] = useState("board"); // "board" | "rounds"
+  const [previousView, setPreviousView] = useState("board");
   const scrollContainerRef = useRef(null);
+  const scoreCloseTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (scoreCloseTimerRef.current) clearTimeout(scoreCloseTimerRef.current);
+    };
+  }, []);
 
   // The Rounds tab only makes sense once rounds exist and not in circle (best-of)
   // modes. Snap back to the board if it stops being available.
   const maxRounds = Math.max(0, ...players.map((p) => p.scores.length));
   const showTabs = !isCircleMode(winMode) && maxRounds > 0;
   useEffect(() => {
-    if (view === "rounds" && !showTabs) setView("board");
+    if (view === "rounds" && !showTabs) {
+      setPreviousView("board");
+      setView("board");
+    }
   }, [view, showTabs]);
+
+  const activeViewIndex = SCOREBOARD_TABS.findIndex((item) => item.id === view);
+  const previousViewIndex = SCOREBOARD_TABS.findIndex((item) => item.id === previousView);
+  const handleViewChange = (id) => {
+    if (id === view) return;
+    setPreviousView(view);
+    setView(id);
+  };
 
   useEffect(() => {
     db.games.list("-played_at", 20).then((games) => {
@@ -143,14 +169,27 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
       onAddScore(player.id, 1);
       return;
     }
+    if (scoreCloseTimerRef.current) clearTimeout(scoreCloseTimerRef.current);
     setActivePlayer(player);
     setEditingScore(null);
+    setScoreModalOpen(true);
   };
 
   const handleEditScore = (player, scoreIndex) => {
     if (circleMode) return; // no numeric editing in circle modes
+    if (scoreCloseTimerRef.current) clearTimeout(scoreCloseTimerRef.current);
     setActivePlayer(player);
     setEditingScore({ playerId: player.id, scoreIndex });
+    setScoreModalOpen(true);
+  };
+
+  const closeScoreModal = () => {
+    setScoreModalOpen(false);
+    if (scoreCloseTimerRef.current) clearTimeout(scoreCloseTimerRef.current);
+    scoreCloseTimerRef.current = setTimeout(() => {
+      setActivePlayer(null);
+      setEditingScore(null);
+    }, 420);
   };
 
   const handleSubmit = (value) => {
@@ -168,13 +207,11 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         onAddScore(activePlayer.id, value);
       }
     }
-    setActivePlayer(null);
-    setEditingScore(null);
+    closeScoreModal();
   };
 
   const handleClose = () => {
-    setActivePlayer(null);
-    setEditingScore(null);
+    closeScoreModal();
   };
 
   const handleSavePlayer = ({ name, color, emoji }) => {
@@ -230,24 +267,19 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
       {showTabs && (
         <div className="px-4 pb-2 flex-shrink-0">
           <div className="relative flex rounded-full bg-secondary border border-border p-1">
-            {[
-              { id: "board", label: "Scoreboard" },
-              { id: "rounds", label: "Rounds" },
-            ].map(({ id, label }) => {
+            <StretchTabPill
+              activeIndex={activeViewIndex}
+              previousIndex={previousViewIndex}
+              onSettle={() => setPreviousView(view)}
+            />
+            {SCOREBOARD_TABS.map(({ id, label }) => {
               const active = view === id;
               return (
                 <button
                   key={id}
-                  onClick={() => setView(id)}
+                  onClick={() => handleViewChange(id)}
                   className="relative flex-1 h-9 rounded-full text-sm font-medium"
                 >
-                  {active && (
-                    <motion.div
-                      layoutId="board-tab-pill"
-                      transition={SPRING_SNAPPY}
-                      className="absolute inset-0 rounded-full bg-card border border-border shadow-sm"
-                    />
-                  )}
                   <span className={`relative z-10 transition-colors ${active ? "text-foreground" : "text-muted-foreground"}`}>
                     {label}
                   </span>
@@ -329,51 +361,28 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           )}
         </AnimatePresence>
 
-        {/* End Game — fixed at bottom of scoreboard, centered */}
-        <div
+        {/* End Game — fixed at bottom of scoreboard, slide-to-confirm */}
+        <motion.div
           className="absolute inset-x-0 bottom-0 z-30 flex justify-center"
-          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)", paddingLeft: 48, paddingRight: 48 }}>
-          
-          <motion.button
-            onClick={() => setShowEndGame(true)}
-            whileTap={{ scale: 0.9 }}
-            whileHover={{ scale: 1.03 }}
-            transition={SPRING_POP}
-            className="relative rounded-full p-1 overflow-hidden">
+          animate={{
+            y: showEndGame || scoreModalOpen ? 120 : 0,
+          }}
+          transition={SPRING_SHEET}
+          style={{
+            paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)",
+            paddingLeft: 48,
+            paddingRight: 48,
+            pointerEvents: showEndGame || scoreModalOpen ? "none" : "auto",
+          }}>
 
-            {/* Flowing brand gradient — visible only as the 4px stroke around
-                the ink fill (the inner span is inset by the p-1 padding). */}
-            <motion.span
-              aria-hidden="true"
-              className="absolute inset-0"
-              style={{
-                background: "linear-gradient(110deg, #2DC5F8 0%, #6366F1 22%, #A855F7 48%, #FF3A3A 74%, #2DC5F8 100%)",
-                backgroundSize: "220% 100%",
-              }}
-              animate={{ backgroundPosition: ["0% 50%", "220% 50%"] }}
-              transition={{ duration: 6, ease: "linear", repeat: Infinity }}
-            />
-            {/* Ink fill — the app background, so the button reads as a glowing
-                gradient outline. */}
-            <span className="relative flex items-center justify-center gap-2.5 rounded-full bg-background px-7 py-3.5">
-              <span className="text-base font-bold text-white tracking-wide">End Game</span>
-              {/* Same playful pop the streak/emoji flourishes use across the app */}
-              <motion.span
-                className="flex"
-                animate={{ scale: [1, 1.35, 1], rotate: [0, -8, 8, 0] }}
-                transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-              >
-                <FluentEmoji emoji="🏁" size={22} />
-              </motion.span>
-            </span>
-          </motion.button>
-        </div>
+          <SlideToEndGame onComplete={() => setShowEndGame(true)} />
+        </motion.div>
       </div>
 
       <ScoreInputModal
         player={activePlayer}
         editingIndex={editingScore?.scoreIndex ?? null}
-        isOpen={!!activePlayer}
+        isOpen={scoreModalOpen}
         onSubmit={handleSubmit}
         onClose={handleClose} />
       

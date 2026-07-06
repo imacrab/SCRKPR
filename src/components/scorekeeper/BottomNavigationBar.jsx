@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Spade, Users, History, Settings } from "lucide-react";
 import { motion } from "framer-motion";
-import { TRANSITION_PAGE, SPRING_SNAPPY } from "@/lib/motion";
+import { TRANSITION_PAGE, TRANSITION_PANEL } from "@/lib/motion";
 
 const TABS = [
   { label: "New Game", icon: Spade,    path: "/" },
@@ -17,6 +17,7 @@ export default function BottomNavigationBar({ hidden = false }) {
   // Slide the nav bar down (and fade out) during an active game,
   // slide back up (and fade in) when returning to any other route.
   const isHidden = hidden || pathname === "/game";
+  const activeIndex = Math.max(0, TABS.findIndex((tab) => tab.path === pathname));
 
   return (
     <motion.div
@@ -30,28 +31,31 @@ export default function BottomNavigationBar({ hidden = false }) {
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 32px)", paddingLeft: "32px", paddingRight: "32px", pointerEvents: isHidden ? "none" : "auto", backgroundColor: "hsl(var(--background))" }}
     >
     <div className="relative flex flex-1">
+      <div
+        aria-hidden="true"
+        className="absolute inset-y-0 left-0 flex items-center justify-center"
+        style={{
+          width: `${100 / TABS.length}%`,
+          transform: `translateX(${activeIndex * 100}%)`,
+          transition: "transform 250ms cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
+      >
+        <div className="rounded-full bg-accent" style={{ width: 56, height: 40 }} />
+      </div>
       {TABS.map(({ label, icon: Icon, path }) => {
         const active = pathname === path;
         return (
           <motion.button
             key={path}
             onClick={() => navigate(path)}
-            whileTap={{ scale: 0.88 }}
-            transition={SPRING_SNAPPY}
+            whileTap={{ scale: 0.96 }}
+            transition={TRANSITION_PANEL}
             className="relative flex-1 flex flex-col items-center justify-center gap-1 px-2 py-2 transition-colors"
             style={{ minHeight: 56 }}
           >
-            {active && (
-              <motion.div
-                layoutId="nav-active-pill"
-                transition={SPRING_SNAPPY}
-                className="absolute rounded-full bg-accent"
-                style={{ width: 56, height: 40, top: "50%", left: "50%", marginLeft: -28, marginTop: -20 }}
-              />
-            )}
             <motion.span
               animate={{ scale: active ? 1.1 : 1, y: active ? -1 : 0 }}
-              transition={SPRING_SNAPPY}
+              transition={TRANSITION_PANEL}
               className="relative z-10 flex"
             >
               <Icon

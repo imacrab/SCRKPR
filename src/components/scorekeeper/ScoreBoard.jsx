@@ -19,7 +19,7 @@ const SCOREBOARD_TABS = [
   { id: "rounds", label: "Rounds" },
 ];
 
-export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame }) {
+export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, addPlayerModalOpen = false, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame, onModalChange }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [scoreModalOpen, setScoreModalOpen] = useState(false);
   const [streakMap, setStreakMap] = useState({});
@@ -29,16 +29,27 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [sortLocked, setSortLocked] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [showEndGame, setShowEndGame] = useState(false);
+  const [endingGame, setEndingGame] = useState(false);
   const [view, setView] = useState("board"); // "board" | "rounds"
   const [previousView, setPreviousView] = useState("board");
   const scrollContainerRef = useRef(null);
   const scoreCloseTimerRef = useRef(null);
+  const endGameTimerRef = useRef(null);
 
   useEffect(() => {
     return () => {
       if (scoreCloseTimerRef.current) clearTimeout(scoreCloseTimerRef.current);
+      if (endGameTimerRef.current) clearTimeout(endGameTimerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    onModalChange?.(scoreModalOpen || showResetConfirm || showEndGame || addPlayerModalOpen || !!editingPlayer);
+  }, [scoreModalOpen, showResetConfirm, showEndGame, addPlayerModalOpen, editingPlayer, onModalChange]);
+
+  useEffect(() => {
+    return () => onModalChange?.(false);
+  }, [onModalChange]);
 
   // The Rounds tab only makes sense once rounds exist and not in circle (best-of)
   // modes. Snap back to the board if it stops being available.
@@ -222,6 +233,18 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     setEditingPlayer(null);
   };
 
+  const handleConfirmEndGame = () => {
+    if (endingGame) return;
+    setEndingGame(true);
+    setShowEndGame(false);
+    if (endGameTimerRef.current) clearTimeout(endGameTimerRef.current);
+    endGameTimerRef.current = setTimeout(() => {
+      onEndGame();
+    }, 430);
+  };
+
+  const slideControlHidden = showEndGame || scoreModalOpen || showResetConfirm || addPlayerModalOpen;
+
 
 
   return (
@@ -365,14 +388,14 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         <motion.div
           className="absolute inset-x-0 bottom-0 z-30 flex justify-center"
           animate={{
-            y: showEndGame || scoreModalOpen || showResetConfirm ? 120 : 0,
+            y: slideControlHidden ? 120 : 0,
           }}
           transition={SPRING_SHEET}
           style={{
             paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)",
             paddingLeft: 48,
             paddingRight: 48,
-            pointerEvents: showEndGame || scoreModalOpen || showResetConfirm ? "none" : "auto",
+            pointerEvents: slideControlHidden ? "none" : "auto",
           }}>
 
           <SlideToEndGame onComplete={() => setShowEndGame(true)} />
@@ -407,8 +430,12 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         players={players}
         winMode={winMode}
         gameStartTime={gameStartTime}
-        onConfirm={() => {setShowEndGame(false);onEndGame();}}
-        onCancel={() => setShowEndGame(false)} />
+        onConfirm={handleConfirmEndGame}
+        isConfirming={endingGame}
+        onCancel={() => {
+          if (endingGame) return;
+          setShowEndGame(false);
+        }} />
       
     </div>);
 

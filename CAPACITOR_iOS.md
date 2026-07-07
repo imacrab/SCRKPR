@@ -3,27 +3,26 @@
 Everything in `capacitor.config.json` + `assets/` + the `.icon` is scaffolded. These steps run on **macOS** (Xcode/CocoaPods can't run in the cloud sandbox).
 
 - **App ID:** `com.illudcrab.scrkpr`  ·  **Name:** SCRKPR  ·  **webDir:** `dist`  ·  **Team ID:** `8RJXUWMLNF`
-- **Prereqs:** macOS, **Xcode 26+** (required for the Liquid Glass `.icon`), CocoaPods (`sudo gem install cocoapods` or `brew install cocoapods`), an Apple Developer account.
+- **Prereqs:** macOS, **Xcode 26+** (required for the Liquid Glass `.icon`), an Apple Developer account. **No CocoaPods** — this project uses **Swift Package Manager** (`ios/App/CapApp-SPM`); there is no Podfile.
 
-## One-time setup
+## One-time setup — already done (committed)
+
+The `ios/` Xcode project is scaffolded and committed (`ios/App/App.xcodeproj`, SPM-based). You do **not** re-run `npx cap add ios`. The splash imageset + raster icon are in the asset catalog. Also already applied (July 7): `ITSAppUsesNonExemptEncryption = NO` in `Info.plist`, `TARGETED_DEVICE_FAMILY = 1` (iPhone-only), and a fresh `npm run build && npx cap sync ios`.
+
+The only command you need after a web change:
 
 ```bash
-git pull                      # get the Capacitor scaffold
-npm install                   # installs Capacitor + (on Mac) sharp for @capacitor/assets
-npm run build                 # vite -> dist/
-npx cap add ios               # creates ios/ Xcode project + runs pod install
-npx @capacitor/assets generate --ios   # generates splash from assets/splash*.png
-npx cap sync ios              # copies web build + plugins into the iOS project
+npm run build && npx cap sync ios   # rebuild dist/ and copy it into the iOS project
 ```
 
-> The `assets/splash.png` + `assets/splash-dark.png` (2732²) are already in the repo, so `@capacitor/assets` will produce the launch-screen images. `@capacitor/assets` needs `sharp`, which installs fine on macOS (it failed only in the cloud sandbox).
+> Splash images (`assets/splash*.png`, 2732²) are already generated into `ios/.../Splash.imageset/`, so a `@capacitor/assets generate` run is optional.
 
 ## App icon — the Liquid Glass `.icon`
 
 1. Open the project: `npx cap open ios` (opens `ios/App/App.xcworkspace`).
 2. In Xcode, select the **App** target → **General** → App Icons, or open the asset catalog.
-3. Set the app icon source to **`src/assets/SCRKPR-Icon.icon`** (Xcode 26 accepts the Icon Composer `.icon` directly — drag it in / point the App Icon at it). Xcode generates every size, the light/dark/tinted variants, and the flattened fallback for pre-iOS-26 automatically.
-   - Eyeball the variants once: default = glassy gradient, **dark = orange S**, **tinted = blue S**.
+3. Set the app icon source to **`assets/Icons/SCRKPR.icon`** (Xcode 26 accepts the Icon Composer `.icon` directly — drag it in / point the App Icon at it). Xcode generates every size, the light/dark/tinted variants, and the flattened fallback for pre-iOS-26 automatically. (A 1024² raster fallback — `AppIcon-512@2x.png` — is already wired into the asset catalog, so the app has a working icon even before you do this step.)
+   - Eyeball it once: coral `#FA5845` tile + four white circles (bottom-right one hollow). The old geometric-S `.icon` was scrapped (§14 in HANDOFF) — do not reference `src/assets/SCRKPR-Icon.icon`; it's deleted.
 
 ## Xcode settings to confirm
 

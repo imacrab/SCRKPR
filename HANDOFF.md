@@ -259,6 +259,17 @@ Small but visible motion/feel fixes while testing the live app at `http://127.0.
 
 **Verified this pass:** `npm run lint` clean; `npm run build` exit 0. In-browser (preview on `:5176`, mobile viewport): History "Clear All Games?" renders as the unified sheet with confirmed computed colors — title `rgb(255,255,255)`, description `rgba(255,255,255,0.7)`, ⚠️ icon `rgb(255,255,255)` — and dismisses on tap-outside; the History "Clear All" trigger reads `rgba(255,255,255,0.7)`. Reset flow: tapping ↺ set the slide control's `pointerEvents:none` and animated `y` 0→120 while the "Reset all scores?" sheet rose; Cancel returned it to `y:0`/`pointerEvents:auto` (all measured). Settings "Clear All Data?" verified by code parity (identical `BottomSheetModal` invocation) + clean of dangling refs + lint/build — a live screenshot wasn't captured because the backgrounded preview tab froze framer's page-transition (`requestAnimationFrame` pauses in hidden tabs; every page went blank, proving it's environmental, same rAF freeze noted in §15).
 
+### 17. Session July 7 — drop `@base44/sdk` (phase-2 dep removal)
+
+Removed the dormant Base44 SDK from the dependency tree and bundle now that the app is local-first (`SYNC_ENABLED = false`). Motivated by the two open items below (bundle-drop + `npm audit`).
+
+- **`package.json`** — deleted `@base44/sdk` (kept `@base44/vite-plugin`, a build-config dep). Reinstalled → `package-lock.json` updated.
+- **`src/api/base44Client.js`** — dropped `import { createClient } from '@base44/sdk'` and the `SYNC_ENABLED ? createClient(...) : stub` ternary. Now always exports `createStubClient()` (the `auth.me`-rejects / `logout`+`redirectToLogin` no-op surface that `AccountSettings.jsx` and `PageNotFound.jsx` still reference). The stub has no SDK coupling.
+- **`src/lib/AuthContext.jsx`** — dropped `import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client'` and replaced the unreachable cloud `checkAppState` body (the app-public-settings fetch + `auth_required`/`user_not_registered` branch) with a minimal token→`checkUserAuth` fall-through. Context contract (all exported fields) unchanged; the live `!SYNC_ENABLED` fast-path is untouched.
+- **Restoring cross-device sync** is now a deliberate rebuild: re-add `@base44/sdk`, reinstate the real client behind `SYNC_ENABLED` in `base44Client.js`, and rebuild the public-settings/auth fetch in `AuthContext.jsx`. In-code comments in both files point the way.
+
+**Verified:** `npm run lint` clean; `npm run build` exit 0; **`npm audit` → 0 vulnerabilities** (was 16 — the socket-transport deps ws/socket.io-parser/engine.io-client/form-data were transitive to the SDK); `dist/` no longer contains socket.io/engine.io; and the running dev app (`:5173`) boots to the **real UI** (game board + persistent logo), not the ErrorBoundary fallback, confirming the boot path (`AuthProvider` → stub `base44Client` → `AuthenticatedApp`) survives the removal.
+
 ## Open items
 
 - [x] ~~APP ICON (was the active blocker)~~ — **RESOLVED July 5** (§14): coral-circles direction final; favicon + Xcode raster + splash all wired. Only Mac step left: set `assets/Icons/SCRKPR.icon` in Xcode 26 for Liquid Glass.
@@ -267,8 +278,8 @@ Small but visible motion/feel fixes while testing the live app at `http://127.0.
 - [~] **Local-first** — phase 1 done (§6). Remaining (only if/when cross-device wanted): the Base44 sync layer + first-launch migration, both behind `SYNC_ENABLED`.
 - [ ] **iPad version** — scoped/brainstormed (§12), not built. Ship iPhone first.
 - [ ] **Merge/publish caution** — Base44 syncs `main`; confirm its Builder/publish flow tolerates the stubbed SDK (`SYNC_ENABLED=false`) before relying on it.
-- [ ] **`npm audit fix` (from §13, not run):** 16 non-breaking advisories; only `react-router`/`react-router-dom` actually ship + run — bump + device-retest before submission. Rest are build-time or dormant base44-SDK socket deps.
-- [ ] **Drop `@base44/sdk` from the bundle (phase 2):** still statically imported though the stub runs offline; removing it clears the dormant socket-dep advisories. Tied to the sync decision.
+- [x] ~~**`npm audit fix`**~~ — **RESOLVED July 7** (§17): `npm audit` now reports **0 vulnerabilities**. Dropping `@base44/sdk` (below) cleared all 16 advisories — the socket-transport deps (ws/socket.io/engine.io/form-data) were transitive to the SDK, and the build-time ones deduped away with the reinstall. No separate `npm audit fix` run needed.
+- [x] ~~**Drop `@base44/sdk` from the bundle (phase 2)**~~ — **DONE July 7** (§17): removed from `package.json`; both static imports (`createClient` in `base44Client.js`, `createAxiosClient` in `AuthContext.jsx`) dropped. `base44Client.js` now always exports the local-first stub (the `base44.auth.*` surface `AccountSettings`/`PageNotFound` still call); `AuthContext.jsx` lost its unreachable cloud-fetch. Bundle no longer contains socket.io/engine.io; app boots to the real UI (not ErrorBoundary). Restoring cross-device sync = re-add the SDK + reinstate the client/fetch behind `SYNC_ENABLED` (comments in both files point the way).
 - [x] ~~Pre-submission code review + cleanup~~ — green build/lint/tests; dead `GameMenuModal` + 5 dead deps removed, then full `ui/` prune (37 components, deps 53→20), dev server verified (§13).
 - [x] ~~App Store readiness pass / quick wins~~ — viewport-fit, head metas, dep prune, package rename, Capacitor scaffold all done (§10).
 - [x] ~~Core-loop rework~~ — generic modes, number-pad-only scoring, sort-follows-mode, round guard + accumulate (§11, §12).

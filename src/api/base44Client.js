@@ -1,16 +1,12 @@
-import { createClient } from '@base44/sdk';
-import { appParams } from '@/lib/app-params';
-import { SYNC_ENABLED } from '@/lib/store';
-
-const { appId, token, functionsVersion, appBaseUrl } = appParams;
-
-// Local-first: when cloud sync is disabled we don't instantiate the Base44 SDK
-// at all. Instantiating it pings the backend (auth.me) on boot, which would
-// break the "zero network, no account, works offline" promise. A tiny stub
-// satisfies the auth surface the (now dormant) auth code still references —
-// auth.me rejects so callers fall through to their unauthenticated path, and
-// logout/redirect are no-ops. Flip SYNC_ENABLED on (lib/store.js) to restore
-// the real client once cross-device sync is built.
+// Local-first: the app runs entirely on-device (see SYNC_ENABLED in lib/store.js),
+// so the Base44 SDK is not bundled. `base44` is a tiny stub that satisfies the
+// auth surface the (now dormant) auth code still references — auth.me rejects so
+// callers fall through to their unauthenticated path, and logout/redirect are
+// no-ops. The zero-network, no-account, works-offline promise depends on this.
+//
+// Restoring cloud sync (a deliberate phase-2 rebuild): re-add `@base44/sdk` to
+// package.json, then instantiate the real client here behind SYNC_ENABLED and
+// reinstate the app-state/auth flow in lib/AuthContext.jsx.
 function createStubClient() {
   const noop = () => {};
   return {
@@ -22,13 +18,4 @@ function createStubClient() {
   };
 }
 
-export const base44 = SYNC_ENABLED
-  ? createClient({
-      appId,
-      token,
-      functionsVersion,
-      serverUrl: '',
-      requiresAuth: false,
-      appBaseUrl,
-    })
-  : createStubClient();
+export const base44 = createStubClient();

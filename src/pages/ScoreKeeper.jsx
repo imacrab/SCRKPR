@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { db } from "@/lib/store";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import PlayerSetup from "@/components/scorekeeper/PlayerSetup";
 import ScoreBoard from "@/components/scorekeeper/ScoreBoard";
@@ -76,9 +76,11 @@ export default function ScoreKeeper() {
   // so it never unmounts, and glides/resizes between each page's logo slot —
   // a shared-element transition that mode="wait" otherwise makes impossible
   // (the two pages never coexist for a layoutId tween). Each page renders an
-  // invisible [data-logo-anchor] in its real slot; we measure that and move the
-  // floating logo to match.
-  const [logoBox, setLogoBox] = useState({ x: 0, y: 0, w: 200, visible: false, ready: false });
+  // invisible [data-logo-anchor] in its real slot; we measure that and transform
+  // the floating logo to match. The rendered logo keeps one stable base width
+  // and animates via scale, so it does not resize first and then drift into place.
+  const LOGO_BASE_WIDTH = 200;
+  const [logoBox, setLogoBox] = useState({ x: 0, y: 0, scale: 1, visible: false, ready: false });
 
   const measureLogo = useCallback(() => {
     if (view !== "/" && view !== "/game") {
@@ -89,14 +91,16 @@ export default function ScoreKeeper() {
     if (!el) return; // anchor not mounted yet (mid-transition) — keep last box
     const r = el.getBoundingClientRect();
     if (r.width === 0) return;
-    setLogoBox({ x: r.left, y: r.top, w: r.width, visible: true, ready: true });
+    setLogoBox({ x: r.left, y: r.top, scale: r.width / LOGO_BASE_WIDTH, visible: true, ready: true });
   }, [view]);
 
-  // Re-measure on every view change (covers initial mount) and on resize.
+  // Hide immediately on pages without a logo anchor. Home/game measure from
+  // onAnimationComplete so we read the settled anchor, not the page-enter scale.
   useEffect(() => {
-    const id = requestAnimationFrame(measureLogo);
-    return () => cancelAnimationFrame(id);
-  }, [measureLogo]);
+    if (view !== "/" && view !== "/game") {
+      setLogoBox((b) => (b.ready ? { ...b, visible: false } : b));
+    }
+  }, [view]);
 
   useEffect(() => {
     window.addEventListener("resize", measureLogo);
@@ -232,38 +236,38 @@ export default function ScoreKeeper() {
   }, []);
 
   const pageVariants = {
-    initial: { opacity: 0, filter: "blur(12px)", scale: 0.97 },
-    animate: { opacity: 1, filter: "blur(0px)", scale: 1 },
-    exit:    { opacity: 0, filter: "blur(12px)", scale: 1.02 },
+    initial: { opacity: 0, filter: "blur(12px)", scale: 0.97, zIndex: 1 },
+    animate: { opacity: 1, filter: "blur(0px)", scale: 1, zIndex: 1, pointerEvents: "auto" },
   };
   const pageTransition = TRANSITION_PAGE;
+  const pageClassName = "absolute inset-0 w-screen overflow-hidden";
 
   // Height reserved for the bottom nav bar (hidden on /game)
   const navHeight = view === "/game" ? "0px" : "calc(56px + env(safe-area-inset-bottom))";
 
   return (
     <>
-      <AnimatePresence mode="wait" onExitComplete={() => requestAnimationFrame(measureLogo)}>
+      <div className="relative w-screen overflow-hidden" style={{ height: "100dvh" }}>
         {view === "/history" && (
-          <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
+          <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} className={pageClassName} style={{ height: "100dvh", paddingBottom: navHeight }}>
             <History onBack={() => navigate(-1)} onModalChange={setNavHidden} />
           </motion.div>
         )}
 
         {view === "/players" && (
-          <motion.div key="players" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
+          <motion.div key="players" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} className={pageClassName} style={{ height: "100dvh", paddingBottom: navHeight }}>
             <Players onBack={() => navigate(-1)} onModalChange={setNavHidden} />
           </motion.div>
         )}
 
         {view === "/account" && (
-          <motion.div key="account" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
+          <motion.div key="account" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} className={pageClassName} style={{ height: "100dvh", paddingBottom: navHeight }}>
             <AccountSettings onBack={() => navigate(-1)} onModalChange={setNavHidden} />
           </motion.div>
         )}
 
         {view === "/" && (
-          <motion.div key="setup" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} onAnimationComplete={measureLogo} className="w-screen overflow-hidden" style={{ height: "100dvh", paddingBottom: navHeight }}>
+          <motion.div key="setup" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} onAnimationComplete={measureLogo} className={pageClassName} style={{ height: "100dvh", paddingBottom: navHeight }}>
             <PlayerSetup
               onStart={handleStartGame}
               onShowHistory={() => navigate("/history")}
@@ -274,13 +278,14 @@ export default function ScoreKeeper() {
         )}
 
         {view === "/game" && (
-          <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} onAnimationComplete={measureLogo} className="w-screen overflow-hidden" style={{ height: "100dvh" }}>
+          <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} onAnimationComplete={measureLogo} className={pageClassName} style={{ height: "100dvh" }}>
             <ScoreBoard
               players={players}
               winMode={winMode}
               bestOf={bestOf}
               targetScore={targetScore}
               lastAddedPlayerId={lastAddedPlayerId}
+              addPlayerModalOpen={showAddPlayer}
               onAddScore={handleAddScore}
               onEditScore={handleEditScore}
               onEditName={handleEditName}
@@ -289,6 +294,7 @@ export default function ScoreKeeper() {
               onReset={handleReset}
               onEndGame={handleEndGame}
               onAddPlayer={() => setShowAddPlayer(true)}
+              onModalChange={setNavHidden}
             />
             <PlayerEditModal
               isOpen={showAddPlayer}
@@ -300,7 +306,7 @@ export default function ScoreKeeper() {
             />
           </motion.div>
         )}
-      </AnimatePresence>
+      </div>
 
       {/* Persistent SCRKPR logo — glides between the home + game logo slots.
           z-30 keeps it above page content but below modals (backdrop z-40).
@@ -313,15 +319,15 @@ export default function ScoreKeeper() {
           aria-hidden="true"
           draggable={false}
           className="fixed left-0 top-0 z-30 pointer-events-none select-none"
-          style={{ height: "auto", transformOrigin: "top left" }}
-          initial={{ x: logoBox.x, y: logoBox.y, width: logoBox.w, opacity: 0 }}
+          style={{ width: LOGO_BASE_WIDTH, height: "auto", transformOrigin: "top left" }}
+          initial={{ x: logoBox.x, y: logoBox.y, scale: logoBox.scale, opacity: 0 }}
           animate={{
             x: logoBox.x,
             y: logoBox.y,
-            width: logoBox.w,
+            scale: logoBox.scale,
             opacity: logoBox.visible ? 1 : 0,
           }}
-          transition={{ x: SPRING_SHEET, y: SPRING_SHEET, width: SPRING_SHEET, opacity: { duration: 0.2 } }}
+          transition={{ x: SPRING_SHEET, y: SPRING_SHEET, scale: SPRING_SHEET, opacity: { duration: 0.2 } }}
         />
       )}
 

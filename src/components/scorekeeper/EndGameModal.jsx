@@ -8,7 +8,7 @@ import BottomSheetModal from "./BottomSheetModal";
 import { PLAYER_COLORS } from "@/lib/colors";
 import { SPRING_SHEET } from "@/lib/motion";
 
-export default function EndGameModal({ isOpen, players, winMode, gameStartTime, onConfirm, onCancel }) {
+export default function EndGameModal({ isOpen, players, winMode, gameStartTime, onConfirm, onCancel, isConfirming = false }) {
   useEffect(() => {
     if (!isOpen || players.length === 0) return;
 
@@ -94,11 +94,12 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
       scrollable
       footer={
             <div className="flex gap-3">
-              <Button onClick={onCancel} variant="outline" className="flex-1 h-11">
+              <Button onClick={onCancel} disabled={isConfirming} variant="outline" className="flex-1 h-11">
                 Keep Playing
               </Button>
               <Button
                 onClick={onConfirm}
+                disabled={isConfirming}
                 className="flex-1 h-11 font-semibold bg-green-600 hover:bg-green-700 text-white"
                 style={{ boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
               >

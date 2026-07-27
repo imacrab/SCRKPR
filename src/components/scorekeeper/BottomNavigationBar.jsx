@@ -19,9 +19,9 @@ export default function BottomNavigationBar({ hidden = false }) {
   const isHidden = hidden || pathname === "/game";
   const activeIndex = Math.max(0, TABS.findIndex((tab) => tab.path === pathname));
 
-  // iOS HIG tab bar: 49pt tall content area sitting flush against the home
-  // indicator (safe-area-inset-bottom below the bar). Icons ~25pt with a 44pt
-  // minimum tap target. Selection pill is sized to fit within the 49pt height.
+  // Tab bar: 56pt tall content area sitting flush against the home indicator
+  // (safe-area-inset-bottom below the bar). Icons ~25pt with a 44pt minimum
+  // tap target. Selection pill is sized to fit within the 56pt height.
   return (
     <motion.div
       className="fixed inset-x-0 bottom-0 z-30 flex"
@@ -37,7 +37,7 @@ export default function BottomNavigationBar({ hidden = false }) {
         backgroundColor: "hsl(var(--background))",
       }}
     >
-    <div className="relative flex flex-1" style={{ height: 49 }}>
+    <div className="relative flex flex-1 items-center" style={{ height: 56 }}>
       <div
         aria-hidden="true"
         className="absolute inset-y-0 left-0 flex items-center justify-center"

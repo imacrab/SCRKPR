@@ -243,7 +243,7 @@ export default function ScoreKeeper() {
   const pageClassName = "absolute inset-0 w-screen overflow-hidden";
 
   // Height reserved for the bottom nav bar (hidden on /game)
-  const navHeight = view === "/game" ? "0px" : "calc(56px + env(safe-area-inset-bottom))";
+  const navHeight = view === "/game" ? "0px" : "calc(56px + 20px + env(safe-area-inset-bottom))";
 
   return (
     <>

@@ -37,3 +37,4 @@ ios/App/output
 ios/App/build
 ios/DerivedData
 *.xcuserstate
+base44/.app.jsonc

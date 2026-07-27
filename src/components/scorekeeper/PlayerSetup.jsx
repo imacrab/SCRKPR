@@ -519,7 +519,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       </div>
 
       {/* Actions */}
-      <div className="px-5 pt-0 pb-0 flex flex-col gap-3 relative z-30">
+      <div className="px-5 pt-0 flex flex-col gap-3 relative z-30" style={{ paddingBottom: "20px" }}>
         <Button
           onClick={handleStart}
           disabled={!canStart}

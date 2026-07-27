@@ -243,7 +243,9 @@ export default function ScoreKeeper() {
   const pageClassName = "absolute inset-0 w-screen overflow-hidden";
 
   // Height reserved for the bottom nav bar (hidden on /game)
-  const navHeight = view === "/game" ? "0px" : "calc(56px + 20px + env(safe-area-inset-bottom))";
+  // iOS HIG: 49pt tab bar + safe-area inset. Pages reserve this space so
+  // content never sits under the bar.
+  const navHeight = view === "/game" ? "0px" : "calc(49px + env(safe-area-inset-bottom))";
 
   return (
     <>
@@ -339,7 +341,7 @@ export default function ScoreKeeper() {
         <div
           className="fixed inset-x-0 z-20 pointer-events-none"
           style={{
-            bottom: "calc(56px + env(safe-area-inset-bottom) + 8px)",
+            bottom: "calc(49px + env(safe-area-inset-bottom) + 8px)",
             height: "64px",
             background: "linear-gradient(to top, hsl(var(--background)) 0%, hsl(var(--background) / 0) 100%)",
           }}

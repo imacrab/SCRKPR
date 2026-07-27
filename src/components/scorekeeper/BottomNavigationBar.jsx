@@ -19,6 +19,9 @@ export default function BottomNavigationBar({ hidden = false }) {
   const isHidden = hidden || pathname === "/game";
   const activeIndex = Math.max(0, TABS.findIndex((tab) => tab.path === pathname));
 
+  // iOS HIG tab bar: 49pt tall content area sitting flush against the home
+  // indicator (safe-area-inset-bottom below the bar). Icons ~25pt with a 44pt
+  // minimum tap target. Selection pill is sized to fit within the 49pt height.
   return (
     <motion.div
       className="fixed inset-x-0 bottom-0 z-30 flex"
@@ -28,9 +31,13 @@ export default function BottomNavigationBar({ hidden = false }) {
         filter: isHidden ? "blur(8px)" : "blur(0px)",
       }}
       transition={TRANSITION_PAGE}
-      style={{ paddingBottom: "env(safe-area-inset-bottom)", paddingTop: "20px", paddingLeft: "32px", paddingRight: "32px", pointerEvents: isHidden ? "none" : "auto", backgroundColor: "hsl(var(--background))" }}
+      style={{
+        paddingBottom: "env(safe-area-inset-bottom)",
+        pointerEvents: isHidden ? "none" : "auto",
+        backgroundColor: "hsl(var(--background))",
+      }}
     >
-    <div className="relative flex flex-1">
+    <div className="relative flex flex-1" style={{ height: 49 }}>
       <div
         aria-hidden="true"
         className="absolute inset-y-0 left-0 flex items-center justify-center"
@@ -40,7 +47,7 @@ export default function BottomNavigationBar({ hidden = false }) {
           transition: "transform 250ms cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
-        <div className="rounded-full bg-accent" style={{ width: 56, height: 40 }} />
+        <div className="rounded-full bg-accent" style={{ width: 56, height: 36 }} />
       </div>
       {TABS.map(({ label, icon: Icon, path }) => {
         const active = pathname === path;
@@ -50,16 +57,16 @@ export default function BottomNavigationBar({ hidden = false }) {
             onClick={() => navigate(path)}
             whileTap={{ scale: 0.96 }}
             transition={TRANSITION_PANEL}
-            className="relative flex-1 flex flex-col items-center justify-center gap-1 px-2 py-2 transition-colors"
-            style={{ minHeight: 56 }}
+            className="relative flex-1 flex items-center justify-center transition-colors"
+            style={{ minHeight: 44 }}
           >
             <motion.span
-              animate={{ scale: active ? 1.1 : 1, y: active ? -1 : 0 }}
+              animate={{ scale: active ? 1.1 : 1 }}
               transition={TRANSITION_PANEL}
               className="relative z-10 flex"
             >
               <Icon
-                size={24}
+                size={25}
                 strokeWidth={2}
                 style={{ color: active ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
               />

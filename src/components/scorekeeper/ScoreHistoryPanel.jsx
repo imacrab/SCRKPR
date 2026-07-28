@@ -7,7 +7,14 @@ import { TRANSITION_PANEL } from "@/lib/motion";
 // least one round has been logged.
 export default function ScoreHistoryPanel({ players }) {
   const maxRounds = Math.max(0, ...players.map((p) => p.scores.length));
-  if (maxRounds === 0) return null;
+  if (maxRounds === 0) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center" style={{ gap: 32 }}>
+        <FluentEmoji emoji="🤷‍♀️" size={140} style={{ display: "block" }} />
+        <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No rounds played yet</p>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-xl border border-border bg-card/50 overflow-hidden">

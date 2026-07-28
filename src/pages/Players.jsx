@@ -5,6 +5,7 @@ import { Plus, Users, Check, Trash2, Star } from "lucide-react";
 import PlayerEditModal from "@/components/scorekeeper/PlayerEditModal";
 import DeletePlayerConfirmModal from "@/components/scorekeeper/DeletePlayerConfirmModal";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
+import SwipeableRow from "@/components/scorekeeper/SwipeableRow";
 import { SPRING_SHEET } from "@/lib/motion";
 
 export default function Players({ onBack, onModalChange }) {
@@ -14,6 +15,7 @@ export default function Players({ onBack, onModalChange }) {
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(() => new Set());
   const [showBulkConfirm, setShowBulkConfirm] = useState(false);
+  const [swipeConfirm, setSwipeConfirm] = useState(null); // player pending swipe-delete confirmation
   const [canScroll, setCanScroll] = useState(false);
   const [poppedId, setPoppedId] = useState(null); // star that just bounced
   const scrollRef = useRef(null);
@@ -59,8 +61,8 @@ export default function Players({ onBack, onModalChange }) {
   useEffect(() => {
     // Hide the tab bar (and its gradient) for modals AND select mode —
     // the bulk-delete pill takes the nav's place while selecting.
-    onModalChange?.(!!editing || showBulkConfirm || selectMode);
-  }, [editing, showBulkConfirm, selectMode, onModalChange]);
+    onModalChange?.(!!editing || showBulkConfirm || !!swipeConfirm || selectMode);
+  }, [editing, showBulkConfirm, swipeConfirm, selectMode, onModalChange]);
 
   // Long-press a card (0.5s) to jump straight into select mode with it selected
   const longPressFiredRef = useRef(false);
@@ -196,6 +198,10 @@ export default function Players({ onBack, onModalChange }) {
     const isSelected = selectedIds.has(p.id);
     return (
       <div key={p.id} data-row-id={p.id} data-idx={idx} className="mb-2">
+        <SwipeableRow
+          disabled={selectMode}
+          onDelete={() => setSwipeConfirm(p)}
+        >
         <button
           onClick={() => {
             if (longPressFiredRef.current) { longPressFiredRef.current = false; return; }
@@ -252,6 +258,7 @@ export default function Players({ onBack, onModalChange }) {
             </motion.span>
           )}
         </button>
+        </SwipeableRow>
       </div>
     );
   };
@@ -391,6 +398,17 @@ export default function Players({ onBack, onModalChange }) {
         playerName={selectedIds.size === 1 ? players.find((p) => selectedIds.has(p.id))?.name : undefined}
         onConfirm={handleBulkDelete}
         onClose={() => setShowBulkConfirm(false)}
+      />
+
+      <DeletePlayerConfirmModal
+        isOpen={!!swipeConfirm}
+        playerName={swipeConfirm?.name}
+        onConfirm={async () => {
+          const target = swipeConfirm;
+          setSwipeConfirm(null);
+          if (target) await handleDelete(target.id);
+        }}
+        onClose={() => setSwipeConfirm(null)}
       />
     </div>
   );

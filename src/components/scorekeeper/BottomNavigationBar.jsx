@@ -47,7 +47,7 @@ export default function BottomNavigationBar({ hidden = false }) {
           transition: "transform 250ms cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
-        <div className="rounded-full bg-accent" style={{ width: 72, height: 48 }} />
+        <div className="rounded-full bg-accent" style={{ width: 56, height: 36 }} />
       </div>
       {TABS.map(({ label, icon: Icon, path }) => {
         const active = pathname === path;

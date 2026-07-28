@@ -12,6 +12,7 @@ import ScoreHistoryPanel from "./ScoreHistoryPanel";
 import StretchTabPill from "./StretchTabPill";
 import { isLowMode, isCircleMode } from "@/lib/gameModes";
 import { SPRING_SHEET, TRANSITION_PANEL } from "@/lib/motion";
+import { primeIOSKeyboard } from "@/lib/iosKeyboardPrimer";
 import logoDark from "@/assets/scrkpr-logo.svg";
 
 const SCOREBOARD_TABS = [
@@ -287,6 +288,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           </button>
           {players.length < 20 &&
           <button
+            onPointerDown={primeIOSKeyboard}
             onClick={onAddPlayer}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:text-foreground hover:bg-accent transition-colors text-[hsl(var(--foreground))]"
             aria-label="Add player">

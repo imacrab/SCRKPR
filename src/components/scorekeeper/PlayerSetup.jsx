@@ -11,6 +11,7 @@ import FluentEmoji from "./FluentEmoji";
 import { getModeMeta } from "@/lib/gameModes";
 import { readableTextColor } from "@/lib/contrast";
 import { DUR_MEDIUM } from "@/lib/motion";
+import { primeIOSKeyboard } from "@/lib/iosKeyboardPrimer";
 import logoDark from "@/assets/scrkpr-logo.svg";
 
 export default function PlayerSetup({ onStart, onModalChange }) {
@@ -477,6 +478,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
             })()}
 
               <motion.button
+              onPointerDown={primeIOSKeyboard}
               onClick={() => setShowAddPlayerWithNav(true)}
               // Fades in only after the card stagger has played out: the last
               // card's entrance delay + its spring settle. Guarded by

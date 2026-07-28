@@ -6,6 +6,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import IOSKeyboardPrimer from '@/components/IOSKeyboardPrimer';
 import ScoreKeeper from './pages/ScoreKeeper';
 import AccountSettings from './pages/AccountSettings';
 import Onboarding from '@/components/Onboarding';
@@ -60,6 +61,7 @@ function App() {
               ancestor would otherwise become its containing block and break the
               full-screen centering (the app's stacking-context trap). */}
           <ErrorBoundary>
+            <IOSKeyboardPrimer />
             <motion.div
               initial={{ opacity: 0, filter: "blur(12px)", scale: 0.97 }}
               animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}

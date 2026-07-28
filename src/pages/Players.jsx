@@ -6,6 +6,7 @@ import PlayerEditModal from "@/components/scorekeeper/PlayerEditModal";
 import DeletePlayerConfirmModal from "@/components/scorekeeper/DeletePlayerConfirmModal";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 import { SPRING_SHEET } from "@/lib/motion";
+import { primeIOSKeyboard } from "@/lib/iosKeyboardPrimer";
 
 export default function Players({ onBack, onModalChange }) {
   const [players, setPlayers] = useState([]);
@@ -201,7 +202,7 @@ export default function Players({ onBack, onModalChange }) {
             if (longPressFiredRef.current) { longPressFiredRef.current = false; return; }
             if (selectMode) toggleSelect(p.id); else setEditing(p);
           }}
-          onPointerDown={(e) => startLongPress(e, p)}
+          onPointerDown={(e) => { if (!selectMode) primeIOSKeyboard(); startLongPress(e, p); }}
           onContextMenu={(e) => e.preventDefault()}
           className={`w-full rounded-lg border bg-card overflow-hidden flex items-center gap-3 pl-3 pr-1 py-2.5 text-left transition-colors active:scale-[0.99] ${
             isSelected ? "border-accent-red bg-accent-red/5" : "border-border"
@@ -289,6 +290,7 @@ export default function Players({ onBack, onModalChange }) {
         <h1 className="font-sans font-medium text-lg text-foreground flex-1 text-center">Players</h1>
         {!selectMode && (
           <button
+            onPointerDown={primeIOSKeyboard}
             onClick={() => setEditing({})}
             className="absolute right-5 top-10 text-sm font-medium text-foreground hover:text-foreground transition-colors px-2 py-1 flex items-center gap-1"
           >

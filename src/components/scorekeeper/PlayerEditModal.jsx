@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BottomSheetModal from "./BottomSheetModal";
@@ -25,6 +25,20 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
   const inputRef = useRef(null);
   const isEditing = !!player?.id;
 
+  // iOS only surfaces the software keyboard when focus() runs synchronously
+  // inside the user-gesture task that opened the sheet. A setTimeout — or any
+  // await/rAF — moves us out of that task and iOS silently blocks the keyboard
+  // (focus still applies, so on desktop it "worked"). A ref callback fires
+  // synchronously the moment the <input> mounts, which happens in the same
+  // task as the tap that flipped isOpen — the one window iOS accepts.
+  const setInputRef = useCallback((el) => {
+    inputRef.current = el;
+    if (el && isOpen) {
+      el.focus();
+      try { el.select(); } catch {}
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen) return;
     if (player?.id) {
@@ -40,17 +54,8 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
       setColor(pickRandomUnused(palette, usedColors));
       setEmoji(pickRandomUnused(AUTOFILL_EMOJIS, usedEmojis));
     }
-    // Focus + select after the sheet's entrance animation settles. iOS only
-    // surfaces the keyboard when focus() happens inside the user-gesture task
-    // that opened the sheet — the tap that set isOpen — so we keep the delay
-    // short and select() so the user can type-to-replace immediately.
-    const t = setTimeout(() => {
-      const el = inputRef.current;
-      if (!el) return;
-      el.focus();
-      try { el.select(); } catch {}
-    }, 250);
-    return () => clearTimeout(t);
+    // Focus is handled by setInputRef synchronously on mount — see comment
+    // above. Do not add a setTimeout here or iOS will drop the keyboard.
   }, [isOpen, player, usedColors, usedEmojis, palette, tone]);
 
   const handleSubmit = () => {
@@ -90,7 +95,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
       >
         <div className="pt-1 pb-3">
           <Input
-            ref={inputRef}
+            ref={setInputRef}
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value.slice(0, 20))}

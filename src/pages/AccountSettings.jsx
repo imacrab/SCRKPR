@@ -41,9 +41,11 @@ export default function AccountSettings({ onBack, onModalChange }) {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 pt-2 pb-6 space-y-4">
-         {/* Calm, truthful local-first status — your data lives on this device. */}
-         <div className="rounded-xl border border-border bg-card overflow-hidden">
-           <div className="px-4 py-4 flex items-center gap-3">
+         {/* Calm, truthful local-first status — your data lives on this device.
+             Container blends into the page background; the tappable action pill
+             on the right retains its border so it reads as interactive. */}
+         <div className="overflow-hidden">
+           <div className="px-1 py-4 flex items-center gap-3">
              <div className="w-9 h-9 rounded-full bg-accent-blue/10 flex items-center justify-center flex-shrink-0">
                <Smartphone size={18} strokeWidth={2} className="text-accent-blue" />
              </div>
@@ -57,8 +59,8 @@ export default function AccountSettings({ onBack, onModalChange }) {
          </div>
 
          {/* Replay the welcome / intro flow */}
-         <div className="rounded-xl border border-border bg-card overflow-hidden">
-           <div className="px-4 py-4 flex items-center justify-between gap-4">
+         <div className="overflow-hidden">
+           <div className="px-1 py-4 flex items-center justify-between gap-4">
              <div className="flex items-center gap-3">
                <div className="w-9 h-9 rounded-full bg-accent-blue/10 flex items-center justify-center flex-shrink-0">
                  <Sparkles size={18} strokeWidth={2} className="text-accent-blue" />
@@ -70,7 +72,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
              </div>
              <button
                onClick={() => { resetOnboarding(); window.location.href = "/"; }}
-               className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors hover:text-foreground text-muted-foreground"
+               className="text-sm font-medium px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
              >
                Replay
              </button>
@@ -79,15 +81,15 @@ export default function AccountSettings({ onBack, onModalChange }) {
 
          {/* Sign Out — only relevant once cloud sync is enabled */}
          {SYNC_ENABLED && (
-           <div className="rounded-xl border border-border bg-card overflow-hidden">
-             <div className="px-4 py-4 flex items-center justify-between gap-4">
+           <div className="overflow-hidden">
+             <div className="px-1 py-4 flex items-center justify-between gap-4">
                <div>
                  <p className="text-sm font-medium text-foreground">Sign Out</p>
                  <p className="text-xs text-muted-foreground mt-0.5">End your session and return to login.</p>
                </div>
                <button
                  onClick={() => base44.auth.logout("/")}
-                 className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors hover:text-foreground text-muted-foreground"
+                 className="text-sm font-medium px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                >
                  Sign Out
                </button>
@@ -96,15 +98,15 @@ export default function AccountSettings({ onBack, onModalChange }) {
          )}
 
          {/* Clear all local data */}
-         <div className="rounded-xl border border-border bg-card overflow-hidden">
-           <div className="px-4 py-4 flex items-center justify-between gap-4">
+         <div className="overflow-hidden">
+           <div className="px-1 py-4 flex items-center justify-between gap-4">
              <div>
                <p className="text-sm font-medium text-foreground">Clear All Data</p>
                <p className="text-xs text-muted-foreground mt-0.5">Remove all saved players and game history from this device.</p>
              </div>
              <button
                onClick={() => setShowConfirm(true)}
-               className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors text-white bg-accent-red/10 hover:bg-accent-red/20"
+               className="text-sm font-medium px-3 py-1.5 rounded-full border border-accent-red/40 text-white bg-accent-red/10 hover:bg-accent-red/20 transition-colors"
              >
                Clear
              </button>

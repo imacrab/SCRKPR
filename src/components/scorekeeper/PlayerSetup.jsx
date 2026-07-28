@@ -386,7 +386,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 onClick={() => toggleSelected(player.id)}
                 className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left cursor-pointer"
                 style={{
-                  backgroundColor: selected ? hexToRgba(player.color, 1) : "hsl(var(--background))",
+                  backgroundColor: selected ? hexToRgba(player.color, 1) : "hsl(var(--card))",
                   borderColor: selected ? "transparent" : "hsl(var(--border))",
                   boxShadow: isLifted ? "0 20px 35px -8px rgba(0,0,0,0.45)" : "none",
                   transform: cinch,
@@ -498,7 +498,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       <div className="px-5 pt-2 relative z-30" style={{ paddingBottom: "12px" }}>
         <button
           onClick={() => {setShowGameMode(true);onModalChange?.(true);}}
-          className="w-full flex items-center justify-between gap-3 px-4 rounded-full border border-border bg-background hover:bg-accent transition-colors"
+          className="w-full flex items-center justify-between gap-3 px-4 rounded-full border border-border bg-card hover:bg-accent transition-colors"
           style={{ height: "52px" }}>
           
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Game mode</span>

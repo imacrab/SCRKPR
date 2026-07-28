@@ -203,7 +203,7 @@ export default function Players({ onBack, onModalChange }) {
           }}
           onPointerDown={(e) => startLongPress(e, p)}
           onContextMenu={(e) => e.preventDefault()}
-          className={`w-full rounded-lg border bg-background overflow-hidden flex items-center gap-3 pl-3 pr-1 py-2.5 text-left transition-colors active:scale-[0.99] ${
+          className={`w-full rounded-lg border bg-card overflow-hidden flex items-center gap-3 pl-3 pr-1 py-2.5 text-left transition-colors active:scale-[0.99] ${
             isSelected ? "border-accent-red bg-accent-red/5" : "border-border"
           }`}
         >

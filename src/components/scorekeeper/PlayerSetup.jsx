@@ -19,6 +19,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [canScrollPlayers, setCanScrollPlayers] = useState(false);
+  const [scrolledFromTop, setScrolledFromTop] = useState(false);
   const [winMode, setWinMode] = useState("low");
   const [targetScore, setTargetScore] = useState(null); // optional end-at score for high/low
   const [showBestOf, setShowBestOf] = useState(false);
@@ -307,13 +308,17 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       {/* Player list — pick who's playing */}
       <div className="flex-1 relative overflow-hidden">
         {/* Top fade — mirrors the bottom fade so the list dissolves under the
-            logo instead of meeting it at a hard edge. Always on (the logo
-            header sits above regardless of scroll position). */}
-        <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
+            logo instead of meeting it at a hard edge. Fades in only once the
+            user has scrolled off the top, so first-load is a clean edge. */}
+        <div
+          className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none transition-opacity duration-200"
+          style={{ opacity: scrolledFromTop ? 1 : 0 }}
+        />
         {canScrollPlayers && <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />}
 
         <div
           ref={scrollRef}
+          onScroll={(e) => setScrolledFromTop(e.currentTarget.scrollTop > 4)}
           className="h-full overflow-y-auto px-5 pt-2 pb-4 space-y-2">
           
           {allPlayers === null ?

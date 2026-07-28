@@ -7,8 +7,8 @@ import FluentEmoji from "./FluentEmoji";
 // game when anyone reaches it — e.g. Gin = High + 100, "Swish" = Low + 500
 // (first to 500 ends it, lowest total wins). Best Of asks for a round count next.
 const MODES = [
-  { value: "high", label: "High Score", sub: "Highest total wins", emoji: "📈" },
   { value: "low", label: "Low Score", sub: "Lowest total wins", emoji: "📉" },
+  { value: "high", label: "High Score", sub: "Highest total wins", emoji: "📈" },
   { value: "bestof", label: "Best Of", sub: "First to win N rounds", emoji: "🏆" },
 ];
 

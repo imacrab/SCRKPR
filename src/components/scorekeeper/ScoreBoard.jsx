@@ -51,10 +51,10 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     return () => onModalChange?.(false);
   }, [onModalChange]);
 
-  // The Rounds tab only makes sense once rounds exist and not in circle (best-of)
-  // modes. Snap back to the board if it stops being available.
-  const maxRounds = Math.max(0, ...players.map((p) => p.scores.length));
-  const showTabs = !isCircleMode(winMode) && maxRounds > 0;
+  // The Rounds tab is available in any non-circle (best-of) mode, even before
+  // any rounds have been played. Snap back to the board if it stops being
+  // available (e.g. mode change).
+  const showTabs = !isCircleMode(winMode);
   useEffect(() => {
     if (view === "rounds" && !showTabs) {
       setPreviousView("board");

@@ -40,7 +40,17 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
       setColor(pickRandomUnused(palette, usedColors));
       setEmoji(pickRandomUnused(AUTOFILL_EMOJIS, usedEmojis));
     }
-    setTimeout(() => inputRef.current?.focus(), 120);
+    // Focus + select after the sheet's entrance animation settles. iOS only
+    // surfaces the keyboard when focus() happens inside the user-gesture task
+    // that opened the sheet — the tap that set isOpen — so we keep the delay
+    // short and select() so the user can type-to-replace immediately.
+    const t = setTimeout(() => {
+      const el = inputRef.current;
+      if (!el) return;
+      el.focus();
+      try { el.select(); } catch {}
+    }, 250);
+    return () => clearTimeout(t);
   }, [isOpen, player, usedColors, usedEmojis, palette, tone]);
 
   const handleSubmit = () => {

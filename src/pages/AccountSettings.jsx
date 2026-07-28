@@ -42,7 +42,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
 
       <div className="flex-1 overflow-y-auto px-5 pt-2 pb-6 space-y-4">
          {/* Calm, truthful local-first status — your data lives on this device. */}
-         <div className="rounded-xl border border-border bg-card overflow-hidden">
+         <div className="rounded-xl border border-border bg-background overflow-hidden">
            <div className="px-4 py-4 flex items-center gap-3">
              <div className="w-9 h-9 rounded-full bg-accent-blue/10 flex items-center justify-center flex-shrink-0">
                <Smartphone size={18} strokeWidth={2} className="text-accent-blue" />
@@ -57,7 +57,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
          </div>
 
          {/* Replay the welcome / intro flow */}
-         <div className="rounded-xl border border-border bg-card overflow-hidden">
+         <div className="rounded-xl border border-border bg-background overflow-hidden">
            <div className="px-4 py-4 flex items-center justify-between gap-4">
              <div className="flex items-center gap-3">
                <div className="w-9 h-9 rounded-full bg-accent-blue/10 flex items-center justify-center flex-shrink-0">
@@ -79,7 +79,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
 
          {/* Sign Out — only relevant once cloud sync is enabled */}
          {SYNC_ENABLED && (
-           <div className="rounded-xl border border-border bg-card overflow-hidden">
+           <div className="rounded-xl border border-border bg-background overflow-hidden">
              <div className="px-4 py-4 flex items-center justify-between gap-4">
                <div>
                  <p className="text-sm font-medium text-foreground">Sign Out</p>
@@ -96,7 +96,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
          )}
 
          {/* Clear all local data */}
-         <div className="rounded-xl border border-border bg-card overflow-hidden">
+         <div className="rounded-xl border border-border bg-background overflow-hidden">
            <div className="px-4 py-4 flex items-center justify-between gap-4">
              <div>
                <p className="text-sm font-medium text-foreground">Clear All Data</p>

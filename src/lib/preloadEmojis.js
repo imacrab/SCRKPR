@@ -10,11 +10,18 @@
 import { getFluentEmojiUrl } from "@/components/scorekeeper/FluentEmoji";
 import { PLAYER_EMOJI_LIBRARY, AUTOFILL_EMOJIS } from "@/components/scorekeeper/EmojiPicker";
 
-let started = false;
+let startedPromise = null;
 
-export function preloadPlayerEmojis() {
-  if (started) return;
-  started = true;
+// Preloads every player emoji and resolves when they've all settled. Reports
+// progress (0..1) via the onProgress callback so a loading screen can render a
+// live percentage. Idempotent — subsequent calls share the same promise.
+export function preloadPlayerEmojis(onProgress) {
+  if (startedPromise) {
+    // Fire one immediate 100% tick so late subscribers don't wait forever if
+    // the preload has already finished.
+    if (onProgress) startedPromise.then(() => onProgress(1));
+    return startedPromise;
+  }
 
   // Autofill set first (used the instant a modal opens with a new player), then
   // the full picker library. De-duped to avoid double fetches.
@@ -28,20 +35,32 @@ export function preloadPlayerEmojis() {
   AUTOFILL_EMOJIS.forEach(push);
   PLAYER_EMOJI_LIBRARY.forEach((entry) => push(entry?.emoji || entry));
 
-  const CONCURRENCY = 6;
-  let cursor = 0;
-  const next = () => {
-    if (cursor >= queue.length) return;
-    const emoji = queue[cursor++];
-    const url = getFluentEmojiUrl(emoji);
-    if (!url) { next(); return; }
-    const img = new Image();
-    img.decoding = "async";
-    img.loading = "eager";
-    const done = () => next();
-    img.onload = done;
-    img.onerror = done;
-    img.src = url;
-  };
-  for (let i = 0; i < CONCURRENCY; i++) next();
+  const total = Math.max(1, queue.length);
+  let loaded = 0;
+
+  startedPromise = new Promise((resolve) => {
+    const CONCURRENCY = 8;
+    let cursor = 0;
+    const tick = () => {
+      loaded += 1;
+      if (onProgress) onProgress(Math.min(loaded / total, 1));
+      if (loaded >= total) resolve();
+      else next();
+    };
+    const next = () => {
+      if (cursor >= queue.length) return;
+      const emoji = queue[cursor++];
+      const url = getFluentEmojiUrl(emoji);
+      if (!url) { tick(); return; }
+      const img = new Image();
+      img.decoding = "async";
+      img.loading = "eager";
+      img.onload = tick;
+      img.onerror = tick;
+      img.src = url;
+    };
+    for (let i = 0; i < CONCURRENCY; i++) next();
+  });
+
+  return startedPromise;
 }

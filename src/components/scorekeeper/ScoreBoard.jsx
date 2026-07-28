@@ -122,6 +122,23 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     return ranked[0].id;
   }, [players, winMode]);
 
+  // Low-score mode only: the player currently in LAST place (highest total)
+  // gets a 😭 flair — the mirror of the crown. No flair on ties or before any
+  // scores. When the same player somehow holds both (single player, everyone
+  // tied), the crying emoji wins and replaces the crown.
+  const worstId = useMemo(() => {
+    if (!isLowMode(winMode)) return null;
+    const totals = players.map((p) => ({
+      id: p.id,
+      total: p.scores.reduce((s, n) => s + n, 0),
+      played: p.scores.length,
+    }));
+    if (!totals.some((t) => t.played > 0)) return null;
+    const ranked = [...totals].sort((a, b) => b.total - a.total); // highest first
+    if (ranked.length > 1 && ranked[0].total === ranked[1].total) return null;
+    return ranked[0].id;
+  }, [players, winMode]);
+
   // Sort players by total — direction follows the mode (low-wins → ascending,
   // otherwise descending). Locking preserves the current order (e.g. seating).
   const sortedPlayers = useMemo(() => {
@@ -366,6 +383,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
                       <PlayerColumn
                       player={player}
                       isLeader={player.id === leaderId}
+                      isWorst={player.id === worstId}
                       isHighlighted={player.id === lastAddedPlayerId}
                       streak={streakMap[player.name] || 0}
                       winsNeeded={winsNeeded}

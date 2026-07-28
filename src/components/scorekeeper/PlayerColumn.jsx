@@ -63,7 +63,10 @@ function AnimatedTotal({ value, color }) {
 
 }
 
-export default function PlayerColumn({ player, isLeader = false, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, scoredThisRound = false, onAddScore, onEditScore, onEditPlayer }) {
+export default function PlayerColumn({ player, isLeader = false, isWorst = false, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, scoredThisRound = false, onAddScore, onEditScore, onEditPlayer }) {
+  // If the leader is also somehow the worst (single player, everyone tied on 0
+  // — edge cases only), the crying emoji wins and the crown is suppressed.
+  const showLeader = isLeader && !isWorst;
   const baseTotal = player.scores.reduce((s, n) => s + n, 0);
   const isBestOf = winsNeeded !== null;
   const lastIdx = player.scores.length - 1;
@@ -101,7 +104,7 @@ export default function PlayerColumn({ player, isLeader = false, isHighlighted =
 
         {/* Leader crown — flies between players when the lead changes (shared layoutId) */}
         <AnimatePresence>
-          {isLeader && (
+          {showLeader && (
             <motion.div
               layoutId="leader-crown"
               initial={{ scale: 0, rotate: -40, opacity: 0 }}
@@ -113,6 +116,25 @@ export default function PlayerColumn({ player, isLeader = false, isHighlighted =
               aria-hidden="true"
             >
               <FluentEmoji emoji="👑" size={26} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Worst flair (low-score modes only) — mirrors the crown; flies between
+            players when last place changes via shared layoutId. */}
+        <AnimatePresence>
+          {isWorst && (
+            <motion.div
+              layoutId="worst-cry"
+              initial={{ scale: 0, rotate: 40, opacity: 0 }}
+              animate={{ scale: 1, rotate: -14, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={SPRING_POP}
+              className="absolute pointer-events-none select-none z-20"
+              style={{ top: 4, right: 8 }}
+              aria-hidden="true"
+            >
+              <FluentEmoji emoji="😭" size={26} />
             </motion.div>
           )}
         </AnimatePresence>

@@ -306,6 +306,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
       {/* Player list — pick who's playing */}
       <div className="flex-1 relative overflow-hidden">
+        {/* Top fade — mirrors the bottom fade so the list dissolves under the
+            logo instead of meeting it at a hard edge. Always on (the logo
+            header sits above regardless of scroll position). */}
+        <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
         {canScrollPlayers && <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />}
 
         <div

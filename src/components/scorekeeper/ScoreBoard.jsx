@@ -122,20 +122,21 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     return ranked[0].id;
   }, [players, winMode]);
 
-  // Low-score mode only: the player currently in LAST place (highest total)
-  // gets a 😭 flair — the mirror of the crown. No flair on ties or before any
-  // scores. When the same player somehow holds both (single player, everyone
-  // tied), the crying emoji wins and replaces the crown.
+  // Low-score mode only: the player who scored the MOST in the previous
+  // completed round gets a 😭 flair — where "previous round" is the last round
+  // in which every player has logged a score. Independent of overall standing.
+  // No flair on ties for the highest single-round score.
   const worstId = useMemo(() => {
     if (!isLowMode(winMode)) return null;
-    const totals = players.map((p) => ({
-      id: p.id,
-      total: p.scores.reduce((s, n) => s + n, 0),
-      played: p.scores.length,
-    }));
-    if (!totals.some((t) => t.played > 0)) return null;
-    const ranked = [...totals].sort((a, b) => b.total - a.total); // highest first
-    if (ranked.length > 1 && ranked[0].total === ranked[1].total) return null;
+    const minRounds = players.reduce(
+      (m, p) => Math.min(m, p.scores.length),
+      Infinity
+    );
+    if (!Number.isFinite(minRounds) || minRounds < 1) return null;
+    const roundIdx = minRounds - 1;
+    const roundScores = players.map((p) => ({ id: p.id, s: p.scores[roundIdx] }));
+    const ranked = [...roundScores].sort((a, b) => b.s - a.s);
+    if (ranked.length > 1 && ranked[0].s === ranked[1].s) return null;
     return ranked[0].id;
   }, [players, winMode]);
 

@@ -13,12 +13,12 @@ const MODES = [
 ];
 
 export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, onClose }) {
-  const [mode, setMode] = useState(winMode || "high");
+  const [mode, setMode] = useState(winMode || "low");
   const [target, setTarget] = useState(targetScore ? String(targetScore) : "");
 
   useEffect(() => {
     if (isOpen) {
-      setMode(winMode || "high");
+      setMode(winMode || "low");
       setTarget(targetScore ? String(targetScore) : "");
     }
   }, [isOpen, winMode, targetScore]);

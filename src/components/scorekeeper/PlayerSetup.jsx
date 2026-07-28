@@ -18,7 +18,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [canScrollPlayers, setCanScrollPlayers] = useState(false);
-  const [winMode, setWinMode] = useState("high");
+  const [winMode, setWinMode] = useState("low");
   const [targetScore, setTargetScore] = useState(null); // optional end-at score for high/low
   const [showBestOf, setShowBestOf] = useState(false);
   const [showGameMode, setShowGameMode] = useState(false);

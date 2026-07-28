@@ -298,11 +298,11 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       </div>
 
       {/* Header */}
-      <div className="pt-10 pb-5 px-6" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
+      <div className="pt-7 pb-4 px-6" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         {/* Invisible anchor — the visible logo is the persistent one hoisted to
             ScoreKeeper, which measures this slot and floats over it (opacity:0
             here keeps the layout space + position). */}
-        <img src={logoDark} alt="SCRKPR!" data-logo-anchor className="mx-auto" style={{ maxWidth: 200, height: "auto", opacity: 0 }} />
+        <img src={logoDark} alt="SCRKPR!" data-logo-anchor className="mx-auto" style={{ maxWidth: 150, height: "auto", opacity: 0 }} />
       </div>
 
       {/* Player list — pick who's playing */}

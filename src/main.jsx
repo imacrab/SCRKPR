@@ -1,28 +1,29 @@
-import React, { useState } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { Capacitor } from '@capacitor/core'
 import App from '@/App.jsx'
-import LoadingScreen from '@/components/LoadingScreen'
 import '@/index.css'
+import { preloadPlayerEmojis } from '@/lib/preloadEmojis'
 
 // Force dark theme app-wide
 document.documentElement.classList.add('dark')
 document.documentElement.style.colorScheme = 'dark'
 
-// Gate the app on a full preload so nothing pops in after the user starts
-// interacting. LoadingScreen owns the preload lifecycle and calls onReady
-// once assets are warm; only then do we mount the real app.
-function Root() {
-  const [ready, setReady] = useState(false)
-  return (
-    <>
-      {!ready && <LoadingScreen onReady={() => setReady(true)} />}
-      {ready && <App />}
-    </>
-  )
-}
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <App />
+)
 
-ReactDOM.createRoot(document.getElementById('root')).render(<Root />)
+// Warm the emoji image cache off the critical path. Uses requestIdleCallback
+// so we never fight React's initial paint; falls back to a short timeout on
+// browsers without it (Safari).
+const kickoffPreload = () => preloadPlayerEmojis();
+if (typeof window !== 'undefined') {
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(kickoffPreload, { timeout: 2000 });
+  } else {
+    setTimeout(kickoffPreload, 500);
+  }
+}
 
 // Native shell only (no-op on web): set a light-content status bar for the dark
 // UI, and hide the launch splash once React has painted. The plugins are

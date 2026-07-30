@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { UserPlus, RotateCcw, Lock, Unlock } from "lucide-react";
+import { UserPlus, RotateCcw } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { db } from "@/lib/store";
 import SlideToEndGame from "./SlideToEndGame";
@@ -27,7 +27,6 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [gameStartTime] = useState(new Date());
   const [scrollPos, setScrollPos] = useState(0);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [sortLocked, setSortLocked] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [showEndGame, setShowEndGame] = useState(false);
   const [endingGame, setEndingGame] = useState(false);
@@ -160,16 +159,15 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   }, [players, winMode]);
 
   // Sort players by total — direction follows the mode (low-wins → ascending,
-  // otherwise descending). Locking preserves the current order (e.g. seating).
+  // otherwise descending).
   const sortedPlayers = useMemo(() => {
-    if (sortLocked) return players;
     const lowWins = isLowMode(winMode);
     return [...players].sort((a, b) => {
       const totalA = a.scores.reduce((s, n) => s + n, 0);
       const totalB = b.scores.reduce((s, n) => s + n, 0);
       return lowWins ? totalA - totalB : totalB - totalA;
     });
-  }, [players, winMode, sortLocked]);
+  }, [players, winMode]);
 
   // Track whether we've auto-triggered the end-game modal for the current game.
   // Without this guard, the effect re-fires on every score change after the threshold
@@ -296,14 +294,6 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           <img src={logoDark} alt="SCRKPR!" data-logo-anchor style={{ maxWidth: 120, height: "auto", opacity: 0 }} />
         </button>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setSortLocked((v) => !v)}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-accent transition-colors"
-            style={{ color: sortLocked ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
-            aria-label={sortLocked ? "Unlock sort order" : "Lock sort order"}>
-            
-            {sortLocked ? <Lock size={22} strokeWidth={2} /> : <Unlock size={22} strokeWidth={2} />}
-          </button>
           {players.length < 20 &&
           <button
             onPointerDown={primeIOSKeyboard}

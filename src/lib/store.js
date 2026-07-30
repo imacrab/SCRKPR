@@ -1,53 +1,55 @@
-// Cloud-backed data store — Base44 entities are the source of truth, with a
-// localStorage cache for instant reads and offline resilience.
+// Local-first data store — localStorage is the source of truth.
 //
-// Why this exists:
-// Previously this file was local-only (localStorage was the source of truth).
-// That meant any time browser storage was cleared — a domain change, a private
-// tab, iOS storage eviction, or an "app got updated and reloaded" event — the
-// user's players and history would vanish. Now those records live in the
-// Base44 cloud entities (Player, GameHistory), so they follow the user across
-// devices and survive reloads/updates.
+// The app is now local-first: players + game history live on-device and the
+// pages read/write here instead of hitting Base44 directly. Reads resolve
+// instantly from localStorage (no network on the happy path), so the History
+// and Players screens can no longer come back empty or fail silently offline.
 //
-// Strategy per read: hit the cache immediately (so screens paint instantly),
-// then fetch from Base44 in the background and repaint if it differs. Writes
-// go to Base44 first; on success we mirror to the cache. If the network
-// write fails we still keep the record in the cache and mark it as needing
-// sync (best-effort — the app never blocks on the network).
+// The API mirrors the old `base44.entities.Player` / `base44.entities.GameHistory`
+// surface (list / create / update / delete, all async) so call sites barely
+// changed and a future cloud-sync layer can slot in behind the same methods.
 //
-// The public API (db.players / db.games list/create/update/delete) is
-// unchanged, so call sites don't need to change.
+// Cloud sync to Base44 is deliberately deferred (see HANDOFF "Local-first plan").
+// SYNC_ENABLED gates every Base44/auth path; flip it on once the best-effort
+// mirror + reconnect flush are built. While it's false, the app needs no
+// account and never touches the network for player/history data.
 
-import { base44 } from "@/api/base44Client";
+export const SYNC_ENABLED = false;
 
-const PLAYERS_KEY = "scrkpr_players_cache";
-const GAMES_KEY = "scrkpr_games_cache";
+const PLAYERS_KEY = "scrkpr_players";
+const GAMES_KEY = "scrkpr_games";
 
-// Kept for callers that still reference it; sync is now always on.
-export const SYNC_ENABLED = true;
-
-function readCache(key) {
+function read(key) {
   try {
     const raw = localStorage.getItem(key);
     const parsed = raw ? JSON.parse(raw) : [];
     return Array.isArray(parsed) ? parsed : [];
   } catch (e) {
-    console.error(`[store] failed to read cache ${key}:`, e);
+    console.error(`[store] failed to read ${key}:`, e);
     return [];
   }
 }
 
-function writeCache(key, value) {
+function write(key, value) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
+    return true;
   } catch (e) {
-    // Quota / private-mode failures shouldn't crash the app.
-    console.error(`[store] failed to write cache ${key}:`, e);
+    // Quota / private-mode failures shouldn't crash the app — the in-memory
+    // result is still returned to the caller; only persistence is lost.
+    console.error(`[store] failed to write ${key}:`, e);
+    return false;
   }
 }
 
-// Parse a Base44-style order token ("-played_at" => field played_at, desc)
-// and return a comparator — used to sort cached rows the same way Base44 would.
+function newId() {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+  return `id-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+// Parse a Base44-style order token ("-played_at" => field played_at, desc;
+// "created_date" => asc) and return a comparator. Falls back to no-op sort
+// when the field is missing on the records.
 function comparator(order) {
   if (!order) return null;
   const desc = order.startsWith("-");
@@ -63,103 +65,59 @@ function comparator(order) {
   };
 }
 
-function sortAndLimit(rows, order, limit) {
+function listFrom(key, order, limit) {
+  const rows = read(key);
   const cmp = comparator(order);
   const sorted = cmp ? [...rows].sort(cmp) : rows;
   return typeof limit === "number" ? sorted.slice(0, limit) : sorted;
 }
 
-// Whether we've done at least one successful cloud fetch this session — used
-// to avoid clobbering fresh cloud writes with a stale cache on subsequent
-// list() calls.
-const hydrated = { players: false, games: false };
-
-async function cloudList(entity, cacheKey, hydratedKey, order, limit) {
-  try {
-    const rows = await base44.entities[entity].list(order, 500);
-    writeCache(cacheKey, rows);
-    hydrated[hydratedKey] = true;
-    return sortAndLimit(rows, order, limit);
-  } catch (e) {
-    console.warn(`[store] cloud list ${entity} failed, using cache:`, e?.message || e);
-    return sortAndLimit(readCache(cacheKey), order, limit);
-  }
-}
-
 export const db = {
   players: {
-    // Cache-first, then cloud. Returns whatever we have immediately; the cloud
-    // refresh happens in the background and updates the cache for next time.
+    // Mirrors base44.entities.Player.list("-created_date", 100)
     async list(order = "-created_date", limit) {
-      const cached = sortAndLimit(readCache(PLAYERS_KEY), order, limit);
-      // If we've already hydrated this session, return the fresh cache and
-      // still kick off a background refresh so long-lived sessions catch up.
-      if (hydrated.players) {
-        cloudList("Player", PLAYERS_KEY, "players", order, limit).catch(() => {});
-        return cached;
-      }
-      // First call this session: await the cloud so History/Players don't
-      // show stale-then-flash on cold start.
-      return cloudList("Player", PLAYERS_KEY, "players", order, limit);
+      return listFrom(PLAYERS_KEY, order, limit);
     },
     async create(data) {
-      const created = await base44.entities.Player.create(data);
-      writeCache(PLAYERS_KEY, [created, ...readCache(PLAYERS_KEY).filter((p) => p.id !== created.id)]);
-      return created;
+      const record = { id: newId(), created_date: new Date().toISOString(), ...data };
+      const rows = read(PLAYERS_KEY);
+      write(PLAYERS_KEY, [record, ...rows]);
+      return record;
     },
     async update(id, patch) {
-      const updated = await base44.entities.Player.update(id, patch);
-      writeCache(
-        PLAYERS_KEY,
-        readCache(PLAYERS_KEY).map((p) => (p.id === id ? { ...p, ...updated } : p))
-      );
+      const rows = read(PLAYERS_KEY);
+      let updated = null;
+      const next = rows.map((p) => (p.id === id ? (updated = { ...p, ...patch }) : p));
+      write(PLAYERS_KEY, next);
       return updated;
     },
     async delete(id) {
-      await base44.entities.Player.delete(id);
-      writeCache(PLAYERS_KEY, readCache(PLAYERS_KEY).filter((p) => p.id !== id));
+      write(PLAYERS_KEY, read(PLAYERS_KEY).filter((p) => p.id !== id));
       return true;
     },
   },
 
   games: {
+    // Mirrors base44.entities.GameHistory.list("-played_at", 50)
     async list(order = "-played_at", limit) {
-      const cached = sortAndLimit(readCache(GAMES_KEY), order, limit);
-      if (hydrated.games) {
-        cloudList("GameHistory", GAMES_KEY, "games", order, limit).catch(() => {});
-        return cached;
-      }
-      return cloudList("GameHistory", GAMES_KEY, "games", order, limit);
+      return listFrom(GAMES_KEY, order, limit);
     },
     async create(data) {
-      const created = await base44.entities.GameHistory.create(data);
-      writeCache(GAMES_KEY, [created, ...readCache(GAMES_KEY).filter((g) => g.id !== created.id)]);
-      return created;
+      const record = { id: newId(), ...data };
+      const rows = read(GAMES_KEY);
+      write(GAMES_KEY, [record, ...rows]);
+      return record;
     },
     async delete(id) {
-      await base44.entities.GameHistory.delete(id);
-      writeCache(GAMES_KEY, readCache(GAMES_KEY).filter((g) => g.id !== id));
+      write(GAMES_KEY, read(GAMES_KEY).filter((g) => g.id !== id));
       return true;
     },
   },
 
-  // Wipe everything (used by Account Settings' "Clear all data"). This clears
-  // both the cloud records (owned by this user via RLS) and the local cache.
+  // Wipe everything stored on this device (used by Account Settings).
   async clearAll() {
-    try {
-      const [players, games] = await Promise.all([
-        base44.entities.Player.list("-created_date", 500),
-        base44.entities.GameHistory.list("-played_at", 500),
-      ]);
-      await Promise.all([
-        ...players.map((p) => base44.entities.Player.delete(p.id).catch(() => {})),
-        ...games.map((g) => base44.entities.GameHistory.delete(g.id).catch(() => {})),
-      ]);
-    } catch (e) {
-      console.error("[store] clearAll cloud sweep failed:", e);
-    }
-    writeCache(PLAYERS_KEY, []);
-    writeCache(GAMES_KEY, []);
+    write(PLAYERS_KEY, []);
+    write(GAMES_KEY, []);
     return true;
   },
 };

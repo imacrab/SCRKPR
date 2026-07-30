@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
 import FluentEmoji from "./FluentEmoji";
 import ScoreHistoryPanel from "./ScoreHistoryPanel";
+import HistoryGameStats from "./HistoryGameStats";
 import { TRANSITION_PANEL, SPRING_SNAPPY } from "@/lib/motion";
 
 const safeFormat = (value, fmt) => {
@@ -160,6 +161,14 @@ export default function HistoryGameDetail({ game, onBack }) {
             ))}
           </div>
         </motion.div>
+
+        {/* Game stats — recoverable meta from stored scores */}
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-1 pt-2 pb-2">
+          Stats
+        </p>
+        <div className="mb-4">
+          <HistoryGameStats game={game} />
+        </div>
 
         {/* Round-by-round */}
         <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-1 pt-2 pb-2">

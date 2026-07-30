@@ -8,8 +8,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#111111" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="SCRKPR" />
+    <!-- Lock the whole document to the device viewport so the body's dark
+         background fills the home-indicator area on iOS standalone launches
+         (fixes the gray gap under the tab bar). -->
+    <style>
+      html, body, #root {
+        height: 100%;
+        min-height: 100dvh;
+        background-color: #111111;
+        margin: 0;
+        padding: 0;
+      }
+      body { overscroll-behavior: none; }
+    </style>
     <link rel="apple-touch-icon" href="/favicon.png" />
     <link rel="manifest" href="/manifest.json" />
     <title>SCRKPR</title>

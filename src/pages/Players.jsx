@@ -295,7 +295,8 @@ export default function Players({ onBack, onModalChange }) {
             <button
               onPointerDown={primeIOSKeyboard}
               onClick={() => setEditing({})}
-              className="text-sm font-medium text-foreground hover:text-foreground transition-colors px-2 py-1 flex items-center gap-1 self-center"
+              className="text-sm font-medium text-foreground hover:text-foreground transition-colors px-2 py-1 flex items-center gap-1"
+              style={{ transform: "translateY(3px)" }}
             >
               <Plus size={20} strokeWidth={2} />
             </button>

@@ -87,6 +87,31 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
   const minutes = Math.floor(elapsedMs / 60000);
   const seconds = Math.floor((elapsedMs % 60000) / 1000);
 
+  // Swish-only stats:
+  //  • Went-out-most: player with the most rounds scoring exactly 0 ("going out")
+  //  • Worst round : the single highest one-round score across the whole game
+  const isSwish = winMode === "swish";
+  let wentOutPlayer = null;
+  let wentOutCount = 0;
+  let worstRoundPlayer = null;
+  let worstRoundScore = -Infinity;
+  let worstRoundNumber = 0;
+  if (isSwish && hasPlayers) {
+    players.forEach((p) => {
+      const zeros = p.scores.filter((s) => s === 0).length;
+      if (zeros > wentOutCount) { wentOutCount = zeros; wentOutPlayer = p; }
+    });
+    players.forEach((p) => {
+      p.scores.forEach((s, idx) => {
+        if (s > worstRoundScore) {
+          worstRoundScore = s;
+          worstRoundPlayer = p;
+          worstRoundNumber = idx + 1;
+        }
+      });
+    });
+  }
+
   return (
     <BottomSheetModal
       isOpen={hasPlayers}
@@ -202,22 +227,49 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
 
           {/* Stats */}
           <div className="space-y-2 mb-6">
-            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
-              <span className="text-xs text-muted-foreground">Most Rounds Played</span>
-              <span className="text-sm font-semibold text-foreground">{mostRoundsPlayer?.name}</span>
-            </div>
-            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
-              <span className="text-xs text-muted-foreground">Worst Score</span>
-              <span className="text-sm font-semibold text-foreground">{loserPlayer?.name} ({loserPlayer?.total})</span>
-            </div>
-            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
-              <span className="text-xs text-muted-foreground">Total Rounds</span>
-              <span className="text-sm font-semibold text-foreground">{Math.round(totalRounds)}</span>
-            </div>
-            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
-              <span className="text-xs text-muted-foreground">Time Elapsed</span>
-              <span className="text-sm font-semibold text-foreground">{minutes}m {seconds}s</span>
-            </div>
+            {isSwish ? (
+              <>
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
+                  <span className="text-xs text-muted-foreground">Went Out Most</span>
+                  <span className="text-sm font-semibold text-foreground">
+                    {wentOutPlayer ? `${wentOutPlayer.name} (${wentOutCount})` : "—"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
+                  <span className="text-xs text-muted-foreground">Worst Round</span>
+                  <span className="text-sm font-semibold text-foreground">
+                    {worstRoundPlayer ? `${worstRoundPlayer.name} · R${worstRoundNumber} (${worstRoundScore})` : "—"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
+                  <span className="text-xs text-muted-foreground">Total Rounds</span>
+                  <span className="text-sm font-semibold text-foreground">{Math.round(totalRounds)}</span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
+                  <span className="text-xs text-muted-foreground">Total Time</span>
+                  <span className="text-sm font-semibold text-foreground">{minutes}m {seconds}s</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
+                  <span className="text-xs text-muted-foreground">Most Rounds Played</span>
+                  <span className="text-sm font-semibold text-foreground">{mostRoundsPlayer?.name}</span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
+                  <span className="text-xs text-muted-foreground">Worst Score</span>
+                  <span className="text-sm font-semibold text-foreground">{loserPlayer?.name} ({loserPlayer?.total})</span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
+                  <span className="text-xs text-muted-foreground">Total Rounds</span>
+                  <span className="text-sm font-semibold text-foreground">{Math.round(totalRounds)}</span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
+                  <span className="text-xs text-muted-foreground">Time Elapsed</span>
+                  <span className="text-sm font-semibold text-foreground">{minutes}m {seconds}s</span>
+                </div>
+              </>
+            )}
           </div>
     </BottomSheetModal>
   );

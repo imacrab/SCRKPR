@@ -7,25 +7,33 @@ import FluentEmoji from "./FluentEmoji";
 // game when anyone reaches it — e.g. Gin = High + 100, "Swish" = Low + 500
 // (first to 500 ends it, lowest total wins). Best Of asks for a round count next.
 const MODES = [
+  { value: "swish", label: "Swish", sub: "First to 500 ends — lowest wins", emoji: "⚡" },
   { value: "low", label: "Low Score", sub: "Lowest total wins", emoji: "📉" },
   { value: "high", label: "High Score", sub: "Highest total wins", emoji: "📈" },
   { value: "bestof", label: "Best Of", sub: "First to win N rounds", emoji: "🏆" },
 ];
 
 export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, onClose }) {
-  const [mode, setMode] = useState(winMode || "low");
+  const [mode, setMode] = useState(winMode || "swish");
   const [target, setTarget] = useState(targetScore ? String(targetScore) : "");
 
   useEffect(() => {
     if (isOpen) {
-      setMode(winMode || "low");
+      setMode(winMode || "swish");
       setTarget(targetScore ? String(targetScore) : "");
     }
   }, [isOpen, winMode, targetScore]);
 
+  // Swish has a locked 500 target — no user-editable end score. High/Low keep
+  // their optional target input.
   const hasTarget = mode === "high" || mode === "low";
 
   const handleDone = () => {
+    if (mode === "swish") {
+      onSelect("swish", 500);
+      onClose();
+      return;
+    }
     const n = hasTarget && target.trim() !== "" ? parseInt(target, 10) : null;
     onSelect(mode, Number.isFinite(n) && n > 0 ? n : null);
     onClose();

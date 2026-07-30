@@ -20,8 +20,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [canScrollPlayers, setCanScrollPlayers] = useState(false);
   const [scrolledFromTop, setScrolledFromTop] = useState(false);
-  const [winMode, setWinMode] = useState("low");
-  const [targetScore, setTargetScore] = useState(null); // optional end-at score for high/low
+  const [winMode, setWinMode] = useState("swish");
+  const [targetScore, setTargetScore] = useState(500); // Swish locks to 500; high/low can override
   const [showBestOf, setShowBestOf] = useState(false);
   const [showGameMode, setShowGameMode] = useState(false);
   const [tappedId, setTappedId] = useState(null);

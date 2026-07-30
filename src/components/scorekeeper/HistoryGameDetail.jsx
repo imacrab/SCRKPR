@@ -40,7 +40,7 @@ export default function HistoryGameDetail({ game, onBack }) {
 
   return (
     <motion.div
-      className="absolute inset-0 bg-background flex flex-col overflow-hidden"
+      className="absolute inset-0 z-40 bg-background flex flex-col overflow-hidden"
       initial={{ x: "100%" }}
       animate={{ x: 0 }}
       exit={{ x: "100%" }}

@@ -443,7 +443,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   className="w-6 h-6 rounded-full flex items-center justify-center transition-colors"
                   style={{
                     backgroundColor: selected ? rowText : "transparent",
-                    border: selected ? "none" : "2px solid hsl(var(--border))"
+                    border: selected ? "none" : `2px solid ${rowTextMuted}`
                   }}>
 
                       {selected && <Check size={16} strokeWidth={3} style={{ color: player.color }} />}
@@ -495,7 +495,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
               initial={entranceDone ? false : { opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: Math.min(allPlayers.length - 1, 8) * 0.07 + 0.45, duration: DUR_MEDIUM }}
-              className="w-full mt-1 h-11 rounded-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50">
+              className="w-full mt-1 h-11 rounded-full flex items-center justify-center gap-2 text-white text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50">
 
                 <Plus size={24} strokeWidth={2} />
                 Add Player

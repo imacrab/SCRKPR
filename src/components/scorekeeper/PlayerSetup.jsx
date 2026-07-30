@@ -520,7 +520,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 <>
                   <FluentEmoji emoji={emoji} size={18} />
                   <span className="text-sm font-medium text-foreground">
-                    {label}{targetScore ? ` · to ${targetScore}` : ""}
+                    {label}{targetScore && winMode !== "swish" ? ` · to ${targetScore}` : ""}
                   </span>
                 </>);
 

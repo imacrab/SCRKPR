@@ -534,10 +534,10 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         <Button
           onClick={handleStart}
           disabled={!canStart}
-          className="w-full text-base font-semibold bg-white hover:bg-white/90"
-          style={{ height: "52px", color: "#111", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
+          className="w-full text-lg font-semibold bg-white hover:bg-white/90"
+          style={{ height: "72px", color: "#111", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
           
-          <FluentEmoji emoji="♠️" size={24} className="mr-2" />
+          <FluentEmoji emoji="♠️" size={28} className="mr-2" />
           Start Game
         </Button>
       </div>

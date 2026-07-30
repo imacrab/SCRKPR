@@ -126,7 +126,11 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   // Low-score mode only: the player who scored the MOST in the previous
   // completed round gets a 😭 flair — where "previous round" is the last round
   // in which every player has logged a score. Independent of overall standing.
-  // No flair on ties for the highest single-round score.
+  //
+  // Tiebreaker: if 2+ players tie for the worst score of that round, walk BACK
+  // through prior rounds — whoever had the higher score among the tied set in
+  // the earliest earlier round that separates them keeps the flair. If every
+  // prior round is also tied (or there are no prior rounds), no flair.
   const worstId = useMemo(() => {
     if (!isLowMode(winMode)) return null;
     const minRounds = players.reduce(
@@ -136,9 +140,23 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     if (!Number.isFinite(minRounds) || minRounds < 1) return null;
     const roundIdx = minRounds - 1;
     const roundScores = players.map((p) => ({ id: p.id, s: p.scores[roundIdx] }));
-    const ranked = [...roundScores].sort((a, b) => b.s - a.s);
-    if (ranked.length > 1 && ranked[0].s === ranked[1].s) return null;
-    return ranked[0].id;
+    const maxScore = Math.max(...roundScores.map((r) => r.s));
+    let tied = roundScores.filter((r) => r.s === maxScore);
+    if (tied.length === 1) return tied[0].id;
+
+    // Walk back through prior rounds, narrowing the tied set each time
+    // whichever tied players scored highest survives.
+    for (let r = roundIdx - 1; r >= 0; r--) {
+      const tiedIds = new Set(tied.map((t) => t.id));
+      const prev = players
+        .filter((p) => tiedIds.has(p.id))
+        .map((p) => ({ id: p.id, s: p.scores[r] }));
+      const prevMax = Math.max(...prev.map((x) => x.s));
+      const survivors = prev.filter((x) => x.s === prevMax);
+      if (survivors.length === 1) return survivors[0].id;
+      tied = survivors;
+    }
+    return null;
   }, [players, winMode]);
 
   // Sort players by total — direction follows the mode (low-wins → ascending,

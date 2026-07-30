@@ -15,6 +15,7 @@ const safeFormat = (value, fmt) => {
 import HistoryStats from "@/components/scorekeeper/HistoryStats";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 import StretchTabPill from "@/components/scorekeeper/StretchTabPill";
+import HistoryGameDetail from "@/components/scorekeeper/HistoryGameDetail";
 import { TRANSITION_PANEL, SPRING_SNAPPY } from "@/lib/motion";
 
 const HISTORY_TABS = [
@@ -32,6 +33,7 @@ export default function History({ onBack, onModalChange }) {
   const [canScroll, setCanScroll] = useState(false);
   const [tab, setTab] = useState("games"); // "games" | "stats"
   const [previousTab, setPreviousTab] = useState("games");
+  const [selectedGameId, setSelectedGameId] = useState(null);
   const scrollRef = useRef(null);
   const touchStartY = useRef(null);
   const PULL_THRESHOLD = 64;
@@ -108,10 +110,13 @@ export default function History({ onBack, onModalChange }) {
     return () => window.removeEventListener("resize", checkScroll);
   }, [games, loading]);
 
-  // Update parent when modal opens/closes
+  // Update parent when modal / detail view opens/closes — hides the bottom
+  // nav bar so the detail view feels full-screen.
   useEffect(() => {
-    onModalChange?.(showConfirm);
-  }, [showConfirm, onModalChange]);
+    onModalChange?.(showConfirm || selectedGameId !== null);
+  }, [showConfirm, selectedGameId, onModalChange]);
+
+  const selectedGame = selectedGameId !== null ? games.find((g) => g.id === selectedGameId) : null;
 
   const activeTabIndex = HISTORY_TABS.findIndex((item) => item.id === tab);
   const previousTabIndex = HISTORY_TABS.findIndex((item) => item.id === previousTab);
@@ -240,10 +245,12 @@ export default function History({ onBack, onModalChange }) {
                   return (
                     <motion.div
                       key={game.id}
+                      onClick={() => setSelectedGameId(game.id)}
                       initial={{ opacity: 0, y: 16, scale: 0.97 }}
                       animate={{ opacity: 1, y: 0, scale: 1, transition: { ...SPRING_SNAPPY, delay: enterDelay } }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="mb-4 rounded-3xl overflow-hidden relative border"
+                      whileTap={{ scale: 0.985 }}
+                      className="mb-4 rounded-3xl overflow-hidden relative border cursor-pointer"
                       style={{
                         borderColor: `${winner.color}66`,
                         background: `linear-gradient(155deg, ${winner.color}30 0%, ${winner.color}10 35%, hsl(var(--card)) 70%)`,
@@ -326,10 +333,12 @@ export default function History({ onBack, onModalChange }) {
                     <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-1 pt-1 pb-2">Earlier</p>
                   )}
                   <motion.div
+                    onClick={() => setSelectedGameId(game.id)}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0, transition: { ...SPRING_SNAPPY, delay: enterDelay } }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="mb-3 rounded-xl border border-border bg-card overflow-hidden">
+                    whileTap={{ scale: 0.985 }}
+                    className="mb-3 rounded-xl border border-border bg-card overflow-hidden cursor-pointer">
 
                   {/* Game header */}
                   <div className="px-4 py-3 flex items-baseline justify-between border-b border-border">
@@ -380,6 +389,17 @@ export default function History({ onBack, onModalChange }) {
           }
         </div>
       </div>
+
+      {/* Game detail — slides in from the right; swipe or arrow to go back */}
+      <AnimatePresence>
+        {selectedGame && (
+          <HistoryGameDetail
+            key={selectedGame.id}
+            game={selectedGame}
+            onBack={() => setSelectedGameId(null)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Confirm modal — shared BottomSheetModal shell */}
       <BottomSheetModal

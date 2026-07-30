@@ -278,33 +278,37 @@ export default function Players({ onBack, onModalChange }) {
         )}
       </AnimatePresence>
 
-      <div className="pt-10 pb-2 px-5 flex items-center flex-shrink-0 relative" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
-        {players.length > 0 && (
-          <button
-            onClick={() => (selectMode ? exitSelectMode() : setSelectMode(true))}
-            className="absolute left-5 top-10 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
-          >
-            {selectMode ? "Cancel" : "Select"}
-          </button>
-        )}
-        <h1 className="font-sans font-medium text-lg text-foreground flex-1 text-center">Players</h1>
-        {!selectMode && (
-          <button
-            onPointerDown={primeIOSKeyboard}
-            onClick={() => setEditing({})}
-            className="absolute right-5 top-10 text-sm font-medium text-foreground hover:text-foreground transition-colors px-2 py-1 flex items-center gap-1"
-          >
-            <Plus size={20} strokeWidth={2} />
-          </button>
-        )}
-        {selectMode && players.length > 0 && (
-          <button
-            onClick={toggleSelectAll}
-            className="absolute right-5 top-10 text-sm font-medium text-accent-blue hover:opacity-80 transition-opacity px-2 py-1"
-          >
-            {allSelected ? "Deselect all" : "Select all"}
-          </button>
-        )}
+      <div className="pt-10 pb-2 px-5 flex items-baseline flex-shrink-0 relative" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
+        <div className="flex-1 flex items-baseline">
+          {players.length > 0 && (
+            <button
+              onClick={() => (selectMode ? exitSelectMode() : setSelectMode(true))}
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+            >
+              {selectMode ? "Cancel" : "Select"}
+            </button>
+          )}
+        </div>
+        <h1 className="font-sans font-medium text-lg text-foreground text-center">Players</h1>
+        <div className="flex-1 flex items-baseline justify-end">
+          {!selectMode && (
+            <button
+              onPointerDown={primeIOSKeyboard}
+              onClick={() => setEditing({})}
+              className="text-sm font-medium text-foreground hover:text-foreground transition-colors px-2 py-1 flex items-center gap-1 self-center"
+            >
+              <Plus size={20} strokeWidth={2} />
+            </button>
+          )}
+          {selectMode && players.length > 0 && (
+            <button
+              onClick={toggleSelectAll}
+              className="text-sm font-medium text-accent-blue hover:opacity-80 transition-opacity px-2 py-1"
+            >
+              {allSelected ? "Deselect all" : "Select all"}
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 relative overflow-hidden">

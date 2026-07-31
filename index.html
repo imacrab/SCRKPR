@@ -15,11 +15,12 @@
          background fills the home-indicator area on iOS standalone launches
          (fixes the gray gap under the tab bar). -->
     <style>
+      /* Fill the ENTIRE screen including the home-indicator safe area on iOS
+         home-screen bookmarks. Using 100vh (large viewport) sizes against the
+         full device height — 100% on a fixed element resolves to the layout
+         viewport, which excludes the safe area and leaves a gap at the bottom
+         where the WebView's default background shows through. */
       html, body, #root {
-        /* Use svh (small viewport height) + fixed positioning so the dark
-           background fills the whole screen from FIRST paint on iOS — dvh
-           mis-measures on cold launch until a rotation forces a re-layout,
-           leaving a stubborn gap at the bottom. */
         background-color: #111111;
         margin: 0;
         padding: 0;
@@ -27,8 +28,9 @@
       html, body {
         position: fixed;
         inset: 0;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
         overflow: hidden;
       }
       #root {

@@ -55,7 +55,6 @@ export default function BestOfModal({ isOpen, onConfirm, onClose }) {
           <span className="text-5xl font-bold font-display" style={{ color: "hsl(var(--foreground))" }}>
             {bestOf}
           </span>
-          <p className="text-xs text-muted-foreground mt-1">total games</p>
         </div>
 
         <button

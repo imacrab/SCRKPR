@@ -89,6 +89,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
         eyebrow={isEditing ? "Edit Player" : "New Player"}
         title={isEditing ? "Update Details" : "Add Player"}
         scrollable
+        fullHeight
         footer={
           <div className="flex gap-3">
             {isEditing && onDelete && (
@@ -111,7 +112,10 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
           </div>
         }
       >
-        <div className="pt-1 pb-3">
+        {/* Full-height layout: input + tabs are fixed at the top; the tab
+            panel below fills the remaining space so the sheet height is
+            constant whether Color or Emoji is active — no jump on switch. */}
+        <div className="pt-1 pb-3 flex flex-col h-full min-h-0">
           <Input
             ref={setInputRef}
             type="text"
@@ -120,10 +124,10 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
             onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); if (e.key === "Escape") onClose(); }}
             placeholder="Player name"
             maxLength={20}
-            className="mb-3 h-11 text-center text-base bg-secondary border-border"
+            className="mb-3 h-11 text-center text-base bg-secondary border-border flex-shrink-0"
           />
 
-          <div className="px-1 pt-1 pb-2">
+          <div className="px-1 pt-1 pb-2 flex-shrink-0">
             <div className="relative flex rounded-full bg-secondary border border-border p-1">
               <StretchTabPill
                 activeIndex={styleTabIndex}
@@ -148,24 +152,26 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
             </div>
           </div>
 
-          {styleTab === "color" ? (
-            <div className="grid grid-cols-5 gap-3 p-3 justify-items-center">
-              {palette.map((c) => (
-                <button
-                  key={c}
-                  onPointerDown={(e) => { e.preventDefault(); setColor(c); }}
-                  className="w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-90"
-                  style={{ backgroundColor: c, color: readableTextColor(c), outline: color === c ? "2px solid hsl(var(--foreground))" : "none", outlineOffset: "2px" }}
-                >
-                  {color === c && emoji ? <FluentEmoji emoji={emoji} size={24} /> : ""}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="pt-2">
-              <EmojiPicker selected={emoji} onChange={setEmoji} />
-            </div>
-          )}
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            {styleTab === "color" ? (
+              <div className="grid grid-cols-5 gap-3 p-3 justify-items-center">
+                {palette.map((c) => (
+                  <button
+                    key={c}
+                    onPointerDown={(e) => { e.preventDefault(); setColor(c); }}
+                    className="w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-90"
+                    style={{ backgroundColor: c, color: readableTextColor(c), outline: color === c ? "2px solid hsl(var(--foreground))" : "none", outlineOffset: "2px" }}
+                  >
+                    {color === c && emoji ? <FluentEmoji emoji={emoji} size={24} /> : ""}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="pt-2">
+                <EmojiPicker selected={emoji} onChange={setEmoji} />
+              </div>
+            )}
+          </div>
         </div>
       </BottomSheetModal>
 

@@ -25,6 +25,7 @@ export default function BottomSheetModal({
   footer,
   zIndex = 50,
   scrollable = false,
+  fullHeight = false,
 }) {
   const dragControls = useDragControls();
   const [scrolled, setScrolled] = useState(false);
@@ -121,6 +122,9 @@ export default function BottomSheetModal({
           // is bottom-anchored, so shrinking max-height just leaves clearance at
           // the top — the body is `overflow-y-auto`, so no content is unreachable.
           maxHeight: `calc(100dvh - 56px - env(safe-area-inset-top) - ${keyboardInset}px)`,
+          // fullHeight locks the sheet to that maxHeight so its size doesn't
+          // change as inner content swaps (e.g. switching tabs) — prevents jump.
+          ...(fullHeight ? { height: `calc(100dvh - 56px - env(safe-area-inset-top) - ${keyboardInset}px)` } : {}),
         }}
       >
             {/* Drag handle + Header (both draggable) — border fades in once the body scrolls */}

@@ -249,7 +249,7 @@ export default function ScoreKeeper() {
 
   return (
     <>
-      <div className="relative w-screen overflow-hidden" style={{ height: "100dvh" }}>
+      <div className="relative w-screen overflow-hidden" style={{ height: "100vh", minHeight: "100dvh" }}>
         {view === "/history" && (
           <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} className={pageClassName} style={{ height: "100dvh", paddingBottom: navHeight }}>
             <History onBack={() => navigate(-1)} onModalChange={setNavHidden} />

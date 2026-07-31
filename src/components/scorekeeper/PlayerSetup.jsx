@@ -330,7 +330,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
               {allPlayers.length === 0 &&
             <div className="h-full flex flex-col items-center justify-center text-center" style={{ gap: 32 }}>
                   <FluentEmoji emoji="👇" size={140} style={{ display: "block" }} />
-                  <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">Start by adding players</p>
+                  <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">Let's add some players</p>
                   <button
                     onPointerDown={primeIOSKeyboard}
                     onClick={() => setShowAddPlayerWithNav(true)}

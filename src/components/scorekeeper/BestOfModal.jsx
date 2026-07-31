@@ -25,7 +25,7 @@ export default function BestOfModal({ isOpen, onConfirm, onClose }) {
       isOpen={isOpen}
       onClose={onClose}
       eyebrow="Best Of"
-      title="First to win a set amount of rounds"
+      title="First to win…"
       footer={
         <div className="flex gap-3">
           <Button onClick={onClose} variant="outline" className="flex-1 h-11">

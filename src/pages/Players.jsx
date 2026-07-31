@@ -326,7 +326,7 @@ export default function Players({ onBack, onModalChange }) {
               <div className="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
             </div>
           ) : players.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center" style={{ gap: 32 }}>
+            <div className="h-full flex flex-col items-center justify-center text-center" style={{ gap: 20 }}>
               <FluentEmoji emoji="🕵️" size={140} style={{ display: "block" }} />
               <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No players added yet</p>
             </div>

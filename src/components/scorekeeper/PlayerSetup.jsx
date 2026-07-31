@@ -328,8 +328,9 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
           <>
               {allPlayers.length === 0 &&
-            <div className="text-center py-10 text-sm text-muted-foreground">
-                  No players yet. Tap below to add one.
+            <div className="h-full flex flex-col items-center justify-center text-center" style={{ gap: 32 }}>
+                  <FluentEmoji emoji="👋" size={140} style={{ display: "block" }} />
+                  <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">Start by adding players</p>
                 </div>
             }
 

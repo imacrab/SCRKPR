@@ -10,7 +10,7 @@ const MODES = [
   { value: "swish", label: "Swish", sub: "First to 500 ends — lowest wins", emoji: "⚡" },
   { value: "low", label: "Low Score", sub: "Lowest total wins", emoji: "📉" },
   { value: "high", label: "High Score", sub: "Highest total wins", emoji: "📈" },
-  { value: "bestof", label: "Best Of", sub: "First to win any number of rounds", emoji: "🏆" },
+  { value: "bestof", label: "Best Of", sub: "First to win a set amount of rounds", emoji: "🏆" },
 ];
 
 export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, onClose }) {

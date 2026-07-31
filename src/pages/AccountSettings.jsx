@@ -5,10 +5,14 @@ import { db, SYNC_ENABLED } from "@/lib/store";
 import { resetOnboarding } from "@/lib/onboarding";
 import { base44 } from "@/api/base44Client";
 import BottomSheetModal from "@/components/scorekeeper/BottomSheetModal";
+import Toggle from "@/components/scorekeeper/Toggle";
+import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
+import { useGameModeToggles, OPTIONAL_MODES } from "@/lib/useGameModeToggles";
 
 export default function AccountSettings({ onBack, onModalChange }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [clearing, setClearing] = useState(false);
+  const { toggles, setMode } = useGameModeToggles();
 
   // Local-first: players + game history live on this device. "Clear" wipes the
   // local store. Sign Out is only meaningful once cloud sync (and therefore an
@@ -41,6 +45,34 @@ export default function AccountSettings({ onBack, onModalChange }) {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 pt-2 pb-6 space-y-4">
+         {/* Game Modes — toggle optional modes on/off. Disabled modes are
+             hidden from the Game Mode picker on the home screen. */}
+         <div>
+           <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest px-1 pb-2">
+             Game Modes
+           </p>
+           <div className="rounded-xl border border-border bg-card overflow-hidden">
+             {OPTIONAL_MODES.map((mode) => (
+               <div key={mode.id} className="px-4 py-3 flex items-center justify-between gap-4">
+                 <div className="flex items-center gap-3 min-w-0">
+                   <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
+                     <FluentEmoji emoji={mode.emoji} size={28} />
+                   </div>
+                   <div className="min-w-0">
+                     <p className="text-sm font-medium text-foreground">{mode.label}</p>
+                     <p className="text-xs text-muted-foreground mt-0.5 truncate">{mode.description}</p>
+                   </div>
+                 </div>
+                 <Toggle
+                   checked={toggles[mode.id] !== false}
+                   onChange={(next) => setMode(mode.id, next)}
+                   ariaLabel={`Toggle ${mode.label}`}
+                 />
+               </div>
+             ))}
+           </div>
+         </div>
+
          {/* Calm, truthful local-first status — your data lives on this device. */}
          <div className="rounded-xl border border-border bg-card overflow-hidden">
            <div className="px-4 py-4 flex items-center gap-3">

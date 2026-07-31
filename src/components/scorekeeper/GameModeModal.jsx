@@ -2,26 +2,35 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import BottomSheetModal from "./BottomSheetModal";
 import FluentEmoji from "./FluentEmoji";
+import { useGameModeToggles } from "@/lib/useGameModeToggles";
 
 // Generic scoring shapes. High/Low take an optional target score that ends the
 // game when anyone reaches it — e.g. Gin = High + 100, "Swish" = Low + 500
 // (first to 500 ends it, lowest total wins). Best Of asks for a round count next.
+// `optional: true` means the mode can be hidden via Settings → Game Modes.
 const MODES = [
-  { value: "swish", label: "Swish", emoji: "⚡" },
+  { value: "swish", label: "Swish", emoji: "⚡", optional: true },
   { value: "low", label: "Low Score", emoji: "📉" },
   { value: "high", label: "High Score", emoji: "📈" },
   { value: "bestof", label: "Best Of", emoji: "🏆" },
 ];
 
 export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, onClose }) {
-  const [mode, setMode] = useState(winMode || "swish");
+  const { toggles } = useGameModeToggles();
+  const visibleModes = MODES.filter((m) => !m.optional || toggles[m.value] !== false);
+
+  const [mode, setMode] = useState(winMode || visibleModes[0]?.value || "high");
   const [target, setTarget] = useState(targetScore ? String(targetScore) : "");
 
   useEffect(() => {
     if (isOpen) {
-      setMode(winMode || "swish");
+      // If the previously-selected mode was disabled in settings, fall back
+      // to the first visible mode so the picker never shows an empty selection.
+      const stillVisible = visibleModes.some((m) => m.value === winMode);
+      setMode(stillVisible ? winMode : (visibleModes[0]?.value || "high"));
       setTarget(targetScore ? String(targetScore) : "");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, winMode, targetScore]);
 
   // Swish has a locked 500 target — no user-editable end score. High/Low keep
@@ -57,7 +66,7 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
       }
     >
       <div className="flex flex-col gap-2 pb-1">
-        {MODES.map(({ value, label, emoji }) => {
+        {visibleModes.map(({ value, label, emoji }) => {
           const active = mode === value;
           return (
             <button

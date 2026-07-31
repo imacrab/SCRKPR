@@ -50,7 +50,7 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
         <Button
           onClick={handleDone}
           className="w-full h-11 bg-white hover:bg-white/90 font-semibold"
-          style={{ color: "#001321" }}
+          style={{ color: "#111111" }}
         >
           Done
         </Button>

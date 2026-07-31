@@ -243,9 +243,8 @@ export default function ScoreKeeper() {
   const pageClassName = "absolute inset-0 w-screen overflow-hidden";
 
   // Height reserved for the bottom nav bar (hidden on /game)
-  // 56pt tab bar + safe-area inset. Pages reserve this space so content
-  // never sits under the bar.
-  const navHeight = view === "/game" ? "0px" : "calc(56px + env(safe-area-inset-bottom))";
+  // Nav padding removed — pages can flow behind/under the nav bar for now.
+  const navHeight = "0px";
 
   return (
     <>

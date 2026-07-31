@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
 import { db } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Users, Check, Trash2, Star } from "lucide-react";
@@ -260,23 +261,26 @@ export default function Players({ onBack, onModalChange }) {
   return (
     <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* Edit-mode frame — a 4px brand border around the whole screen that
-          fades in while selecting, signalling a distinct "edit mode". Sits
-          above content but is click-through; portaled modals (body-level)
-          still render above it. */}
-      <AnimatePresence>
-        {selectMode && (
-          <motion.div
-            key="edit-frame"
-            aria-hidden="true"
-            className="fixed inset-0 z-30 pointer-events-none rounded-[44px]"
-            style={{ border: "4px solid #2DC5F8", boxShadow: "inset 0 0 26px -8px rgba(45,197,248,0.6)" }}
-            initial={{ opacity: 0, scale: 1.015 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.015 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
-          />
-        )}
-      </AnimatePresence>
+          fades in while selecting, signalling a distinct "edit mode". Portaled
+          to <body> so the outer overflow-hidden container can't clip its
+          rounded corners into squares at the screen edges. */}
+      {createPortal(
+        <AnimatePresence>
+          {selectMode && (
+            <motion.div
+              key="edit-frame"
+              aria-hidden="true"
+              className="fixed inset-0 z-30 pointer-events-none rounded-[55px]"
+              style={{ border: "4px solid #2DC5F8", boxShadow: "inset 0 0 26px -8px rgba(45,197,248,0.6)" }}
+              initial={{ opacity: 0, scale: 1.015 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.015 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+            />
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
       <div className="pt-10 pb-2 px-5 flex items-baseline flex-shrink-0 relative" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <div className="flex-1 flex items-baseline">

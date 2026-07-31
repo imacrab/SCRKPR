@@ -204,10 +204,9 @@ export default function Players({ onBack, onModalChange }) {
           }}
           onPointerDown={(e) => { if (!selectMode) primeIOSKeyboard(); startLongPress(e, p); }}
           onContextMenu={(e) => e.preventDefault()}
-          className={`w-full rounded-lg border overflow-hidden flex items-center gap-3 pl-3 pr-1 py-2.5 text-left transition-colors active:scale-[0.99] ${
-            isSelected ? "border-accent-red bg-accent-red/5" : "border-transparent"
+          className={`w-full rounded-lg border bg-card overflow-hidden flex items-center gap-3 pl-3 pr-1 py-2.5 text-left transition-colors active:scale-[0.99] ${
+            isSelected ? "border-accent-red bg-accent-red/5" : "border-border"
           }`}
-          style={!isSelected ? { backgroundColor: "rgba(255,255,255,0.05)" } : undefined}
         >
           <div
             className="w-9 h-9 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"

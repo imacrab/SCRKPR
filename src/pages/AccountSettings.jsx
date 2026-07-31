@@ -79,7 +79,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
 
          {/* Sign Out — only relevant once cloud sync is enabled */}
          {SYNC_ENABLED && (
-           <div className="rounded-xl border border-transparent overflow-hidden" style={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
+           <div className="rounded-xl border border-border bg-card overflow-hidden">
              <div className="px-4 py-4 flex items-center justify-between gap-4">
                <div>
                  <p className="text-sm font-medium text-foreground">Sign Out</p>

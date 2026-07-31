@@ -7,10 +7,10 @@ import FluentEmoji from "./FluentEmoji";
 // game when anyone reaches it — e.g. Gin = High + 100, "Swish" = Low + 500
 // (first to 500 ends it, lowest total wins). Best Of asks for a round count next.
 const MODES = [
-  { value: "swish", label: "Swish", sub: "First to 500 ends — lowest wins", emoji: "⚡" },
-  { value: "low", label: "Low Score", sub: "Lowest total wins", emoji: "📉" },
-  { value: "high", label: "High Score", sub: "Highest total wins", emoji: "📈" },
-  { value: "bestof", label: "Best Of", sub: "First to win a set amount of rounds", emoji: "🏆" },
+  { value: "swish", label: "Swish", emoji: "⚡" },
+  { value: "low", label: "Low Score", emoji: "📉" },
+  { value: "high", label: "High Score", emoji: "📈" },
+  { value: "bestof", label: "Best Of", emoji: "🏆" },
 ];
 
 export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, onClose }) {
@@ -57,7 +57,7 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
       }
     >
       <div className="flex flex-col gap-2 pb-1">
-        {MODES.map(({ value, label, sub, emoji }) => {
+        {MODES.map(({ value, label, emoji }) => {
           const active = mode === value;
           return (
             <button
@@ -70,10 +70,7 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
               }}
             >
               <FluentEmoji emoji={emoji} size={36} />
-              <span className="flex flex-col">
-                <span className="text-foreground leading-tight [font-family:'Geist',_sans-serif] font-semibold text-base">{label}</span>
-                <span className="text-muted-foreground leading-tight mt-0.5 text-sm">{sub}</span>
-              </span>
+              <span className="text-foreground leading-tight [font-family:'Geist',_sans-serif] font-semibold text-base">{label}</span>
             </button>
           );
         })}

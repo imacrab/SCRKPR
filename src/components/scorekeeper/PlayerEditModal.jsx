@@ -5,6 +5,7 @@ import BottomSheetModal from "./BottomSheetModal";
 import EmojiPicker, { AUTOFILL_EMOJIS } from "./EmojiPicker";
 import FluentEmoji from "./FluentEmoji";
 import DeletePlayerConfirmModal from "./DeletePlayerConfirmModal";
+import { Trash2 } from "lucide-react";
 import { getPaletteForTone, readableTextColor, toLightBg } from "@/lib/contrast";
 import { usePlayerTone } from "@/lib/usePlayerTone";
 
@@ -77,9 +78,10 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
             {isEditing && onDelete && (
               <Button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="h-11 bg-accent-red/15 hover:bg-accent-red/25 text-white border-0 shadow-none"
+                aria-label="Delete player"
+                className="h-11 w-11 flex-shrink-0 bg-accent-red/15 hover:bg-accent-red/25 text-accent-red border-0 shadow-none"
               >
-                <FluentEmoji emoji="🗑️" size={20} />
+                <Trash2 size={18} strokeWidth={2} />
               </Button>
             )}
             <Button

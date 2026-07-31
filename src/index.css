@@ -7,7 +7,7 @@
 @layer base {
   /* Light mode defaults */
   :root {
-    --background: 0 0% 98%;
+    --background: 221 39% 11%;
     --foreground: 220 13% 9%;
     --card: 0 0% 100%;
     --card-foreground: 220 13% 9%;

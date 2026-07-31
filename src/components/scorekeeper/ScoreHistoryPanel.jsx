@@ -9,9 +9,12 @@ export default function ScoreHistoryPanel({ players }) {
   const maxRounds = Math.max(0, ...players.map((p) => p.scores.length));
   if (maxRounds === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center" style={{ gap: 20 }}>
+      <div className="h-full flex flex-col items-center justify-center" style={{ gap: 32 }}>
         <FluentEmoji emoji="🤷‍♀️" size={140} style={{ display: "block" }} />
-        <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No rounds played yet</p>
+        <div className="flex flex-col items-center" style={{ gap: 8 }}>
+          <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No rounds played yet</p>
+          <p className="text-white/50 text-sm [font-family:'Geist',_sans-serif]">All previous round's score will appear here</p>
+        </div>
       </div>
     );
   }

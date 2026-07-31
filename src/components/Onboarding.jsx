@@ -291,7 +291,8 @@ export default function Onboarding({ onDone }) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={finish}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+                className="text-sm font-medium transition-colors px-2 py-1"
+                style={{ color: "rgba(255,255,255,0.5)" }}
               >
                 Skip
               </motion.button>

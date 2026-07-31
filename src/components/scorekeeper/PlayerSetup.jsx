@@ -331,10 +331,17 @@ export default function PlayerSetup({ onStart, onModalChange }) {
             <div className="h-full flex flex-col items-center justify-center text-center" style={{ gap: 32 }}>
                   <FluentEmoji emoji="👋" size={140} style={{ display: "block" }} />
                   <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">Start by adding players</p>
+                  <button
+                    onPointerDown={primeIOSKeyboard}
+                    onClick={() => setShowAddPlayerWithNav(true)}
+                    className="h-11 px-5 rounded-full flex items-center justify-center gap-2 text-white text-sm font-medium border border-dashed border-border hover:border-accent-blue/50 transition-colors">
+                    <Plus size={20} strokeWidth={2} />
+                    Add Player
+                  </button>
                 </div>
             }
 
-              {(() => {
+              {allPlayers.length > 0 && (() => {
               const selectedList = allPlayers.filter((p) => selectedIds.has(p.id));
               const unselectedList = allPlayers.filter((p) => !selectedIds.has(p.id));
 
@@ -487,7 +494,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
             })()}
 
-              <motion.button
+              {allPlayers.length > 0 && <motion.button
               onPointerDown={primeIOSKeyboard}
               onClick={() => setShowAddPlayerWithNav(true)}
               // Fades in only after the card stagger has played out: the last
@@ -500,7 +507,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
                 <Plus size={24} strokeWidth={2} />
                 Add Player
-              </motion.button>
+              </motion.button>}
             </>
           }
         </div>

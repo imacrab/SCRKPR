@@ -6,7 +6,7 @@
     <!-- viewport-fit=cover is required for env(safe-area-inset-*) to resolve on
          notched iPhones; without it the app's safe-area padding is a no-op. -->
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#14171c" />
+    <meta name="theme-color" content="#001321" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -16,11 +16,25 @@
          (fixes the gray gap under the tab bar). -->
     <style>
       html, body, #root {
-        height: 100%;
-        min-height: 100dvh;
-        background-color: #14171c;
+        /* Use svh (small viewport height) + fixed positioning so the dark
+           background fills the whole screen from FIRST paint on iOS — dvh
+           mis-measures on cold launch until a rotation forces a re-layout,
+           leaving a stubborn gap at the bottom. */
+        background-color: #001321;
         margin: 0;
         padding: 0;
+      }
+      html, body {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      #root {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
       }
       body { overscroll-behavior: none; }
     </style>

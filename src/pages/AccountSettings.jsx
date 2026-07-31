@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AlertTriangle, Smartphone, Sparkles } from "lucide-react";
+import { AlertTriangle, Smartphone, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { db, SYNC_ENABLED } from "@/lib/store";
 import { resetOnboarding } from "@/lib/onboarding";
@@ -73,73 +73,78 @@ export default function AccountSettings({ onBack, onModalChange }) {
            </div>
          </div>
 
-         {/* Calm, truthful local-first status — your data lives on this device. */}
-         <div className="rounded-xl border border-border bg-card overflow-hidden">
-           <div className="px-4 py-4 flex items-center gap-3">
-             <div className="w-9 h-9 rounded-full bg-accent-blue/10 flex items-center justify-center flex-shrink-0">
-               <Smartphone size={18} strokeWidth={2} className="text-accent-blue" />
-             </div>
-             <div>
-               <p className="text-sm font-medium text-foreground">Saved on this device</p>
-               <p className="text-xs text-muted-foreground mt-0.5">
-                 Your players and games stay here — no account needed.
-               </p>
-             </div>
-           </div>
-         </div>
-
-         {/* Replay the welcome / intro flow */}
-         <div className="rounded-xl border border-border bg-card overflow-hidden">
-           <div className="px-4 py-4 flex items-center justify-between gap-4">
-             <div className="flex items-center gap-3">
+         {/* System — grouped device/data controls in a single card. */}
+         <div>
+           <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest px-1 pb-2">
+             System
+           </p>
+           <div className="rounded-xl border border-border bg-card overflow-hidden divide-y divide-border">
+             {/* Saved on this device */}
+             <div className="px-4 py-4 flex items-center gap-3">
                <div className="w-9 h-9 rounded-full bg-accent-blue/10 flex items-center justify-center flex-shrink-0">
-                 <Sparkles size={18} strokeWidth={2} className="text-accent-blue" />
+                 <Smartphone size={18} strokeWidth={2} className="text-accent-blue" />
                </div>
                <div>
-                 <p className="text-sm font-medium text-foreground">Replay Welcome</p>
-                 <p className="text-xs text-muted-foreground mt-0.5">See the intro tour again.</p>
+                 <p className="text-sm font-medium text-foreground">Saved on this device</p>
+                 <p className="text-xs text-muted-foreground mt-0.5">
+                   Your players and games stay here — no account needed.
+                 </p>
                </div>
              </div>
-             <button
-               onClick={() => { resetOnboarding(); window.location.href = "/"; }}
-               className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors hover:text-foreground text-muted-foreground"
-             >
-               Replay
-             </button>
-           </div>
-         </div>
 
-         {/* Sign Out — only relevant once cloud sync is enabled */}
-         {SYNC_ENABLED && (
-           <div className="rounded-xl border border-border bg-card overflow-hidden">
+             {/* Replay welcome */}
              <div className="px-4 py-4 flex items-center justify-between gap-4">
-               <div>
-                 <p className="text-sm font-medium text-foreground">Sign Out</p>
-                 <p className="text-xs text-muted-foreground mt-0.5">End your session and return to login.</p>
+               <div className="flex items-center gap-3">
+                 <div className="w-9 h-9 rounded-full bg-accent-blue/10 flex items-center justify-center flex-shrink-0">
+                   <Sparkles size={18} strokeWidth={2} className="text-accent-blue" />
+                 </div>
+                 <div>
+                   <p className="text-sm font-medium text-foreground">Replay Welcome</p>
+                   <p className="text-xs text-muted-foreground mt-0.5">See the intro tour again.</p>
+                 </div>
                </div>
                <button
-                 onClick={() => base44.auth.logout("/")}
+                 onClick={() => { resetOnboarding(); window.location.href = "/"; }}
                  className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors hover:text-foreground text-muted-foreground"
                >
-                 Sign Out
+                 Replay
                </button>
              </div>
-           </div>
-         )}
 
-         {/* Clear all local data */}
-         <div className="rounded-xl border border-border bg-card overflow-hidden">
-           <div className="px-4 py-4 flex items-center justify-between gap-4">
-             <div>
-               <p className="text-sm font-medium text-foreground">Clear All Data</p>
-               <p className="text-xs text-muted-foreground mt-0.5">Remove all saved players and game history from this device.</p>
+             {/* Sign Out — only relevant once cloud sync is enabled */}
+             {SYNC_ENABLED && (
+               <div className="px-4 py-4 flex items-center justify-between gap-4">
+                 <div>
+                   <p className="text-sm font-medium text-foreground">Sign Out</p>
+                   <p className="text-xs text-muted-foreground mt-0.5">End your session and return to login.</p>
+                 </div>
+                 <button
+                   onClick={() => base44.auth.logout("/")}
+                   className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors hover:text-foreground text-muted-foreground"
+                 >
+                   Sign Out
+                 </button>
+               </div>
+             )}
+
+             {/* Clear all local data */}
+             <div className="px-4 py-4 flex items-center justify-between gap-4">
+               <div className="flex items-center gap-3">
+                 <div className="w-9 h-9 rounded-full bg-accent-red/10 flex items-center justify-center flex-shrink-0">
+                   <Trash2 size={18} strokeWidth={2} className="text-accent-red" />
+                 </div>
+                 <div>
+                   <p className="text-sm font-medium text-foreground">Clear All Data</p>
+                   <p className="text-xs text-muted-foreground mt-0.5">Remove all saved players and game history from this device.</p>
+                 </div>
+               </div>
+               <button
+                 onClick={() => setShowConfirm(true)}
+                 className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors text-white bg-accent-red/10 hover:bg-accent-red/20 flex-shrink-0"
+               >
+                 Clear
+               </button>
              </div>
-             <button
-               onClick={() => setShowConfirm(true)}
-               className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors text-white bg-accent-red/10 hover:bg-accent-red/20"
-             >
-               Clear
-             </button>
            </div>
          </div>
        </div>

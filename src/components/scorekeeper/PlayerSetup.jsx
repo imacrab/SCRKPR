@@ -8,6 +8,7 @@ import BestOfModal from "./BestOfModal";
 import GameModeModal from "./GameModeModal";
 import PlayerEditModal from "./PlayerEditModal";
 import FluentEmoji from "./FluentEmoji";
+import VoicePulse from "./VoicePulse";
 import { getModeMeta } from "@/lib/gameModes";
 import { readableTextColor } from "@/lib/contrast";
 import { DUR_MEDIUM } from "@/lib/motion";
@@ -297,12 +298,18 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         
       </div>
 
-      {/* Header */}
-      <div className="pt-7 pb-4 px-6" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
+      {/* Header — subtle animated pulse sits behind the logo, ebbing and
+          flowing to give the home screen a "listening" feel. It only exists
+          on this screen, so it fades out naturally when the game starts and
+          the scoreboard reveals a solid background. */}
+      <div className="relative pt-7 pb-4 px-6" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
+        <VoicePulse
+          style={{ inset: 0, opacity: 0.55 }}
+        />
         {/* Invisible anchor — the visible logo is the persistent one hoisted to
             ScoreKeeper, which measures this slot and floats over it (opacity:0
             here keeps the layout space + position). */}
-        <img src={logoDark} alt="SCRKPR!" data-logo-anchor className="mx-auto" style={{ maxWidth: 150, height: "auto", opacity: 0 }} />
+        <img src={logoDark} alt="SCRKPR!" data-logo-anchor className="relative mx-auto" style={{ maxWidth: 150, height: "auto", opacity: 0 }} />
       </div>
 
       {/* Player list — pick who's playing */}

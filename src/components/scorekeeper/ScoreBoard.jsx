@@ -457,7 +457,8 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
                 exit={{ y: 20, opacity: 0 }}
                 transition={SPRING_SHEET}
                 onClick={() => setSlideRevealed(true)}
-                className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
+                className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full border border-border"
+                style={{ padding: "4px 8px" }}
               >
                 End game early?
               </motion.button>

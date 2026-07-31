@@ -30,14 +30,6 @@ export default function BottomSheetModal({
   const dragControls = useDragControls();
   const [scrolled, setScrolled] = useState(false);
   const [shouldRender, setShouldRender] = useState(isOpen);
-  // Track how much of the viewport the iOS software keyboard is covering.
-  // window.visualViewport shrinks when the keyboard opens; the difference
-  // between innerHeight and visualViewport.height is the keyboard's height.
-  // We subtract this from the sheet's maxHeight so the sheet's TOP stays
-  // above the keyboard instead of getting pushed off-screen — the sheet is
-  // bottom-anchored (bottom: 8px) and its body is overflow-y-auto, so no
-  // content is lost.
-  const [keyboardInset, setKeyboardInset] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
@@ -47,26 +39,6 @@ export default function BottomSheetModal({
 
     const timeout = setTimeout(() => setShouldRender(false), 420);
     return () => clearTimeout(timeout);
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      setKeyboardInset(0);
-      return undefined;
-    }
-    const vv = window.visualViewport;
-    if (!vv) return undefined;
-    const update = () => {
-      const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      setKeyboardInset(inset);
-    };
-    update();
-    vv.addEventListener("resize", update);
-    vv.addEventListener("scroll", update);
-    return () => {
-      vv.removeEventListener("resize", update);
-      vv.removeEventListener("scroll", update);
-    };
   }, [isOpen]);
 
   const handleDragEnd = (_, info) => {
@@ -111,20 +83,17 @@ export default function BottomSheetModal({
         className="fixed inset-x-0 bg-card border border-border rounded-sheet shadow-2xl flex flex-col"
         style={{
           zIndex,
-          // Anchor above the software keyboard when it's up; otherwise 8px from
-          // the screen edge. Without this the sheet stays glued to the bottom
-          // of the window and the keyboard covers the input.
-          bottom: keyboardInset > 0 ? `${keyboardInset + 8}px` : "8px",
+          bottom: "8px",
           left: "8px",
           right: "8px",
-          // Cap the sheet's top so it can't slide under the notch/dynamic island,
-          // AND shrink to leave room for the keyboard when it opens. The sheet
-          // is bottom-anchored, so shrinking max-height just leaves clearance at
-          // the top — the body is `overflow-y-auto`, so no content is unreachable.
-          maxHeight: `calc(100dvh - 56px - env(safe-area-inset-top) - ${keyboardInset}px)`,
+          // Cap the sheet's top so it can't slide under the notch/dynamic island.
+          // We intentionally do NOT track the software keyboard here — letting
+          // the sheet stay put means the keyboard simply overlays it, matching
+          // native iOS sheet behavior.
+          maxHeight: `calc(100dvh - 56px - env(safe-area-inset-top))`,
           // fullHeight locks the sheet to that maxHeight so its size doesn't
           // change as inner content swaps (e.g. switching tabs) — prevents jump.
-          ...(fullHeight ? { height: `calc(100dvh - 56px - env(safe-area-inset-top) - ${keyboardInset}px)` } : {}),
+          ...(fullHeight ? { height: `calc(100dvh - 56px - env(safe-area-inset-top))` } : {}),
         }}
       >
             {/* Drag handle + Header (both draggable) — border fades in once the body scrolls */}

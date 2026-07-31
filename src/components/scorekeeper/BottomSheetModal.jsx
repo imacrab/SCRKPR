@@ -80,7 +80,18 @@ export default function BottomSheetModal({
         dragSnapToOrigin
         onDragEnd={handleDragEnd}
         className="fixed inset-x-0 bg-card border border-border rounded-sheet shadow-2xl flex flex-col"
-        style={{ zIndex, bottom: "8px", left: "8px", right: "8px", maxHeight: "calc(100dvh - 48px)" }}
+        style={{
+          zIndex,
+          bottom: "8px",
+          left: "8px",
+          right: "8px",
+          // Cap the sheet's top so it can't slide under the notch/dynamic island.
+          // 56px minimum clearance PLUS the safe-area inset (Dynamic Island is
+          // reported in env(safe-area-inset-top)). The sheet is bottom-anchored,
+          // so shrinking max-height just leaves clearance at the top — the body
+          // is `overflow-y-auto`, so no content is unreachable.
+          maxHeight: "calc(100dvh - 56px - env(safe-area-inset-top))",
+        }}
       >
             {/* Drag handle + Header (both draggable) — border fades in once the body scrolls */}
             <div

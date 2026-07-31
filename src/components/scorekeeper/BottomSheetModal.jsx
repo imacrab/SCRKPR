@@ -41,6 +41,24 @@ export default function BottomSheetModal({
     return () => clearTimeout(timeout);
   }, [isOpen]);
 
+  // iOS Safari quirk: when a text input inside a `position: fixed` element
+  // gets focus, iOS scrolls the DOCUMENT to bring the input into view — and
+  // it drags fixed elements along with that scroll. The sheet then appears
+  // to "move up with the keyboard" even though we removed all keyboard
+  // tracking. Fix: while the modal is open, force the document scroll
+  // position back to 0 on every scroll event.
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const pin = () => {
+      if (window.scrollY !== 0 || window.pageYOffset !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+    pin();
+    window.addEventListener("scroll", pin, { passive: true });
+    return () => window.removeEventListener("scroll", pin);
+  }, [isOpen]);
+
   const handleDragEnd = (_, info) => {
     if (info.offset.y > 120 || info.velocity.y > 500) {
       onClose();

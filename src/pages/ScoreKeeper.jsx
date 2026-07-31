@@ -249,27 +249,27 @@ export default function ScoreKeeper() {
 
   return (
     <>
-      <div className="relative w-screen overflow-hidden" style={{ height: "100vh" }}>
+      <div className="relative w-screen overflow-hidden" style={{ height: "100%" }}>
         {view === "/history" && (
-          <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} className={pageClassName} style={{ height: "100vh", paddingBottom: navHeight }}>
+          <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} className={pageClassName} style={{ height: "100%", paddingBottom: navHeight }}>
             <History onBack={() => navigate(-1)} onModalChange={setNavHidden} />
           </motion.div>
         )}
 
         {view === "/players" && (
-          <motion.div key="players" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} className={pageClassName} style={{ height: "100vh", paddingBottom: navHeight }}>
+          <motion.div key="players" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} className={pageClassName} style={{ height: "100%", paddingBottom: navHeight }}>
             <Players onBack={() => navigate(-1)} onModalChange={setNavHidden} />
           </motion.div>
         )}
 
         {view === "/account" && (
-          <motion.div key="account" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} className={pageClassName} style={{ height: "100vh", paddingBottom: navHeight }}>
+          <motion.div key="account" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} className={pageClassName} style={{ height: "100%", paddingBottom: navHeight }}>
             <AccountSettings onBack={() => navigate(-1)} onModalChange={setNavHidden} />
           </motion.div>
         )}
 
         {view === "/" && (
-          <motion.div key="setup" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} onAnimationComplete={measureLogo} className={pageClassName} style={{ height: "100vh", paddingBottom: navHeight }}>
+          <motion.div key="setup" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} onAnimationComplete={measureLogo} className={pageClassName} style={{ height: "100%", paddingBottom: navHeight }}>
             <PlayerSetup
               onStart={handleStartGame}
               onShowHistory={() => navigate("/history")}
@@ -280,7 +280,7 @@ export default function ScoreKeeper() {
         )}
 
         {view === "/game" && (
-          <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} onAnimationComplete={measureLogo} className={pageClassName} style={{ height: "100vh" }}>
+          <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} onAnimationComplete={measureLogo} className={pageClassName} style={{ height: "100%" }}>
             <ScoreBoard
               players={players}
               winMode={winMode}

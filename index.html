@@ -11,11 +11,14 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="SCRKPR" />
-    <!-- Fullscreen PWA sizing per iOS Game UI guide, Section 2: `height: 100%`
-         silently breaks `viewport-fit=cover` + `black-translucent` (Safari
-         falls back to non-cover layout, leaving a gap at the safe-area zone),
-         and `100dvh` reports stale values on PWA cold start. `100vh` is the
-         only unit that works from cold start in standalone mode. -->
+    <!-- Fullscreen sizing per iOS Game UI guide, Section 2 + Section 8:
+         - PWA standalone: `100vh` is the only unit that works from cold start
+           (`100%` breaks viewport-fit=cover; `100dvh` returns stale values).
+         - Safari (in-browser): `100vh` INCLUDES the area behind the toolbar,
+           so content extends below the visible viewport. `100dvh` fixes this
+           in Safari (the cold-start bug only affects standalone PWAs).
+         We branch on `display-mode: standalone` to give each context the
+         right unit. -->
     <style>
       html, body, #root {
         background-color: #111111;
@@ -24,13 +27,16 @@
       }
       html, body {
         width: 100vw;
-        height: 100vh;
+        height: 100dvh; /* Safari default — respects the toolbar */
         overflow: hidden;
       }
       #root {
         width: 100vw;
-        height: 100vh;
+        height: 100dvh;
         overflow: hidden;
+      }
+      @media all and (display-mode: standalone) {
+        html, body, #root { height: 100vh; }
       }
       body {
         overscroll-behavior: none;

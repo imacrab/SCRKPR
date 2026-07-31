@@ -12,7 +12,17 @@ import { getModeMeta } from "@/lib/gameModes";
 import { readableTextColor } from "@/lib/contrast";
 import { DUR_MEDIUM } from "@/lib/motion";
 import { primeIOSKeyboard } from "@/lib/iosKeyboardPrimer";
+import { useGameModeToggles } from "@/lib/useGameModeToggles";
 import logoDark from "@/assets/scrkpr-logo.svg";
+
+// Order matches the picker; used to pick a sensible default when the
+// currently-selected mode is disabled in settings.
+const DEFAULT_MODE_ORDER = ["swish", "low", "high", "bestof"];
+const OPTIONAL_MODE_IDS = new Set(["swish"]);
+const isModeVisible = (mode, toggles) =>
+  !OPTIONAL_MODE_IDS.has(mode) || toggles[mode] !== false;
+const firstVisibleMode = (toggles) =>
+  DEFAULT_MODE_ORDER.find((m) => isModeVisible(m, toggles)) || "high";
 
 export default function PlayerSetup({ onStart, onModalChange }) {
   const [allPlayers, setAllPlayers] = useState(null); // null = loading
@@ -20,8 +30,22 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [canScrollPlayers, setCanScrollPlayers] = useState(false);
   const [scrolledFromTop, setScrolledFromTop] = useState(false);
-  const [winMode, setWinMode] = useState("swish");
+  const { toggles: modeToggles } = useGameModeToggles();
+  // Initial default assumes all modes visible; the effect below corrects it
+  // on mount using the real toggles from settings.
+  const [winMode, setWinMode] = useState(() => firstVisibleMode({}));
   const [targetScore, setTargetScore] = useState(500); // Swish locks to 500; high/low can override
+
+  // If the currently-selected mode gets disabled from Settings, fall back to
+  // the first visible one so the pill on the home screen never shows a mode
+  // the user just turned off.
+  useEffect(() => {
+    if (!isModeVisible(winMode, modeToggles)) {
+      const next = firstVisibleMode(modeToggles);
+      setWinMode(next);
+      setTargetScore(next === "swish" ? 500 : null);
+    }
+  }, [modeToggles, winMode]);
   const [showBestOf, setShowBestOf] = useState(false);
   const [showGameMode, setShowGameMode] = useState(false);
   const [tappedId, setTappedId] = useState(null);

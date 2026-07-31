@@ -332,8 +332,10 @@ export default function Players({ onBack, onModalChange }) {
           ) : players.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center" style={{ gap: 20 }}>
               <FluentEmoji emoji="☝️" size={140} style={{ display: "block" }} />
-              <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">Add some players</p>
-              <p className="text-white/60 text-base [font-family:'Geist',_sans-serif]">Tap the + above to get started</p>
+              <div className="flex flex-col items-center" style={{ gap: 8 }}>
+                <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">Add some players</p>
+                <p className="text-white/60 text-base [font-family:'Geist',_sans-serif]">Tap the + above to get started</p>
+              </div>
             </div>
           ) : (
             (() => {

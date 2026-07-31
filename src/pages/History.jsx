@@ -200,8 +200,10 @@ export default function History({ onBack, onModalChange }) {
           games.length === 0 ?
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-5" style={{ gap: 20 }}>
             <FluentEmoji emoji="🙀" size={140} style={{ display: "block" }} />
-            <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No rounds saved yet</p>
-            <p className="text-white/60 text-base [font-family:'Geist',_sans-serif]">All past games and stats will appear here</p>
+            <div className="flex flex-col items-center" style={{ gap: 8 }}>
+              <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No rounds saved yet</p>
+              <p className="text-white/60 text-base [font-family:'Geist',_sans-serif]">All past games and stats will appear here</p>
+            </div>
           </div> :
 
           <>

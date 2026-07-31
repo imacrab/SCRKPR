@@ -42,7 +42,7 @@ export default function BestOfModal({ isOpen, onConfirm, onClose }) {
       }
     >
       {/* Stepper */}
-      <div className="flex items-center justify-center gap-6 mb-3">
+      <div className="flex items-center justify-center gap-6 py-6">
         <button
           onClick={decrement}
           disabled={bestOf === ODD_OPTIONS[0]}
@@ -66,7 +66,7 @@ export default function BestOfModal({ isOpen, onConfirm, onClose }) {
         </button>
       </div>
 
-      <p className="text-center text-sm text-muted-foreground pb-2">
+      <p className="text-center text-sm text-muted-foreground">
         First to <span className="font-semibold text-foreground">{winsNeeded}</span> wins takes it all
       </p>
     </BottomSheetModal>

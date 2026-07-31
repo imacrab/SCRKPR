@@ -298,14 +298,14 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         
       </div>
 
-      {/* Header — subtle animated pulse sits behind the logo, ebbing and
-          flowing to give the home screen a "listening" feel. It only exists
-          on this screen, so it fades out naturally when the game starts and
-          the scoreboard reveals a solid background. */}
+      {/* Full-screen ambient pulse — sits behind everything on the home
+          screen, ebbing and flowing to give it a "listening" feel. It only
+          exists on this screen, so it fades out naturally when the game
+          starts and the scoreboard reveals a solid background. */}
+      <VoicePulse style={{ inset: 0, opacity: 0.15, zIndex: 0 }} />
+
+      {/* Header */}
       <div className="relative pt-7 pb-4 px-6" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
-        <VoicePulse
-          style={{ inset: 0, opacity: 0.55 }}
-        />
         {/* Invisible anchor — the visible logo is the persistent one hoisted to
             ScoreKeeper, which measures this slot and floats over it (opacity:0
             here keeps the layout space + position). */}

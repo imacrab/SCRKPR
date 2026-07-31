@@ -4,10 +4,16 @@ import { Input } from "@/components/ui/input";
 import BottomSheetModal from "./BottomSheetModal";
 import EmojiPicker, { AUTOFILL_EMOJIS } from "./EmojiPicker";
 import FluentEmoji from "./FluentEmoji";
+import StretchTabPill from "./StretchTabPill";
 import DeletePlayerConfirmModal from "./DeletePlayerConfirmModal";
 import { Trash2 } from "lucide-react";
 import { getPaletteForTone, readableTextColor, toLightBg } from "@/lib/contrast";
 import { usePlayerTone } from "@/lib/usePlayerTone";
+
+const STYLE_TABS = [
+  { id: "color", label: "Color" },
+  { id: "emoji", label: "Emoji" },
+];
 
 function pickRandomUnused(options, used = []) {
   const taken = new Set(used);
@@ -23,8 +29,18 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
   const [color, setColor] = useState(palette[0]);
   const [emoji, setEmoji] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [styleTab, setStyleTab] = useState("color"); // "color" | "emoji"
+  const [previousStyleTab, setPreviousStyleTab] = useState("color");
   const inputRef = useRef(null);
   const isEditing = !!player?.id;
+
+  const styleTabIndex = STYLE_TABS.findIndex((t) => t.id === styleTab);
+  const previousStyleTabIndex = STYLE_TABS.findIndex((t) => t.id === previousStyleTab);
+  const handleStyleTabChange = (id) => {
+    if (id === styleTab) return;
+    setPreviousStyleTab(styleTab);
+    setStyleTab(id);
+  };
 
   // iOS only surfaces the software keyboard when focus() runs synchronously
   // inside the user-gesture task that opened the sheet. A setTimeout — or any
@@ -107,22 +123,49 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
             className="mb-3 h-11 text-center text-base bg-secondary border-border"
           />
 
-          <div className="grid grid-cols-5 gap-3 p-3 justify-items-center">
-            {palette.map((c) => (
-              <button
-                key={c}
-                onPointerDown={(e) => { e.preventDefault(); setColor(c); }}
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-90"
-                style={{ backgroundColor: c, color: readableTextColor(c), outline: color === c ? "2px solid hsl(var(--foreground))" : "none", outlineOffset: "2px" }}
-              >
-                {color === c && emoji ? <FluentEmoji emoji={emoji} size={24} /> : ""}
-              </button>
-            ))}
+          <div className="px-1 pt-1 pb-2">
+            <div className="relative flex rounded-full bg-secondary border border-border p-1">
+              <StretchTabPill
+                activeIndex={styleTabIndex}
+                previousIndex={previousStyleTabIndex}
+                onSettle={() => setPreviousStyleTab(styleTab)}
+              />
+              {STYLE_TABS.map(({ id, label }) => {
+                const active = styleTab === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => handleStyleTabChange(id)}
+                    className="relative flex-1 h-9 rounded-full text-sm font-medium"
+                  >
+                    <span className={`relative z-10 inline-flex items-center gap-1.5 transition-colors ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                      {label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="border-t border-border pt-2">
-            <EmojiPicker selected={emoji} onChange={setEmoji} />
-          </div>
+          {styleTab === "color" ? (
+            <div className="grid grid-cols-5 gap-3 p-3 justify-items-center">
+              {palette.map((c) => (
+                <button
+                  key={c}
+                  onPointerDown={(e) => { e.preventDefault(); setColor(c); }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-90"
+                  style={{ backgroundColor: c, color: readableTextColor(c), outline: color === c ? "2px solid hsl(var(--foreground))" : "none", outlineOffset: "2px" }}
+                >
+                  {color === c && emoji ? <FluentEmoji emoji={emoji} size={24} /> : ""}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="pt-2">
+              <EmojiPicker selected={emoji} onChange={setEmoji} />
+            </div>
+          )}
         </div>
       </BottomSheetModal>
 

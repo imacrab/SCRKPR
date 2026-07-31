@@ -19,8 +19,8 @@ import HistoryGameDetail from "@/components/scorekeeper/HistoryGameDetail";
 import { TRANSITION_PANEL, SPRING_SNAPPY } from "@/lib/motion";
 
 const HISTORY_TABS = [
-  { id: "games", label: "Games", emoji: "🎲" },
-  { id: "stats", label: "Stats", emoji: "📊" },
+  { id: "games", label: "Games" },
+  { id: "stats", label: "Stats" },
 ];
 
 export default function History({ onBack, onModalChange }) {
@@ -155,7 +155,7 @@ export default function History({ onBack, onModalChange }) {
               previousIndex={previousTabIndex}
               onSettle={() => setPreviousTab(tab)}
             />
-            {HISTORY_TABS.map(({ id, label, emoji }) => {
+            {HISTORY_TABS.map(({ id, label }) => {
               const active = tab === id;
               return (
                 <button
@@ -164,7 +164,6 @@ export default function History({ onBack, onModalChange }) {
                   className="relative flex-1 h-9 rounded-full text-sm font-medium"
                 >
                   <span className={`relative z-10 inline-flex items-center gap-1.5 transition-colors ${active ? "text-foreground" : "text-muted-foreground"}`}>
-                    <FluentEmoji emoji={emoji} size={15} />
                     {label}
                   </span>
                 </button>

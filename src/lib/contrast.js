@@ -1,5 +1,5 @@
 // WCAG 2.2 contrast utilities + curated palettes that pass AA against
-// either white (#FFFFFF) or near-black (#111111) text.
+// either white (#FFFFFF) or near-black (#001321) text.
 
 function hexToRgb(hex) {
   const h = hex.replace("#", "");
@@ -26,9 +26,9 @@ export function contrastRatio(hex1, hex2) {
 
 // Pick the readable text color for a given background (WCAG-driven).
 export function readableTextColor(bg) {
-  return contrastRatio(bg, "#FFFFFF") >= contrastRatio(bg, "#111111")
+  return contrastRatio(bg, "#FFFFFF") >= contrastRatio(bg, "#001321")
     ? "#FFFFFF"
-    : "#111111";
+    : "#001321";
 }
 
 // --- HSL helpers (for lightening) -------------------------------------------
@@ -71,7 +71,7 @@ function hslToHex({ h, s, l }) {
   return `#${to255(r)}${to255(g)}${to255(b)}`.toUpperCase();
 }
 
-// Convert any color into a bright, playful pastel that pairs with #111 text.
+// Convert any color into a bright, playful pastel that pairs with #001321 text.
 // Keeps the hue, forces a high lightness and caps saturation so a dark color
 // (e.g. a legacy player color) becomes a light-mode-friendly version of itself.
 // Colors that are already light are returned essentially unchanged.
@@ -114,7 +114,7 @@ export const DARK_BG_COLORS = [
 ];
 
 // Light palette → pairs with NEAR-BLACK text. Vibrant generic 25-hue wheel
-// (evenly-stepped hues at S85 / ~L65). Every color tested ≥ 4.5:1 vs #111111;
+// (evenly-stepped hues at S85 / ~L65). Every color tested ≥ 4.5:1 vs #001321;
 // the blue-violets are nudged lighter just enough to keep dark text readable.
 export const LIGHT_BG_COLORS = [
   "#F25A5A", // red

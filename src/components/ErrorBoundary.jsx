@@ -50,7 +50,7 @@ export default class ErrorBoundary extends React.Component {
         <button
           onClick={this.handleHome}
           className="py-3.5 px-8 rounded-full bg-white font-semibold text-base active:scale-95 transition-transform"
-          style={{ color: "#111", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.2)" }}
+          style={{ color: "#001321", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.2)" }}
         >
           Back to Home
         </button>

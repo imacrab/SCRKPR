@@ -86,7 +86,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
               onClick={handleSubmit}
               disabled={!name.trim()}
               className="flex-1 h-11 bg-white hover:bg-white/90 font-semibold"
-              style={{ color: "#111111" }}
+              style={{ color: "#001321" }}
             >
               {isEditing ? "Save" : "Add"}
             </Button>

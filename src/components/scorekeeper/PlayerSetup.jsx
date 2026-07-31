@@ -396,7 +396,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 onClick={() => toggleSelected(player.id)}
                 className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left cursor-pointer"
                 style={{
-                  backgroundColor: selected ? hexToRgba(player.color, 1) : "rgba(255,255,255,0.1)",
+                  backgroundColor: selected ? hexToRgba(player.color, 1) : "rgba(255,255,255,0.05)",
                   borderColor: "transparent",
                   boxShadow: isLifted ? "0 20px 35px -8px rgba(0,0,0,0.45)" : "none",
                   transform: cinch,

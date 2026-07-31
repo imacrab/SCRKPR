@@ -198,7 +198,7 @@ export default function History({ onBack, onModalChange }) {
             <div className="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
           </div> :
           games.length === 0 ?
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-5" style={{ gap: 20 }}>
+          <div className="h-full flex flex-col items-center justify-center text-center px-5" style={{ gap: 20 }}>
             <FluentEmoji emoji="🙀" size={140} style={{ display: "block" }} />
             <div className="flex flex-col items-center" style={{ gap: 8 }}>
               <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No rounds saved yet</p>

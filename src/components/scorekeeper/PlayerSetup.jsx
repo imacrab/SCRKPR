@@ -302,7 +302,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
           screen, ebbing and flowing to give it a "listening" feel. It only
           exists on this screen, so it fades out naturally when the game
           starts and the scoreboard reveals a solid background. */}
-      <VoicePulse style={{ inset: 0, opacity: 0.15, zIndex: 0 }} />
+      <VoicePulse style={{ inset: 0, opacity: 0.25, zIndex: 0 }} />
 
       {/* Header */}
       <div className="relative pt-7 pb-4 px-6" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>

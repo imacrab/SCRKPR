@@ -326,10 +326,9 @@ export default function Players({ onBack, onModalChange }) {
               <div className="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
             </div>
           ) : players.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <Users size={36} strokeWidth={2} className="text-muted-foreground mb-3" />
-              <p className="text-muted-foreground text-sm">No saved players yet.</p>
-              <p className="text-muted-foreground/60 text-xs mt-1">Tap + to add one.</p>
+            <div className="h-full flex flex-col items-center justify-center text-center" style={{ gap: 32 }}>
+              <FluentEmoji emoji="🕵️" size={140} style={{ display: "block" }} />
+              <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No players added yet</p>
             </div>
           ) : (
             (() => {

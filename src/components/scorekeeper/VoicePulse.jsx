@@ -31,19 +31,19 @@ export default function VoicePulse({ className = "", style = {}, color = "#2DC5F
       <motion.div
         style={{
           position: "absolute",
-          width: "85%",
+          width: "140%",
           aspectRatio: "1 / 1",
           borderRadius: "9999px",
           background: `radial-gradient(circle, ${color}66 0%, ${color}22 45%, transparent 72%)`,
-          filter: "blur(32px)",
+          filter: "blur(48px)",
           willChange: "transform, opacity",
         }}
         animate={{
-          scaleX: [0.95, 1.08, 0.98, 1.05, 0.95],
-          scaleY: [1.03, 0.94, 1.08, 0.97, 1.03],
-          x: ["-6%", "4%", "-2%", "5%", "-6%"],
-          y: ["3%", "-4%", "2%", "-5%", "3%"],
-          opacity: [0.55, 0.75, 0.6, 0.7, 0.55],
+          scaleX: [0.95, 1.15, 1.0, 1.1, 0.95],
+          scaleY: [1.08, 0.92, 1.15, 0.97, 1.08],
+          x: ["-12%", "8%", "-4%", "10%", "-12%"],
+          y: ["6%", "-8%", "4%", "-10%", "6%"],
+          opacity: [0.55, 0.8, 0.6, 0.75, 0.55],
         }}
         transition={{
           duration: 11,
@@ -56,19 +56,19 @@ export default function VoicePulse({ className = "", style = {}, color = "#2DC5F
       <motion.div
         style={{
           position: "absolute",
-          width: "62%",
+          width: "100%",
           aspectRatio: "1 / 1",
           borderRadius: "9999px",
           background: `radial-gradient(circle, ${color}88 0%, ${color}33 48%, transparent 74%)`,
-          filter: "blur(24px)",
+          filter: "blur(36px)",
           willChange: "transform, opacity",
         }}
         animate={{
-          scaleX: [1.04, 0.93, 1.07, 0.96, 1.04],
-          scaleY: [0.94, 1.06, 0.95, 1.08, 0.94],
-          x: ["4%", "-5%", "3%", "-3%", "4%"],
-          y: ["-3%", "4%", "-5%", "2%", "-3%"],
-          opacity: [0.65, 0.5, 0.75, 0.55, 0.65],
+          scaleX: [1.06, 0.9, 1.12, 0.94, 1.06],
+          scaleY: [0.92, 1.1, 0.94, 1.14, 0.92],
+          x: ["8%", "-10%", "6%", "-6%", "8%"],
+          y: ["-6%", "8%", "-10%", "4%", "-6%"],
+          opacity: [0.7, 0.5, 0.8, 0.55, 0.7],
         }}
         transition={{
           duration: 8,
@@ -81,19 +81,19 @@ export default function VoicePulse({ className = "", style = {}, color = "#2DC5F
       <motion.div
         style={{
           position: "absolute",
-          width: "42%",
+          width: "70%",
           aspectRatio: "1 / 1",
           borderRadius: "9999px",
           background: `radial-gradient(circle, ${color}aa 0%, ${color}44 50%, transparent 76%)`,
-          filter: "blur(16px)",
+          filter: "blur(24px)",
           willChange: "transform, opacity",
         }}
         animate={{
-          scaleX: [1.02, 0.96, 1.06, 0.98, 1.02],
-          scaleY: [0.98, 1.04, 0.95, 1.06, 0.98],
-          x: ["-2%", "3%", "-4%", "2%", "-2%"],
-          y: ["2%", "-3%", "3%", "-4%", "2%"],
-          opacity: [0.7, 0.55, 0.8, 0.6, 0.7],
+          scaleX: [1.04, 0.94, 1.1, 0.96, 1.04],
+          scaleY: [0.96, 1.08, 0.93, 1.1, 0.96],
+          x: ["-4%", "6%", "-8%", "4%", "-4%"],
+          y: ["4%", "-6%", "6%", "-8%", "4%"],
+          opacity: [0.75, 0.55, 0.85, 0.6, 0.75],
         }}
         transition={{
           duration: 5.5,

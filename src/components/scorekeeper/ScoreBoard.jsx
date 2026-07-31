@@ -32,6 +32,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [endingGame, setEndingGame] = useState(false);
   const [view, setView] = useState("board"); // "board" | "rounds"
   const [previousView, setPreviousView] = useState("board");
+  const [slideRevealed, setSlideRevealed] = useState(false);
   const scrollContainerRef = useRef(null);
   const scoreCloseTimerRef = useRef(null);
   const endGameTimerRef = useRef(null);
@@ -413,9 +414,11 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           )}
         </AnimatePresence>
 
-        {/* End Game — fixed at bottom of scoreboard, slide-to-confirm */}
+        {/* End Game — fixed at bottom of scoreboard. Shows a subtle "End game
+            early?" button by default; tapping it swaps in the slide-to-confirm
+            control (harder to trigger accidentally). */}
         <motion.div
-          className="absolute inset-x-0 bottom-0 z-30 flex justify-center"
+          className="absolute inset-x-0 bottom-0 z-30 flex justify-center items-end"
           animate={{
             y: slideControlHidden ? 120 : 0,
           }}
@@ -425,9 +428,41 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             paddingLeft: 48,
             paddingRight: 48,
             pointerEvents: slideControlHidden ? "none" : "auto",
+            minHeight: 72,
           }}>
 
-          <SlideToEndGame onComplete={() => setShowEndGame(true)} />
+          <AnimatePresence mode="wait" initial={false}>
+            {slideRevealed ? (
+              <motion.div
+                key="slide"
+                initial={{ y: 80, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 80, opacity: 0 }}
+                transition={SPRING_SHEET}
+                className="w-full"
+                onAnimationComplete={() => {
+                  // Auto-collapse back to the subtle button if the user
+                  // doesn't slide within a short window
+                  if (endGameTimerRef.current) clearTimeout(endGameTimerRef.current);
+                  endGameTimerRef.current = setTimeout(() => setSlideRevealed(false), 5000);
+                }}
+              >
+                <SlideToEndGame onComplete={() => setShowEndGame(true)} />
+              </motion.div>
+            ) : (
+              <motion.button
+                key="reveal"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 20, opacity: 0 }}
+                transition={SPRING_SHEET}
+                onClick={() => setSlideRevealed(true)}
+                className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
+              >
+                End game early?
+              </motion.button>
+            )}
+          </AnimatePresence>
         </motion.div>
       </div>
 

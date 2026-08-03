@@ -17,8 +17,8 @@ import logoDark from "@/assets/scrkpr-logo.svg";
 
 // Order matches the picker; used to pick a sensible default when the
 // currently-selected mode is disabled in settings.
-const DEFAULT_MODE_ORDER = ["swish", "low", "high", "bestof"];
-const OPTIONAL_MODE_IDS = new Set(["swish"]);
+const DEFAULT_MODE_ORDER = ["swish", "ginrummy", "hotdice", "phase10", "low", "high", "bestof"];
+const OPTIONAL_MODE_IDS = new Set(["swish", "ginrummy", "hotdice", "phase10"]);
 const isModeVisible = (mode, toggles) =>
   !OPTIONAL_MODE_IDS.has(mode) || toggles[mode] !== false;
 const firstVisibleMode = (toggles) =>
@@ -43,7 +43,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     if (!isModeVisible(winMode, modeToggles)) {
       const next = firstVisibleMode(modeToggles);
       setWinMode(next);
-      setTargetScore(next === "swish" ? 500 : null);
+      setTargetScore(next === "swish" ? 500 : next === "ginrummy" ? 100 : next === "hotdice" ? 10000 : null);
     }
   }, [modeToggles, winMode]);
   const [showBestOf, setShowBestOf] = useState(false);
@@ -552,7 +552,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 <>
                   <FluentEmoji emoji={emoji} size={18} />
                   <span className="text-sm font-medium text-foreground">
-                    {label}{targetScore && winMode !== "swish" ? ` · to ${targetScore}` : ""}
+                    {label}
                   </span>
                 </>);
 

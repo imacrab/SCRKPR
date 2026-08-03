@@ -10,9 +10,13 @@ const STORAGE_KEY = "scrkpr_game_mode_toggles";
 // always visible — only optional/experimental modes live here.
 export const OPTIONAL_MODES = [
   { id: "swish", label: "Swish", emoji: "⚡", description: "Race to 500 — lowest total wins." },
+  { id: "ginrummy", label: "Gin Rummy", emoji: "🎴", description: "Race to 100 — highest total wins." },
+  { id: "hotdice", label: "Hot Dice", emoji: "🎲", description: "Race to 10,000 — highest total wins." },
+  { id: "phase10", label: "Phase 10", emoji: "🃏", description: "Complete all 10 phases — lowest total wins." },
 ];
 
-const DEFAULTS = OPTIONAL_MODES.reduce((acc, m) => ({ ...acc, [m.id]: true }), {});
+// Optional modes ship OFF by default — users opt in from Settings → Game Modes.
+const DEFAULTS = OPTIONAL_MODES.reduce((acc, m) => ({ ...acc, [m.id]: false }), {});
 
 function readToggles() {
   try {

@@ -4,6 +4,8 @@
 // emoji: string                         (rendered via FluentEmoji in the UI)
 export const GAME_MODES = {
   ginrummy: { label: "Gin Rummy",  emoji: "🎴", direction: "high",   targetScore: 100 },
+  hotdice:  { label: "Hot Dice",   emoji: "🎲", direction: "high",   targetScore: 10000 },
+  phase10:  { label: "Phase 10",   emoji: "🃏", direction: "low",    targetScore: null },
   swish:    { label: "Swish",      emoji: "⚡", direction: "low",    targetScore: 500 },
   low:      { label: "Low Score",  emoji: "📉", direction: "low",    targetScore: null },
   high:     { label: "High Score", emoji: "📈", direction: "high",   targetScore: null },

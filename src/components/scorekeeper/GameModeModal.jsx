@@ -10,6 +10,9 @@ import { useGameModeToggles } from "@/lib/useGameModeToggles";
 // `optional: true` means the mode can be hidden via Settings → Game Modes.
 const MODES = [
   { value: "swish", label: "Swish", emoji: "⚡", optional: true },
+  { value: "ginrummy", label: "Gin Rummy", emoji: "🎴", optional: true },
+  { value: "hotdice", label: "Hot Dice", emoji: "🎲", optional: true },
+  { value: "phase10", label: "Phase 10", emoji: "🃏", optional: true },
   { value: "low", label: "Low Score", emoji: "📉" },
   { value: "high", label: "High Score", emoji: "📈" },
   { value: "bestof", label: "Best Of", emoji: "🏆" },
@@ -20,7 +23,11 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
   const visibleModes = MODES.filter((m) => !m.optional || toggles[m.value] !== false);
 
   const [mode, setMode] = useState(winMode || visibleModes[0]?.value || "high");
-  const [target, setTarget] = useState(targetScore ? String(targetScore) : "");
+  // Only seed the target input for high/low, which actually use it. Locked
+  // modes (swish/ginrummy/hotdice) carry a targetScore that shouldn't leak in
+  // as a pre-filled value when the user switches to high/low.
+  const seedTarget = (winMode === "high" || winMode === "low") && targetScore ? String(targetScore) : "";
+  const [target, setTarget] = useState(seedTarget);
 
   useEffect(() => {
     if (isOpen) {
@@ -28,7 +35,7 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
       // to the first visible mode so the picker never shows an empty selection.
       const stillVisible = visibleModes.some((m) => m.value === winMode);
       setMode(stillVisible ? winMode : (visibleModes[0]?.value || "high"));
-      setTarget(targetScore ? String(targetScore) : "");
+      setTarget(seedTarget);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, winMode, targetScore]);
@@ -40,6 +47,16 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
   const handleDone = () => {
     if (mode === "swish") {
       onSelect("swish", 500);
+      onClose();
+      return;
+    }
+    if (mode === "ginrummy") {
+      onSelect("ginrummy", 100);
+      onClose();
+      return;
+    }
+    if (mode === "hotdice") {
+      onSelect("hotdice", 10000);
       onClose();
       return;
     }

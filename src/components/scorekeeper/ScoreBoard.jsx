@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { UserPlus, RotateCcw } from "lucide-react";
+import { UserPlus, RotateCcw, Flag, Bookmark } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { db } from "@/lib/store";
-import SlideToEndGame from "./SlideToEndGame";
 import PlayerColumn from "./PlayerColumn";
 import ScoreInputModal from "./ScoreInputModal";
 import PlayerEditModal from "./PlayerEditModal";
@@ -34,7 +33,6 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [showPauseModal, setShowPauseModal] = useState(false);
   const [view, setView] = useState("board"); // "board" | "rounds"
   const [previousView, setPreviousView] = useState("board");
-  const [slideRevealed, setSlideRevealed] = useState(false);
   const scrollContainerRef = useRef(null);
   const scoreCloseTimerRef = useRef(null);
   const endGameTimerRef = useRef(null);
@@ -421,67 +419,34 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           )}
         </AnimatePresence>
 
-        {/* End Game — fixed at bottom of scoreboard. Shows a subtle "End game
-            early?" button by default; tapping it swaps in the slide-to-confirm
-            control (harder to trigger accidentally). */}
+        {/* Bottom action bar — two equal halves hugging the bottom edge. Left
+            ends the game (opens the results/confirm modal), right pauses it.
+            Slides down out of view while any modal is open. */}
         <motion.div
-          className="absolute inset-x-0 bottom-0 z-30 flex justify-center items-end"
-          animate={{
-            y: slideControlHidden ? 120 : 0,
-          }}
+          className="absolute inset-x-0 bottom-0 z-30"
+          animate={{ y: slideControlHidden ? 140 : 0 }}
           transition={SPRING_SHEET}
-          style={{
-            paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)",
-            paddingLeft: 48,
-            paddingRight: 48,
-            pointerEvents: slideControlHidden ? "none" : "auto",
-            minHeight: 72,
-          }}>
+          style={{ pointerEvents: slideControlHidden ? "none" : "auto" }}>
 
-          <AnimatePresence mode="wait" initial={false}>
-            {slideRevealed ? (
-              <motion.div
-                key="slide"
-                initial={{ y: 80, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 80, opacity: 0 }}
-                transition={SPRING_SHEET}
-                className="w-full"
-                onAnimationComplete={() => {
-                  // Auto-collapse back to the subtle button if the user
-                  // doesn't slide within a short window
-                  if (endGameTimerRef.current) clearTimeout(endGameTimerRef.current);
-                  endGameTimerRef.current = setTimeout(() => setSlideRevealed(false), 5000);
-                }}
-              >
-                <SlideToEndGame onComplete={() => setShowEndGame(true)} />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="reveal"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 20, opacity: 0 }}
-                transition={SPRING_SHEET}
-                className="flex items-center gap-2"
-              >
-                <button
-                  onClick={() => setSlideRevealed(true)}
-                  className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full border border-border"
-                  style={{ padding: "4px 8px" }}
-                >
-                  End game early?
-                </button>
-                <button
-                  onClick={() => setShowPauseModal(true)}
-                  className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full border border-border"
-                  style={{ padding: "4px 8px" }}
-                >
-                  Pause for later
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div
+            className="flex items-stretch border-t border-border"
+            style={{ backgroundColor: "hsl(var(--card))", paddingBottom: "env(safe-area-inset-bottom)" }}>
+            <button
+              onClick={() => setShowEndGame(true)}
+              className="flex-1 flex items-center justify-center gap-2 font-semibold text-foreground hover:bg-accent active:bg-accent/80 transition-colors"
+              style={{ paddingTop: 16, paddingBottom: 16, fontSize: 14 }}>
+              <Flag size={16} strokeWidth={2.5} />
+              End
+            </button>
+            <div className="w-px bg-border" />
+            <button
+              onClick={() => setShowPauseModal(true)}
+              className="flex-1 flex items-center justify-center gap-2 font-semibold text-foreground hover:bg-accent active:bg-accent/80 transition-colors"
+              style={{ paddingTop: 16, paddingBottom: 16, fontSize: 14 }}>
+              <Bookmark size={16} strokeWidth={2.5} />
+              Save
+            </button>
+          </div>
         </motion.div>
       </div>
 

@@ -37,6 +37,7 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
   const [tab, setTab] = useState("games"); // "games" | "stats"
   const [previousTab, setPreviousTab] = useState("games");
   const [selectedGameId, setSelectedGameId] = useState(null);
+  const [savedToDelete, setSavedToDelete] = useState(null); // saved game pending delete confirmation
   const scrollRef = useRef(null);
   const touchStartY = useRef(null);
   const didInitTab = useRef(false);
@@ -142,8 +143,8 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
   // Update parent when modal / detail view opens/closes — hides the bottom
   // nav bar so the detail view feels full-screen.
   useEffect(() => {
-    onModalChange?.(showConfirm || selectedGameId !== null);
-  }, [showConfirm, selectedGameId, onModalChange]);
+    onModalChange?.(showConfirm || selectedGameId !== null || savedToDelete !== null);
+  }, [showConfirm, selectedGameId, savedToDelete, onModalChange]);
 
   const selectedGame = selectedGameId !== null ? games.find((g) => g.id === selectedGameId) : null;
 
@@ -261,7 +262,7 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
                   <SavedGamesList
                     savedGames={savedGames}
                     onResume={onResumeGame}
-                    onDelete={deleteSavedGame}
+                    onDelete={(id) => setSavedToDelete(savedGames.find((g) => g.id === id) || null)}
                   />
                 ) : (
                   <div className="flex flex-col items-center text-center py-16" style={{ gap: 12 }}>
@@ -472,6 +473,31 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
               className="flex-1 h-11 font-semibold bg-accent-red hover:bg-accent-red/90 text-white"
             >
               {clearing ? "Clearing..." : "Yes, Clear All"}
+            </Button>
+          </div>
+        }
+      />
+
+      {/* Delete-saved-game confirmation */}
+      <BottomSheetModal
+        isOpen={savedToDelete !== null}
+        onClose={() => setSavedToDelete(null)}
+        icon={<AlertTriangle size={32} strokeWidth={2} />}
+        title="Delete Saved Game?"
+        description={savedToDelete ? `"${savedToDelete.name}" will be permanently deleted. This cannot be undone.` : ""}
+        footer={
+          <div className="flex gap-3">
+            <Button onClick={() => setSavedToDelete(null)} variant="outline" className="flex-1 h-11">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (savedToDelete) deleteSavedGame(savedToDelete.id);
+                setSavedToDelete(null);
+              }}
+              className="flex-1 h-11 font-semibold bg-accent-red hover:bg-accent-red/90 text-white"
+            >
+              Yes, Delete
             </Button>
           </div>
         }

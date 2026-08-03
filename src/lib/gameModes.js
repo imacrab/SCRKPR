@@ -6,6 +6,7 @@ export const GAME_MODES = {
   ginrummy: { label: "Gin Rummy",  emoji: "🎴", direction: "low",    targetScore: 100 },
   hotdice:  { label: "Hot Dice",   emoji: "🎲", direction: "high",   targetScore: 10000 },
   phase10:  { label: "Phase 10",   emoji: "🃏", direction: "low",    targetScore: null },
+  skipbo:   { label: "Skip-Bo",    emoji: "🔢", direction: "high",   targetScore: 500 },
   swish:    { label: "Swish",      emoji: "⚡", direction: "low",    targetScore: 500 },
   low:      { label: "Low Score",  emoji: "📉", direction: "low",    targetScore: null },
   high:     { label: "High Score", emoji: "📈", direction: "high",   targetScore: null },

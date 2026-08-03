@@ -13,6 +13,7 @@ const MODES = [
   { value: "ginrummy", label: "Gin Rummy", emoji: "🎴", optional: true },
   { value: "hotdice", label: "Hot Dice", emoji: "🎲", optional: true },
   { value: "phase10", label: "Phase 10", emoji: "🃏", optional: true },
+  { value: "skipbo", label: "Skip-Bo", emoji: "🔢", optional: true },
   { value: "low", label: "Low Score", emoji: "📉" },
   { value: "high", label: "High Score", emoji: "📈" },
   { value: "bestof", label: "Best Of", emoji: "🏆" },
@@ -57,6 +58,11 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
     }
     if (mode === "hotdice") {
       onSelect("hotdice", 10000);
+      onClose();
+      return;
+    }
+    if (mode === "skipbo") {
+      onSelect("skipbo", 500);
       onClose();
       return;
     }

@@ -13,6 +13,7 @@ export const OPTIONAL_MODES = [
   { id: "ginrummy", label: "Gin Rummy", emoji: "🎴", description: "Race to 100 — lowest total wins." },
   { id: "hotdice", label: "Hot Dice", emoji: "🎲", description: "Race to 10,000 — highest total wins." },
   { id: "phase10", label: "Phase 10", emoji: "🃏", description: "Complete all 10 phases — lowest total wins." },
+  { id: "skipbo", label: "Skip-Bo", emoji: "🔢", description: "Race to 500 — highest total wins." },
 ];
 
 // Optional modes ship OFF by default — users opt in from Settings → Game Modes.

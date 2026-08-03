@@ -10,7 +10,8 @@ import EndGameModal from "./EndGameModal";
 import ResetConfirmModal from "./ResetConfirmModal";
 import ScoreHistoryPanel from "./ScoreHistoryPanel";
 import StretchTabPill from "./StretchTabPill";
-import { isLowMode, isCircleMode } from "@/lib/gameModes";
+import PauseGameModal from "./PauseGameModal";
+import { isLowMode, isCircleMode, getModeMeta } from "@/lib/gameModes";
 import { SPRING_SHEET, TRANSITION_PANEL } from "@/lib/motion";
 import { primeIOSKeyboard } from "@/lib/iosKeyboardPrimer";
 import logoDark from "@/assets/scrkpr-logo.svg";
@@ -20,7 +21,7 @@ const SCOREBOARD_TABS = [
   { id: "rounds", label: "Rounds" },
 ];
 
-export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, addPlayerModalOpen = false, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame, onModalChange }) {
+export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, addPlayerModalOpen = false, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame, onPauseGame, onModalChange }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [scoreModalOpen, setScoreModalOpen] = useState(false);
   const [streakMap, setStreakMap] = useState({});
@@ -30,6 +31,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [showEndGame, setShowEndGame] = useState(false);
   const [endingGame, setEndingGame] = useState(false);
+  const [showPauseModal, setShowPauseModal] = useState(false);
   const [view, setView] = useState("board"); // "board" | "rounds"
   const [previousView, setPreviousView] = useState("board");
   const [slideRevealed, setSlideRevealed] = useState(false);
@@ -45,8 +47,8 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   }, []);
 
   useEffect(() => {
-    onModalChange?.(scoreModalOpen || showResetConfirm || showEndGame || addPlayerModalOpen || !!editingPlayer);
-  }, [scoreModalOpen, showResetConfirm, showEndGame, addPlayerModalOpen, editingPlayer, onModalChange]);
+    onModalChange?.(scoreModalOpen || showResetConfirm || showEndGame || showPauseModal || addPlayerModalOpen || !!editingPlayer);
+  }, [scoreModalOpen, showResetConfirm, showEndGame, showPauseModal, addPlayerModalOpen, editingPlayer, onModalChange]);
 
   useEffect(() => {
     return () => onModalChange?.(false);
@@ -280,7 +282,11 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     }, 430);
   };
 
-  const slideControlHidden = showEndGame || scoreModalOpen || showResetConfirm || addPlayerModalOpen;
+  const slideControlHidden = showEndGame || scoreModalOpen || showResetConfirm || addPlayerModalOpen || showPauseModal;
+
+  // Default name offered in the pause sheet — mode + short date, e.g.
+  // "Skip-Bo · Aug 3". The user can overwrite it.
+  const defaultPauseName = `${getModeMeta(winMode).label} · ${new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 
 
 
@@ -451,18 +457,29 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
                 <SlideToEndGame onComplete={() => setShowEndGame(true)} />
               </motion.div>
             ) : (
-              <motion.button
+              <motion.div
                 key="reveal"
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 20, opacity: 0 }}
                 transition={SPRING_SHEET}
-                onClick={() => setSlideRevealed(true)}
-                className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full border border-border"
-                style={{ padding: "4px 8px" }}
+                className="flex items-center gap-2"
               >
-                End game early?
-              </motion.button>
+                <button
+                  onClick={() => setSlideRevealed(true)}
+                  className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full border border-border"
+                  style={{ padding: "4px 8px" }}
+                >
+                  End game early?
+                </button>
+                <button
+                  onClick={() => setShowPauseModal(true)}
+                  className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full border border-border"
+                  style={{ padding: "4px 8px" }}
+                >
+                  Pause for later
+                </button>
+              </motion.div>
             )}
           </AnimatePresence>
         </motion.div>
@@ -502,7 +519,14 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           if (endingGame) return;
           setShowEndGame(false);
         }} />
-      
+
+
+      <PauseGameModal
+        isOpen={showPauseModal}
+        defaultName={defaultPauseName}
+        onSave={(name) => onPauseGame?.(name)}
+        onClose={() => setShowPauseModal(false)} />
+
     </div>);
 
 }

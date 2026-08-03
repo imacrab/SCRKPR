@@ -18,6 +18,7 @@ export const SYNC_ENABLED = false;
 
 const PLAYERS_KEY = "scrkpr_players";
 const GAMES_KEY = "scrkpr_games";
+const SAVED_GAMES_KEY = "scrkpr_saved_games";
 
 function read(key) {
   try {
@@ -114,10 +115,31 @@ export const db = {
     },
   },
 
+  // Paused/in-progress games the user saved to resume later. Unlike `games`
+  // (completed, aggregated results) these hold the FULL live state — each
+  // player's `scores` array plus win_mode / best_of / target_score — so a game
+  // can be restored exactly where it left off.
+  savedGames: {
+    async list(order = "-saved_at", limit) {
+      return listFrom(SAVED_GAMES_KEY, order, limit);
+    },
+    async create(data) {
+      const record = { id: newId(), ...data };
+      const rows = read(SAVED_GAMES_KEY);
+      write(SAVED_GAMES_KEY, [record, ...rows]);
+      return record;
+    },
+    async delete(id) {
+      write(SAVED_GAMES_KEY, read(SAVED_GAMES_KEY).filter((g) => g.id !== id));
+      return true;
+    },
+  },
+
   // Wipe everything stored on this device (used by Account Settings).
   async clearAll() {
     write(PLAYERS_KEY, []);
     write(GAMES_KEY, []);
+    write(SAVED_GAMES_KEY, []);
     return true;
   },
 };

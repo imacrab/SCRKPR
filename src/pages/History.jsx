@@ -16,15 +16,18 @@ import HistoryStats from "@/components/scorekeeper/HistoryStats";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 import StretchTabPill from "@/components/scorekeeper/StretchTabPill";
 import HistoryGameDetail from "@/components/scorekeeper/HistoryGameDetail";
+import SavedGamesList from "@/components/scorekeeper/SavedGamesList";
 import { TRANSITION_PANEL, SPRING_SNAPPY } from "@/lib/motion";
 
 const HISTORY_TABS = [
   { id: "games", label: "Games" },
+  { id: "saved", label: "Saved" },
   { id: "stats", label: "Stats" },
 ];
 
-export default function History({ onBack, onModalChange }) {
+export default function History({ onBack, onResumeGame, onModalChange }) {
   const [games, setGames] = useState([]);
+  const [savedGames, setSavedGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
@@ -36,12 +39,17 @@ export default function History({ onBack, onModalChange }) {
   const [selectedGameId, setSelectedGameId] = useState(null);
   const scrollRef = useRef(null);
   const touchStartY = useRef(null);
+  const didInitTab = useRef(false);
   const PULL_THRESHOLD = 64;
 
   const fetchGames = useCallback(async () => {
     try {
-      const data = await db.games.list("-played_at", 50);
-      setGames(data);
+      const [completed, saved] = await Promise.all([
+        db.games.list("-played_at", 50),
+        db.savedGames.list("-saved_at", 50),
+      ]);
+      setGames(completed);
+      setSavedGames(saved);
     } catch (e) {
       console.error("Failed to load game history:", e);
     }
@@ -50,6 +58,27 @@ export default function History({ onBack, onModalChange }) {
   useEffect(() => {
     fetchGames().finally(() => setLoading(false));
   }, [fetchGames]);
+
+  // First load only: if there are saved games but no completed ones, open on
+  // the Saved tab so those games aren't hidden behind an empty Games tab.
+  useEffect(() => {
+    if (loading || didInitTab.current) return;
+    didInitTab.current = true;
+    if (games.length === 0 && savedGames.length > 0) {
+      setTab("saved");
+      setPreviousTab("saved");
+    }
+  }, [loading, games.length, savedGames.length]);
+
+  const deleteSavedGame = async (id) => {
+    const prev = savedGames;
+    setSavedGames((g) => g.filter((item) => item.id !== id));
+    try {
+      await db.savedGames.delete(id);
+    } catch {
+      setSavedGames(prev);
+    }
+  };
 
   const handleTouchStart = (e) => {
     if (scrollRef.current?.scrollTop === 0) {
@@ -146,14 +175,15 @@ export default function History({ onBack, onModalChange }) {
         </div>
       </div>
 
-      {/* Games / Stats tabs */}
-      {!loading && games.length > 0 && (
+      {/* Games / Saved / Stats tabs */}
+      {!loading && (games.length > 0 || savedGames.length > 0) && (
         <div className="px-5 pt-2 pb-2 flex-shrink-0">
           <div className="relative flex rounded-full bg-secondary border border-border p-1">
             <StretchTabPill
               activeIndex={activeTabIndex}
               previousIndex={previousTabIndex}
               onSettle={() => setPreviousTab(tab)}
+              count={HISTORY_TABS.length}
             />
             {HISTORY_TABS.map(({ id, label }) => {
               const active = tab === id;
@@ -196,7 +226,7 @@ export default function History({ onBack, onModalChange }) {
           <div className="flex items-center justify-center py-20">
             <div className="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
           </div> :
-          games.length === 0 ?
+          games.length === 0 && savedGames.length === 0 ?
           <div className="h-full flex flex-col items-center justify-center text-center px-5" style={{ gap: 20 }}>
             <FluentEmoji emoji="🙀" size={140} style={{ display: "block" }} />
             <div className="flex flex-col items-center" style={{ gap: 8 }}>
@@ -215,7 +245,31 @@ export default function History({ onBack, onModalChange }) {
                 exit={{ opacity: 0, x: 24 }}
                 transition={TRANSITION_PANEL}
               >
-                <HistoryStats games={games} />
+                {games.length > 0
+                  ? <HistoryStats games={games} />
+                  : <p className="text-center text-sm text-muted-foreground py-16">Finish a game to see stats here.</p>}
+              </motion.div>
+            ) : tab === "saved" ? (
+              <motion.div
+                key="saved"
+                initial={{ opacity: 0, x: 24 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 24 }}
+                transition={TRANSITION_PANEL}
+              >
+                {savedGames.length > 0 ? (
+                  <SavedGamesList
+                    savedGames={savedGames}
+                    onResume={onResumeGame}
+                    onDelete={deleteSavedGame}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center text-center py-16" style={{ gap: 12 }}>
+                    <FluentEmoji emoji="⏸️" size={72} style={{ display: "block" }} />
+                    <p className="text-white/70 text-base [font-family:'Geist',_sans-serif]">No saved games</p>
+                    <p className="text-white/50 text-sm [font-family:'Geist',_sans-serif] max-w-[240px]">Tap “Pause for later” during a game to save it here.</p>
+                  </div>
+                )}
               </motion.div>
             ) : (
             <motion.div
@@ -225,6 +279,9 @@ export default function History({ onBack, onModalChange }) {
               exit={{ opacity: 0, x: -24 }}
               transition={TRANSITION_PANEL}
             >
+            {games.length === 0 && (
+              <p className="text-center text-sm text-muted-foreground py-16">No completed games yet.</p>
+            )}
             <AnimatePresence>
             {games.map((game, gameIdx) => {
                 const isLowWin = isLowMode(game.win_mode);

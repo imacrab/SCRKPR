@@ -175,6 +175,49 @@ export default function ScoreKeeper() {
     navigate("/");
   }, [players, navigate, winMode]);
 
+  // Pause: stash the FULL live game (scores, mode, target) under a name so it
+  // can be resumed from History → Saved, then clear the board and go home.
+  const handlePauseGame = useCallback(async (name) => {
+    if (players.length === 0) return;
+    try {
+      await db.savedGames.create({
+        name: (name && name.trim()) || "Saved game",
+        saved_at: new Date().toISOString(),
+        win_mode: winMode,
+        best_of: bestOf,
+        target_score: targetScore,
+        players,
+      });
+    } catch (e) {
+      // Saving shouldn't strand the user on the board.
+      console.error("Failed to save game for later:", e);
+    }
+    clearGameState();
+    setPlayers([]);
+    setTargetScore(null);
+    navigate("/");
+  }, [players, winMode, bestOf, targetScore, navigate]);
+
+  // Resume a saved game: restore it as the active game, remove it from the
+  // saved list (it's live again), and jump to the board.
+  const handleResumeGame = useCallback(async (saved) => {
+    if (!saved || !Array.isArray(saved.players)) return;
+    const mode = saved.win_mode || "high";
+    const best = saved.best_of ?? null;
+    const target = saved.target_score ?? null;
+    saveGameState(saved.players, mode, best, target);
+    setPlayers(saved.players);
+    setWinMode(mode);
+    setBestOf(best);
+    setTargetScore(target);
+    try {
+      await db.savedGames.delete(saved.id);
+    } catch (e) {
+      console.error("Failed to remove resumed game from saved list:", e);
+    }
+    navigate("/game");
+  }, [navigate]);
+
   const handleAddScore = useCallback((playerId, score) => {
     setPlayers((prev) => {
       const next = prev.map((p) =>
@@ -252,7 +295,7 @@ export default function ScoreKeeper() {
       <div className="relative w-screen overflow-hidden" style={{ height: "100%" }}>
         {view === "/history" && (
           <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} className={pageClassName} style={{ height: "100%", paddingBottom: navHeight }}>
-            <History onBack={() => navigate(-1)} onModalChange={setNavHidden} />
+            <History onBack={() => navigate(-1)} onResumeGame={handleResumeGame} onModalChange={setNavHidden} />
           </motion.div>
         )}
 
@@ -295,6 +338,7 @@ export default function ScoreKeeper() {
               onEditEmoji={handleEditEmoji}
               onReset={handleReset}
               onEndGame={handleEndGame}
+              onPauseGame={handlePauseGame}
               onAddPlayer={() => setShowAddPlayer(true)}
               onModalChange={setNavHidden}
             />

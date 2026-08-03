@@ -72,6 +72,7 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
       eyebrow="Select"
       title="Game Mode"
       scrollable
+      avoidKeyboard
       footer={
         <Button
           onClick={handleDone}
@@ -113,6 +114,12 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
             inputMode="numeric"
             value={target}
             onChange={(e) => setTarget(e.target.value.replace(/[^0-9]/g, ""))}
+            onFocus={(e) => {
+              // Once the sheet has lifted above the keyboard, make sure the
+              // field is scrolled into view inside the sheet body.
+              const el = e.target;
+              setTimeout(() => el.scrollIntoView({ block: "center" }), 200);
+            }}
             placeholder="e.g. 500"
             className="mt-2 w-full h-12 rounded-xl bg-secondary border border-border px-4 text-foreground text-base placeholder:text-muted-foreground/40 focus:outline-none focus:border-accent-blue transition-colors"
           />

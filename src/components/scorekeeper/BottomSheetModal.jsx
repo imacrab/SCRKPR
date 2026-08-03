@@ -26,10 +26,12 @@ export default function BottomSheetModal({
   zIndex = 50,
   scrollable = false,
   fullHeight = false,
+  avoidKeyboard = false,
 }) {
   const dragControls = useDragControls();
   const [scrolled, setScrolled] = useState(false);
   const [shouldRender, setShouldRender] = useState(isOpen);
+  const [keyboardInset, setKeyboardInset] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
@@ -58,6 +60,29 @@ export default function BottomSheetModal({
     window.addEventListener("scroll", pin, { passive: true });
     return () => window.removeEventListener("scroll", pin);
   }, [isOpen]);
+
+  // Opt-in keyboard avoidance: when `avoidKeyboard` is set, lift the sheet to
+  // sit above the software keyboard so inputs near the bottom stay visible
+  // while typing. Uses the visualViewport API — the reliable cross-browser
+  // signal for keyboard height — rather than focus tracking. Modals whose
+  // inputs sit high (under the header) opt out and keep the overlay behavior.
+  useEffect(() => {
+    if (!isOpen || !avoidKeyboard) return undefined;
+    const vv = window.visualViewport;
+    if (!vv) return undefined;
+    const update = () => {
+      const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      setKeyboardInset(inset);
+    };
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+      setKeyboardInset(0);
+    };
+  }, [isOpen, avoidKeyboard]);
 
   const handleDragEnd = (_, info) => {
     if (info.offset.y > 120 || info.velocity.y > 500) {
@@ -101,17 +126,22 @@ export default function BottomSheetModal({
         className="fixed inset-x-0 bg-card border border-border rounded-sheet shadow-2xl flex flex-col"
         style={{
           zIndex,
-          bottom: "8px",
+          // Raised above the keyboard when avoidKeyboard is on (keyboardInset is
+          // always 0 otherwise, so this stays 8px for every other modal).
+          bottom: `calc(8px + ${keyboardInset}px)`,
           left: "8px",
           right: "8px",
           // Cap the sheet's top so it can't slide under the notch/dynamic island.
-          // We intentionally do NOT track the software keyboard here — letting
-          // the sheet stay put means the keyboard simply overlays it, matching
-          // native iOS sheet behavior.
-          maxHeight: `calc(100dvh - 56px - env(safe-area-inset-top))`,
+          // By default we do NOT track the software keyboard — letting the sheet
+          // stay put means the keyboard simply overlays it, matching native iOS
+          // sheet behavior. avoidKeyboard opts a modal into lifting instead, and
+          // the same inset shrinks maxHeight so the top never rides up under the
+          // notch.
+          maxHeight: `calc(100dvh - 56px - env(safe-area-inset-top) - ${keyboardInset}px)`,
           // fullHeight locks the sheet to that maxHeight so its size doesn't
           // change as inner content swaps (e.g. switching tabs) — prevents jump.
-          ...(fullHeight ? { height: `calc(100dvh - 56px - env(safe-area-inset-top))` } : {}),
+          ...(fullHeight ? { height: `calc(100dvh - 56px - env(safe-area-inset-top) - ${keyboardInset}px)` } : {}),
+          transition: "bottom 0.25s ease, max-height 0.25s ease",
         }}
       >
             {/* Drag handle + Header (both draggable) — border fades in once the body scrolls */}

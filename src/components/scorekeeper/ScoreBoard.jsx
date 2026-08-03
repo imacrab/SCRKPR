@@ -123,16 +123,17 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     return ranked[0].id;
   }, [players, winMode]);
 
-  // Low-score mode only: the player who scored the MOST in the previous
-  // completed round gets a 😭 flair — where "previous round" is the last round
-  // in which every player has logged a score. Independent of overall standing.
+  // Swish only: the player who scored the MOST in the previous completed round
+  // gets a 😭 flair — where "previous round" is the last round in which every
+  // player has logged a score. Independent of overall standing. Other low modes
+  // (Gin Rummy, Phase 10) intentionally don't get this flair.
   //
   // Tiebreaker: if 2+ players tie for the worst score of that round, walk BACK
   // through prior rounds — whoever had the higher score among the tied set in
   // the earliest earlier round that separates them keeps the flair. If every
   // prior round is also tied (or there are no prior rounds), no flair.
   const worstId = useMemo(() => {
-    if (!isLowMode(winMode)) return null;
+    if (winMode !== "swish") return null;
     const minRounds = players.reduce(
       (m, p) => Math.min(m, p.scores.length),
       Infinity

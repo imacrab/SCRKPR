@@ -5,7 +5,7 @@ import FluentEmoji from "./FluentEmoji";
 import { useGameModeToggles } from "@/lib/useGameModeToggles";
 
 // Generic scoring shapes. High/Low take an optional target score that ends the
-// game when anyone reaches it — e.g. Gin = High + 100, "Swish" = Low + 500
+// game when anyone reaches it — e.g. Gin = Low + 100, "Swish" = Low + 500
 // (first to 500 ends it, lowest total wins). Best Of asks for a round count next.
 // `optional: true` means the mode can be hidden via Settings → Game Modes.
 const MODES = [

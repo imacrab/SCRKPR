@@ -288,8 +288,12 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
 
 
 
+  // No bottom safe-area padding on the root — the bottom action bar hugs the
+  // true screen edge and fills the home-indicator inset with its own background
+  // (see its paddingBottom). Reserving it here too double-counted the inset and
+  // left a gap below the bar on notched devices.
   return (
-    <div className="w-screen flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
+    <div className="w-screen flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)" }}>
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-10 pb-5 flex-shrink-0" style={{ backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <button onClick={() => setShowEndGame(true)} className="hover:opacity-75 transition-opacity">
@@ -438,7 +442,6 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
               <Flag size={16} strokeWidth={2.5} />
               End
             </button>
-            <div className="w-px bg-border" />
             <button
               onClick={() => setShowPauseModal(true)}
               className="flex-1 flex items-center justify-center gap-2 font-semibold text-foreground hover:bg-accent active:bg-accent/80 transition-colors"

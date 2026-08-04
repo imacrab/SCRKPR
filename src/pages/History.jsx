@@ -459,7 +459,7 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
       <BottomSheetModal
         isOpen={showConfirm}
         onClose={() => !clearing && setShowConfirm(false)}
-        icon={<AlertTriangle size={32} strokeWidth={2} />}
+        icon={<AlertTriangle size={32} strokeWidth={2} className="text-accent-red" />}
         title="Clear All Games?"
         description={`This will permanently delete all ${games.length} game record${games.length !== 1 ? "s" : ""}. This cannot be undone.`}
         footer={
@@ -482,7 +482,7 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
       <BottomSheetModal
         isOpen={savedToDelete !== null}
         onClose={() => setSavedToDelete(null)}
-        icon={<AlertTriangle size={32} strokeWidth={2} />}
+        icon={<AlertTriangle size={32} strokeWidth={2} className="text-accent-red" />}
         title="Delete Saved Game?"
         description={savedToDelete ? `"${savedToDelete.name}" will be permanently deleted. This cannot be undone.` : ""}
         footer={

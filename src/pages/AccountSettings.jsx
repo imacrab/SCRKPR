@@ -153,7 +153,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
       <BottomSheetModal
         isOpen={showConfirm}
         onClose={() => !clearing && setShowConfirm(false)}
-        icon={<AlertTriangle size={32} strokeWidth={2} />}
+        icon={<AlertTriangle size={32} strokeWidth={2} className="text-accent-red" />}
         title="Clear All Data?"
         description="This will permanently delete all saved players and game history from this device. This cannot be undone."
         footer={

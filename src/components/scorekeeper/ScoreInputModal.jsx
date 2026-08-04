@@ -34,7 +34,9 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
   }, [isOpen, player?.id, editingIndex]);
 
   const handleSubmit = () => {
-    const num = parseFloat(value);
+    // An empty pad reads as "0" on screen, so submitting it logs 0 — this is
+    // how you close a round for a player who scored nothing (e.g. Gin Rummy).
+    const num = value === "" ? 0 : parseFloat(value);
     if (isNaN(num)) return;
     onSubmit(num);
     setValue("");
@@ -43,7 +45,9 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
   const displayPlayer = player || renderedPlayer.current;
   const displayEditingIndex = player ? editingIndex : renderedEditingIndex.current;
   const isEditing = displayEditingIndex !== null && displayEditingIndex !== undefined;
-  const isValid = value !== "" && value !== "-" && !isNaN(parseFloat(value));
+  // Empty is valid — it submits 0 (matches the "0" shown on the pad). Only a
+  // lone "-" or malformed input disables the button.
+  const isValid = value === "" || (value !== "-" && !isNaN(parseFloat(value)));
 
   if (!displayPlayer) return null;
 

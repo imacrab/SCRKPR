@@ -28,6 +28,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
   const [name, setName] = useState("");
   const [color, setColor] = useState(palette[0]);
   const [emoji, setEmoji] = useState("");
+  const [cardStyle, setCardStyle] = useState("solid"); // "solid" | "gradient"
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [styleTab, setStyleTab] = useState("color"); // "color" | "emoji"
   const [previousStyleTab, setPreviousStyleTab] = useState("color");
@@ -66,10 +67,12 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
       const needsLightening = tone === "light" && readableTextColor(stored) === "#FFFFFF";
       setColor(needsLightening ? toLightBg(stored) : stored);
       setEmoji(player.emoji || "");
+      setCardStyle(player.cardStyle === "gradient" ? "gradient" : "solid");
     } else {
       setName("");
       setColor(pickRandomUnused(palette, usedColors));
       setEmoji(pickRandomUnused(AUTOFILL_EMOJIS, usedEmojis));
+      setCardStyle("solid");
     }
     // Focus is handled by setInputRef synchronously on mount — see comment
     // above. Do not add a setTimeout here or iOS will drop the keyboard.
@@ -78,7 +81,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
   const handleSubmit = () => {
     const trimmed = name.trim();
     if (!trimmed) return;
-    onSave({ id: player?.id, name: trimmed, color, emoji });
+    onSave({ id: player?.id, name: trimmed, color, emoji, cardStyle });
   };
 
   return (
@@ -154,17 +157,53 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
 
           <div className="flex-1 min-h-0 overflow-y-auto">
             {styleTab === "color" ? (
-              <div className="grid grid-cols-5 gap-3 p-3 justify-items-center">
-                {palette.map((c) => (
-                  <button
-                    key={c}
-                    onPointerDown={(e) => { e.preventDefault(); setColor(c); }}
-                    className="w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-90"
-                    style={{ backgroundColor: c, color: readableTextColor(c), outline: color === c ? "2px solid hsl(var(--foreground))" : "none", outlineOffset: "2px" }}
-                  >
-                    {color === c && emoji ? <FluentEmoji emoji={emoji} size={24} /> : ""}
-                  </button>
-                ))}
+              <div className="p-3 space-y-4">
+                {/* Card style — Solid vs Gradient. Each tile previews the look
+                    using the currently-selected color, so the choice reads at a
+                    glance and updates live as a new swatch is picked. */}
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { id: "solid", label: "Solid" },
+                    { id: "gradient", label: "Gradient" },
+                  ].map(({ id, label }) => {
+                    const active = cardStyle === id;
+                    const previewStyle = id === "solid"
+                      ? { backgroundColor: color }
+                      : {
+                          background: `linear-gradient(150deg, ${color}40 0%, ${color}14 40%, hsl(var(--card)) 78%)`,
+                          border: `1px solid ${color}66`,
+                        };
+                    const labelColor = id === "solid" ? readableTextColor(color) : "hsl(var(--foreground))";
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onPointerDown={(e) => { e.preventDefault(); setCardStyle(id); }}
+                        className="relative h-14 rounded-xl overflow-hidden flex items-end p-2.5 transition-transform active:scale-95"
+                        style={{ ...previewStyle, outline: active ? "2px solid hsl(var(--foreground))" : "none", outlineOffset: "2px" }}
+                      >
+                        {id === "solid" && emoji && (
+                          <span className="absolute top-1.5 right-2 opacity-90"><FluentEmoji emoji={emoji} size={18} /></span>
+                        )}
+                        <span className="text-xs font-semibold" style={{ color: labelColor }}>{label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Color swatches */}
+                <div className="grid grid-cols-5 gap-3 justify-items-center">
+                  {palette.map((c) => (
+                    <button
+                      key={c}
+                      onPointerDown={(e) => { e.preventDefault(); setColor(c); }}
+                      className="w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-90"
+                      style={{ backgroundColor: c, color: readableTextColor(c), outline: color === c ? "2px solid hsl(var(--foreground))" : "none", outlineOffset: "2px" }}
+                    >
+                      {color === c && emoji ? <FluentEmoji emoji={emoji} size={24} /> : ""}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="pt-2">

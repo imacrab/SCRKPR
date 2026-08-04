@@ -19,7 +19,7 @@ const SCOREBOARD_TABS = [
   { id: "rounds", label: "Rounds" },
 ];
 
-export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, addPlayerModalOpen = false, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onEndGame, onPauseGame, onModalChange }) {
+export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, addPlayerModalOpen = false, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onEditCardStyle, onReset, onEndGame, onPauseGame, onModalChange }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [scoreModalOpen, setScoreModalOpen] = useState(false);
   const [streakMap, setStreakMap] = useState({});

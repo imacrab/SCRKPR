@@ -86,11 +86,21 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
     return `rgb(${r}, ${g}, ${b})`;
   }, [player.color]);
 
-  // WCAG 2.2 — pick text color that contrasts with the player's background
-  const textColor = useMemo(() => readableTextColor(player.color || "#000000"), [player.color]);
-  const isDarkText = textColor === "#111111";
-  const streakBg = isDarkText ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.25)";
-  const subtleText = isDarkText ? "rgba(17,17,17,0.65)" : "rgba(255,255,255,0.75)";
+  // Card look: "solid" (full-bleed player color) or "gradient" (a bordered card
+  // whose player color bleeds off the top-left and fades into the dark board —
+  // the same hero treatment as the Latest Game card in History).
+  const isGradient = player.cardStyle === "gradient";
+
+  // WCAG 2.2 — pick text color that contrasts with the player's SOLID background.
+  const solidTextColor = useMemo(() => readableTextColor(player.color || "#000000"), [player.color]);
+  // Gradient cards are mostly dark board, so their text/accents follow the
+  // dark-UI tokens instead of the per-color contrast; the total keeps the
+  // player color for a pop of identity.
+  const textColor = isGradient ? "hsl(var(--foreground))" : solidTextColor;
+  const totalColor = isGradient ? (player.color || "#FFFFFF") : solidTextColor;
+  const isDarkText = !isGradient && solidTextColor === "#111111";
+  const streakBg = isGradient ? "rgba(255,255,255,0.12)" : isDarkText ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.25)";
+  const subtleText = isGradient ? "hsl(var(--muted-foreground))" : isDarkText ? "rgba(17,17,17,0.65)" : "rgba(255,255,255,0.75)";
 
   return (
     <div className="flex flex-col rounded-xl overflow-hidden flex-1">
@@ -109,10 +119,19 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
         role="button"
         aria-label={`Add score for ${player.name}`}
         className="relative px-3 py-3 rounded-lg flex flex-col items-center flex-1 z-10 transition-all overflow-hidden cursor-pointer"
-        style={{
-          backgroundColor: bgTint,
-          borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))"
-        }}>
+        style={
+          isGradient
+            ? {
+                background: `linear-gradient(150deg, ${player.color}40 0%, ${player.color}14 40%, hsl(var(--card)) 78%)`,
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderColor: isHighlighted ? "hsl(var(--primary))" : `${player.color}66`,
+              }
+            : {
+                backgroundColor: bgTint,
+                borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))",
+              }
+        }>
 
         {/* Leader crown — flies between players when the lead changes (shared layoutId) */}
         <AnimatePresence>
@@ -257,7 +276,7 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
             className="flex-shrink-0"
             style={{ marginRight: 8 }}>
 
-            <AnimatedTotal value={total} color={textColor} />
+            <AnimatedTotal value={total} color={totalColor} />
           </div>
         </div>
       </div>

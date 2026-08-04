@@ -268,8 +268,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     }
   };
 
-  const handleAddPlayer = async ({ name, color, emoji }) => {
-    const created = await db.players.create({ name, color, emoji });
+  const handleAddPlayer = async ({ name, color, emoji, cardStyle }) => {
+    const created = await db.players.create({ name, color, emoji, cardStyle });
     setAllPlayers((prev) => [...(prev || []), created]);
     setSelectedIds((prev) => new Set([...prev, created.id]));
     setShowAddPlayer(false);

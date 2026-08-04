@@ -93,10 +93,22 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
   const subtleText = isDarkText ? "rgba(17,17,17,0.65)" : "rgba(255,255,255,0.75)";
 
   return (
-    <div className="flex flex-col rounded-xl overflow-hidden">
-      {/* Header — player color background */}
+    <div className="flex flex-col rounded-xl overflow-hidden flex-1">
+      {/* Header — player color background. flex-1 lets the card grow to fill its
+          row; content stays pinned to the top (justify-start). */}
       <div
-        className="relative px-3 py-3 rounded-lg flex flex-col items-center z-10 transition-all overflow-hidden"
+        onClick={onAddScore}
+        onContextMenu={(e) => {e.preventDefault();onEditPlayer?.();}}
+        onPointerDown={(e) => {
+          const timer = setTimeout(() => onEditPlayer?.(), 500);
+          const cancel = () => clearTimeout(timer);
+          e.currentTarget.addEventListener("pointerup", cancel, { once: true });
+          e.currentTarget.addEventListener("pointerleave", cancel, { once: true });
+          e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
+        }}
+        role="button"
+        aria-label={`Add score for ${player.name}`}
+        className="relative px-3 py-3 rounded-lg flex flex-col items-center flex-1 z-10 transition-all overflow-hidden cursor-pointer"
         style={{
           backgroundColor: bgTint,
           borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))"
@@ -147,7 +159,10 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
           className="absolute pointer-events-none select-none"
           style={{
             left: -12,
-            top: "50%",
+            // Anchored to the top of the card (aligned with the name row) so it
+            // rides with the content as the card grows, rather than floating in
+            // the middle.
+            top: "40px",
             transform: "rotate(-20deg) translateY(-50%)",
             opacity: 0.95,
             // Soft shadow lifts the emoji off the vivid card color (separation,
@@ -189,20 +204,11 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
         }
 
         <div className="relative z-10 flex items-center justify-between w-full gap-1">
-          {/* Name (left) — tap to open score modal, long-press to edit player */}
-          <button
-            onClick={onAddScore}
-            onContextMenu={(e) => {e.preventDefault();onEditPlayer?.();}}
-            onPointerDown={(e) => {
-              const timer = setTimeout(() => onEditPlayer?.(), 500);
-              const cancel = () => clearTimeout(timer);
-              e.currentTarget.addEventListener("pointerup", cancel, { once: true });
-              e.currentTarget.addEventListener("pointerleave", cancel, { once: true });
-              e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
-            }}
+          {/* Name (left) — display only; the whole card handles tap/long-press */}
+          <div
             className="flex-1 flex flex-col items-start gap-1 min-w-0 text-left"
             style={{ marginLeft: isBestOf ? 8 : 68 }}>
-            
+
             <div className="flex items-center gap-2 w-full min-w-0">
               <span className="font-bold truncate leading-tight text-xl" title={player.name} style={{ color: textColor }}>
                 {player.name}
@@ -244,17 +250,15 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
               }
             </div>
             }
-          </button>
+          </div>
 
-          {/* Total — tap to open score modal */}
-          <button
-            onClick={onAddScore}
+          {/* Total (right) — display only; the whole card handles the tap */}
+          <div
             className="flex-shrink-0"
-            style={{ marginRight: 8 }}
-            aria-label={`Add score for ${player.name}`}>
-            
+            style={{ marginRight: 8 }}>
+
             <AnimatedTotal value={total} color={textColor} />
-          </button>
+          </div>
         </div>
       </div>
 

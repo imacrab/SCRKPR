@@ -350,14 +350,6 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
 
       {/* Rows — one player per row, sorted by total */}
       <div className="flex-1 px-4 pb-4 overflow-hidden w-full relative">
-        {/* Bottom fade — players that scroll near the End Game button fade out */}
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-20"
-          style={{
-            height: "120px",
-            background: "linear-gradient(to top, hsl(var(--background)) 30%, hsl(var(--background) / 0) 100%)"
-          }} />
-        
         <AnimatePresence mode="wait" initial={false}>
           {view === "rounds" ? (
             <motion.div
@@ -382,7 +374,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
               <div
                 ref={scrollContainerRef}
                 className="flex flex-col h-full gap-2 w-full overflow-y-auto relative z-0"
-                style={{ WebkitOverflowScrolling: "touch", paddingBottom: "calc(env(safe-area-inset-bottom) + 120px)" }}>
+                style={{ WebkitOverflowScrolling: "touch", paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)" }}>
                 <LayoutGroup>
                   {sortedPlayers.map((player, idx) =>
                   <motion.div
@@ -396,7 +388,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
                       scale: { ...SPRING_SHEET, delay: idx * 0.07 },
                       opacity: { duration: 0.25, delay: idx * 0.07 },
                     }}
-                    className="w-full flex-shrink-0">
+                    className="w-full flex-1 min-h-[72px] flex flex-col">
 
                       <PlayerColumn
                       player={player}

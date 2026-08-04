@@ -214,20 +214,22 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
       <div className="flex-1 relative overflow-hidden">
         {/* Top fade */}
         {canScroll && <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />}
-        {/* Bottom fade — sits flush on top of the tab bar (56px + safe area) so
-            the list dissolves into it instead of ending on a hard edge with a
-            dead gap of background above the bar. */}
+        {/* Bottom fade — sits flush on top of the 56px tab bar so the list
+            dissolves into it instead of ending on a hard edge. The offset is
+            just 56px (NOT + safe-area): this wrapper already sits inside the
+            root's paddingBottom: safe-area, so adding it again double-counts
+            and floats the fade above the bar on notched devices. */}
         {canScroll && (
           <div
             className="absolute inset-x-0 h-8 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none"
-            style={{ bottom: "calc(56px + env(safe-area-inset-bottom))" }}
+            style={{ bottom: "56px" }}
           />
         )}
 
         <div
           ref={scrollRef}
           className="h-full overflow-y-auto px-5 py-4"
-          style={{ paddingBottom: "calc(56px + 16px + 16px + env(safe-area-inset-bottom))" }}
+          style={{ paddingBottom: "calc(56px + 16px + 16px)" }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}>
@@ -255,9 +257,17 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
                 exit={{ opacity: 0, x: 24 }}
                 transition={TRANSITION_PANEL}
               >
-                {games.length > 0
-                  ? <HistoryStats games={games} />
-                  : <p className="text-center text-sm text-muted-foreground py-16">Finish a game to see stats here.</p>}
+                {games.length > 0 ? (
+                  <HistoryStats games={games} />
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-center px-5" style={{ gap: 20, minHeight: "55vh" }}>
+                    <FluentEmoji emoji="📊" size={140} style={{ display: "block" }} />
+                    <div className="flex flex-col items-center" style={{ gap: 8 }}>
+                      <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No stats yet</p>
+                      <p className="text-white/60 text-base [font-family:'Geist',_sans-serif]">Finish a game to see your stats here</p>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             ) : tab === "saved" ? (
               <motion.div
@@ -274,10 +284,12 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
                     onDelete={(id) => setSavedToDelete(savedGames.find((g) => g.id === id) || null)}
                   />
                 ) : (
-                  <div className="flex flex-col items-center text-center py-16" style={{ gap: 12 }}>
-                    <FluentEmoji emoji="⏸️" size={72} style={{ display: "block" }} />
-                    <p className="text-white/70 text-base [font-family:'Geist',_sans-serif]">No saved games</p>
-                    <p className="text-white/50 text-sm [font-family:'Geist',_sans-serif] max-w-[240px]">Tap “Pause for later” during a game to save it here.</p>
+                  <div className="flex flex-col items-center justify-center text-center px-5" style={{ gap: 20, minHeight: "55vh" }}>
+                    <FluentEmoji emoji="🔖" size={140} style={{ display: "block" }} />
+                    <div className="flex flex-col items-center" style={{ gap: 8 }}>
+                      <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No saved games</p>
+                      <p className="text-white/60 text-base [font-family:'Geist',_sans-serif]">Tap the bookmark icon during a game to save it here</p>
+                    </div>
                   </div>
                 )}
               </motion.div>
@@ -290,7 +302,13 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
               transition={TRANSITION_PANEL}
             >
             {games.length === 0 && (
-              <p className="text-center text-sm text-muted-foreground py-16">No completed games yet.</p>
+              <div className="flex flex-col items-center justify-center text-center px-5" style={{ gap: 20, minHeight: "55vh" }}>
+                <FluentEmoji emoji="🏆" size={140} style={{ display: "block" }} />
+                <div className="flex flex-col items-center" style={{ gap: 8 }}>
+                  <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No completed games yet</p>
+                  <p className="text-white/60 text-base [font-family:'Geist',_sans-serif]">Finish a game and it'll show up here</p>
+                </div>
+              </div>
             )}
             <AnimatePresence>
             {games.map((game, gameIdx) => {

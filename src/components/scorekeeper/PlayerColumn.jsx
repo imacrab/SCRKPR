@@ -5,7 +5,7 @@ import { readableTextColor } from "@/lib/contrast";
 import FluentEmoji from "./FluentEmoji";
 import { SPRING_POP, SPRING_POP_SNAPPY, SPRING_SNAPPY, TRANSITION_SLIDE_OUT } from "@/lib/motion";
 
-function AnimatedTotal({ value, color }) {
+function AnimatedTotal({ value, color, sizeClass = "text-3xl" }) {
   const [displayValue, setDisplayValue] = useState(value);
   const [animKey, setAnimKey] = useState(0);
   const [isResetting, setIsResetting] = useState(false);
@@ -46,7 +46,7 @@ function AnimatedTotal({ value, color }) {
     // player card instead (the card header has overflow-hidden). This gives
     // the digit a full runway: the old value slides up and fades out the top,
     // the new value rises in from below.
-    <span className="font-bold leading-none block text-3xl relative" style={{ color, opacity: isResetting ? 0.7 : 1, height: "1em", minWidth: "1ch" }}>
+    <span className={`font-bold leading-none block ${sizeClass} relative`} style={{ color, opacity: isResetting ? 0.7 : 1, height: "1em", minWidth: "1ch" }}>
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
           key={animKey}
@@ -63,7 +63,7 @@ function AnimatedTotal({ value, color }) {
 
 }
 
-export default function PlayerColumn({ player, isLeader = false, isWorst = false, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, scoredThisRound = false, onAddScore, onEditScore, onEditPlayer }) {
+export default function PlayerColumn({ player, isLeader = false, isWorst = false, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, scoredThisRound = false, playerCount = 0, onAddScore, onEditScore, onEditPlayer }) {
   // If the leader is also somehow the worst (single player, everyone tied on 0
   // — edge cases only), the crying emoji wins and the crown is suppressed.
   const showLeader = isLeader && !isWorst;
@@ -102,6 +102,17 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
   const streakBg = isGradient ? "rgba(255,255,255,0.12)" : isDarkText ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.25)";
   const subtleText = isGradient ? "hsl(var(--muted-foreground))" : isDarkText ? "rgba(17,17,17,0.65)" : "rgba(255,255,255,0.75)";
 
+  // Roomy mode: with 4 or fewer players the cards are tall, so lean into the
+  // real estate — vertically center the content, enlarge the emoji flourish,
+  // and scale up the name/score. Everything keys off the player count so the
+  // treatment eases back as more players (shorter cards) join.
+  const spacious = playerCount > 0 && playerCount <= 4;
+  const flourishSize = !spacious ? 96 : playerCount <= 2 ? 150 : playerCount === 3 ? 126 : 108;
+  const flourishSlide = flourishSize + 8; // travel far enough to fully clear on the swap
+  const nameSize = !spacious ? "text-xl" : playerCount <= 2 ? "text-3xl" : "text-2xl";
+  const totalSize = !spacious ? "text-3xl" : playerCount <= 2 ? "text-5xl" : "text-4xl";
+  const nameGutter = isBestOf ? 8 : !spacious ? 68 : playerCount <= 2 ? 96 : playerCount === 3 ? 84 : 76;
+
   return (
     <div className="flex flex-col rounded-xl overflow-hidden flex-1">
       {/* Header — player color background. flex-1 lets the card grow to fill its
@@ -118,7 +129,7 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
         }}
         role="button"
         aria-label={`Add score for ${player.name}`}
-        className="relative px-3 py-3 rounded-lg flex flex-col items-center flex-1 z-10 transition-all overflow-hidden cursor-pointer"
+        className={`relative px-3 py-3 rounded-lg flex flex-col items-center flex-1 z-10 transition-all overflow-hidden cursor-pointer ${spacious ? "justify-center" : ""}`}
         style={
           isGradient
             ? {
@@ -178,10 +189,10 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
           className="absolute pointer-events-none select-none"
           style={{
             left: -12,
-            // Anchored to the top of the card (aligned with the name row) so it
-            // rides with the content as the card grows, rather than floating in
-            // the middle.
-            top: "40px",
+            // Normally anchored near the top (aligned with the name row) so it
+            // rides with the content as the card grows. In roomy mode the
+            // content is vertically centered, so the flourish centers with it.
+            top: spacious ? "50%" : "40px",
             transform: "rotate(-20deg) translateY(-50%)",
             opacity: 0.95,
             // Soft shadow lifts the emoji off the vivid card color (separation,
@@ -196,25 +207,25 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
                 // capture, slides back up and out when the round resets.
                 <motion.div
                   key="check"
-                  initial={{ y: -104, opacity: 0 }}
+                  initial={{ y: -flourishSlide, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -104, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
+                  exit={{ y: -flourishSlide, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
                   transition={SPRING_POP_SNAPPY}
                 >
-                  <FluentEmoji emoji="✅" size={96} />
+                  <FluentEmoji emoji="✅" size={flourishSize} />
                 </motion.div>
               ) : player.emoji ? (
                 // Emoji lives on the BOTTOM: slides down and out on capture,
                 // slides back up into place from below on the next round.
                 <motion.div
                   key="emoji"
-                  initial={{ y: 104, opacity: 0 }}
+                  initial={{ y: flourishSlide, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 104, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
+                  exit={{ y: flourishSlide, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
                   transition={SPRING_POP_SNAPPY}
                 >
                   <span className="block" style={{ transform: "scaleX(-1)" }}>
-                    <FluentEmoji emoji={player.emoji} size={96} />
+                    <FluentEmoji emoji={player.emoji} size={flourishSize} />
                   </span>
                 </motion.div>
               ) : null}
@@ -226,10 +237,10 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
           {/* Name (left) — display only; the whole card handles tap/long-press */}
           <div
             className="flex-1 flex flex-col items-start gap-1 min-w-0 text-left"
-            style={{ marginLeft: isBestOf ? 8 : 68 }}>
+            style={{ marginLeft: nameGutter }}>
 
             <div className="flex items-center gap-2 w-full min-w-0">
-              <span className="font-bold truncate leading-tight text-xl" title={player.name} style={{ color: textColor }}>
+              <span className={`font-bold truncate leading-tight ${nameSize}`} title={player.name} style={{ color: textColor }}>
                 {player.name}
               </span>
               {streak >= 2 &&
@@ -276,7 +287,7 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
             className="flex-shrink-0"
             style={{ marginRight: 8 }}>
 
-            <AnimatedTotal value={total} color={totalColor} />
+            <AnimatedTotal value={total} color={totalColor} sizeClass={totalSize} />
           </div>
         </div>
       </div>

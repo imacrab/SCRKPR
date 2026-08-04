@@ -401,6 +401,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
                       isFirst={idx === 0}
                       isLast={idx === sortedPlayers.length - 1}
                       scoredThisRound={!circleMode && player.scores.length > currentRound}
+                      playerCount={sortedPlayers.length}
                       onAddScore={() => handleOpenScore(player)}
                       onEditScore={(i) => handleEditScore(player, i)}
                       onEditPlayer={() => setEditingPlayer(player)} />

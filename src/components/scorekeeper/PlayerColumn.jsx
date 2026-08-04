@@ -149,9 +149,10 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
               }
         }>
 
-        {/* Leader crown — flies between players when the lead changes (shared layoutId) */}
+        {/* Leader crown — flies between players when the lead changes (shared
+            layoutId). Compact cards only; roomy cards perch it on the name. */}
         <AnimatePresence>
-          {showLeader && (
+          {!spacious && showLeader && (
             <motion.div
               layoutId="leader-crown"
               initial={{ scale: 0, rotate: -40, opacity: 0 }}
@@ -168,9 +169,10 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
         </AnimatePresence>
 
         {/* Worst flair (low-score modes only) — mirrors the crown; flies between
-            players when last place changes via shared layoutId. */}
+            players when last place changes via shared layoutId. Compact cards
+            only; roomy cards perch it on the name. */}
         <AnimatePresence>
-          {isWorst && (
+          {!spacious && isWorst && (
             <motion.div
               layoutId="worst-cry"
               initial={{ scale: 0, rotate: 40, opacity: 0 }}
@@ -274,10 +276,46 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
             </div>
             }
 
-            {/* Name (+ streak) */}
+            {/* Name — the crown/worst flair perches on its top-right (relative
+                wrapper + absolute emoji) so it reads as adorning the name rather
+                than floating in the card's corner. */}
             <div className="flex items-center justify-center gap-2 max-w-full px-2">
-              <span className={`font-bold truncate leading-tight ${nameSize}`} title={player.name} style={{ color: textColor }}>
-                {player.name}
+              <span className="relative inline-flex min-w-0 max-w-full">
+                <span className={`font-bold truncate leading-tight ${nameSize}`} title={player.name} style={{ color: textColor }}>
+                  {player.name}
+                </span>
+                <AnimatePresence>
+                  {showLeader && (
+                    <motion.div
+                      layoutId="leader-crown"
+                      initial={{ scale: 0, rotate: -40, opacity: 0 }}
+                      animate={{ scale: 1, rotate: 16, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={SPRING_POP}
+                      className="absolute pointer-events-none select-none z-20"
+                      style={{ top: -15, right: -14 }}
+                      aria-hidden="true"
+                    >
+                      <FluentEmoji emoji="👑" size={26} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <AnimatePresence>
+                  {isWorst && (
+                    <motion.div
+                      layoutId="worst-cry"
+                      initial={{ scale: 0, rotate: 40, opacity: 0 }}
+                      animate={{ scale: 1, rotate: -16, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={SPRING_POP}
+                      className="absolute pointer-events-none select-none z-20"
+                      style={{ top: -15, right: -14 }}
+                      aria-hidden="true"
+                    >
+                      <FluentEmoji emoji="😭" size={26} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </span>
               {streak >= 2 &&
               <motion.span

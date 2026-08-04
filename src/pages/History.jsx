@@ -214,15 +214,20 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
       <div className="flex-1 relative overflow-hidden">
         {/* Top fade */}
         {canScroll && <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />}
-        {/* Bottom fade — sits flush on top of the 56px tab bar so the list
-            dissolves into it instead of ending on a hard edge. The offset is
-            just 56px (NOT + safe-area): this wrapper already sits inside the
-            root's paddingBottom: safe-area, so adding it again double-counts
-            and floats the fade above the bar on notched devices. */}
+        {/* Bottom fade — the list dissolves into the tab bar instead of ending on
+            a hard edge. Anchored to the very bottom (bottom:0) with the gradient
+            baked in: the top 32px dissolves the list, and the bottom 56px is
+            SOLID background. That solid base sits behind the tab bar's content
+            row, so even if the page's 100dvh + safe-area and the fixed bar's
+            safe-area disagree by a pixel or two on a notched device, the seam
+            shows solid background — never a sliver of the card behind it. */}
         {canScroll && (
           <div
-            className="absolute inset-x-0 h-8 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none"
-            style={{ bottom: "56px" }}
+            className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
+            style={{
+              height: "88px",
+              background: "linear-gradient(to top, hsl(var(--background)) 0, hsl(var(--background)) 56px, transparent 88px)",
+            }}
           />
         )}
 

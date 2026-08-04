@@ -130,6 +130,7 @@ export default function ScoreKeeper() {
       name: p.name || p,
       color: p.color || ACCENT_BLUE,
       emoji: p.emoji || "",
+      cardStyle: p.cardStyle === "gradient" ? "gradient" : "solid",
       scores: [],
     }));
     saveGameState(initialPlayers, mode || "high", bestOfCount, target);
@@ -265,12 +266,20 @@ export default function ScoreKeeper() {
     });
   }, []);
 
-  const handleAddPlayer = useCallback((name, color, emoji = "") => {
+  const handleEditCardStyle = useCallback((playerId, cardStyle) => {
+    setPlayers((prev) => {
+      const next = prev.map((p) => (p.id === playerId ? { ...p, cardStyle } : p));
+      saveGameState(next, _winMode, _bestOf, _targetScore);
+      return next;
+    });
+  }, []);
+
+  const handleAddPlayer = useCallback((name, color, emoji = "", cardStyle = "solid") => {
     setPlayers((prev) => {
       if (prev.length >= 20) return prev;
       const maxId = prev.reduce((m, p) => Math.max(m, p.id), 0);
       const newId = maxId + 1;
-      const next = [...prev, { id: newId, name, color: color || ACCENT_BLUE, emoji, scores: [] }];
+      const next = [...prev, { id: newId, name, color: color || ACCENT_BLUE, emoji, cardStyle, scores: [] }];
       saveGameState(next, _winMode, _bestOf, _targetScore);
       setLastAddedPlayerId(newId);
       return next;
@@ -336,6 +345,7 @@ export default function ScoreKeeper() {
               onEditName={handleEditName}
               onEditColor={handleEditColor}
               onEditEmoji={handleEditEmoji}
+              onEditCardStyle={handleEditCardStyle}
               onReset={handleReset}
               onEndGame={handleEndGame}
               onPauseGame={handlePauseGame}
@@ -347,7 +357,7 @@ export default function ScoreKeeper() {
               player={null}
               usedColors={players.map((p) => p.color)}
               usedEmojis={players.map((p) => p.emoji).filter(Boolean)}
-              onSave={({ name, color, emoji }) => handleAddPlayer(name, color, emoji)}
+              onSave={({ name, color, emoji, cardStyle }) => handleAddPlayer(name, color, emoji, cardStyle)}
               onClose={() => setShowAddPlayer(false)}
             />
           </motion.div>

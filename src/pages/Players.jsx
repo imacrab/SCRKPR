@@ -173,12 +173,12 @@ export default function Players({ onBack, onModalChange }) {
     }
   };
 
-  const handleSave = async ({ id, name, color, emoji }) => {
+  const handleSave = async ({ id, name, color, emoji, cardStyle }) => {
     if (id) {
-      await db.players.update(id, { name, color, emoji });
-      setPlayers((prev) => prev.map((p) => (p.id === id ? { ...p, name, color, emoji } : p)));
+      await db.players.update(id, { name, color, emoji, cardStyle });
+      setPlayers((prev) => prev.map((p) => (p.id === id ? { ...p, name, color, emoji, cardStyle } : p)));
     } else {
-      const created = await db.players.create({ name, color, emoji });
+      const created = await db.players.create({ name, color, emoji, cardStyle });
       setPlayers((prev) => [created, ...prev]);
     }
     setEditing(null);

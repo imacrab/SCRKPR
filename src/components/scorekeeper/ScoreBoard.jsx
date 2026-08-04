@@ -261,11 +261,12 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     closeScoreModal();
   };
 
-  const handleSavePlayer = ({ name, color, emoji }) => {
+  const handleSavePlayer = ({ name, color, emoji, cardStyle }) => {
     if (!editingPlayer) return;
     onEditName(editingPlayer.id, name);
     onEditColor(editingPlayer.id, color);
     onEditEmoji?.(editingPlayer.id, emoji || "");
+    onEditCardStyle?.(editingPlayer.id, cardStyle || "solid");
     setEditingPlayer(null);
   };
 

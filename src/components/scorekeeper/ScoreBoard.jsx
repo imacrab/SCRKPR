@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { UserPlus, RotateCcw, Flag, Bookmark } from "lucide-react";
+import { RotateCcw, Flag, Bookmark } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { db } from "@/lib/store";
 import PlayerColumn from "./PlayerColumn";
@@ -12,7 +12,6 @@ import StretchTabPill from "./StretchTabPill";
 import PauseGameModal from "./PauseGameModal";
 import { isLowMode, isCircleMode, getModeMeta } from "@/lib/gameModes";
 import { SPRING_SHEET, TRANSITION_PANEL } from "@/lib/motion";
-import { primeIOSKeyboard } from "@/lib/iosKeyboardPrimer";
 import logoDark from "@/assets/scrkpr-logo.svg";
 
 const SCOREBOARD_TABS = [
@@ -20,7 +19,7 @@ const SCOREBOARD_TABS = [
   { id: "rounds", label: "Rounds" },
 ];
 
-export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, addPlayerModalOpen = false, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onAddPlayer, onEndGame, onPauseGame, onModalChange }) {
+export default function ScoreBoard({ players, winMode, bestOf, targetScore, lastAddedPlayerId, addPlayerModalOpen = false, onAddScore, onEditScore, onEditName, onEditColor, onEditEmoji, onReset, onEndGame, onPauseGame, onModalChange }) {
   const [activePlayer, setActivePlayer] = useState(null);
   const [scoreModalOpen, setScoreModalOpen] = useState(false);
   const [streakMap, setStreakMap] = useState({});
@@ -280,20 +279,14 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     }, 430);
   };
 
-  const slideControlHidden = showEndGame || scoreModalOpen || showResetConfirm || addPlayerModalOpen || showPauseModal;
-
   // Default name offered in the pause sheet — mode + short date, e.g.
   // "Skip-Bo · Aug 3". The user can overwrite it.
   const defaultPauseName = `${getModeMeta(winMode).label} · ${new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 
 
 
-  // No bottom safe-area padding on the root — the bottom action bar hugs the
-  // true screen edge and fills the home-indicator inset with its own background
-  // (see its paddingBottom). Reserving it here too double-counted the inset and
-  // left a gap below the bar on notched devices.
   return (
-    <div className="w-screen flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)" }}>
+    <div className="w-screen flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-10 pb-5 flex-shrink-0" style={{ backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
         <button onClick={() => setShowEndGame(true)} className="hover:opacity-75 transition-opacity">
@@ -304,21 +297,25 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
           <img src={logoDark} alt="SCRKPR!" data-logo-anchor style={{ maxWidth: 120, height: "auto", opacity: 0 }} />
         </button>
         <div className="flex items-center gap-2">
-          {players.length < 20 &&
           <button
-            onPointerDown={primeIOSKeyboard}
-            onClick={onAddPlayer}
+            onClick={() => setShowEndGame(true)}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:text-foreground hover:bg-accent transition-colors text-[hsl(var(--foreground))]"
-            aria-label="Add player">
-            
-              <UserPlus size={22} strokeWidth={2} />
-            </button>
-          }
+            aria-label="End game">
+
+            <Flag size={22} strokeWidth={2} />
+          </button>
+          <button
+            onClick={() => setShowPauseModal(true)}
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:text-foreground hover:bg-accent transition-colors text-[hsl(var(--foreground))]"
+            aria-label="Save game">
+
+            <Bookmark size={22} strokeWidth={2} />
+          </button>
           <button
             onClick={() => setShowResetConfirm(true)}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:text-foreground hover:bg-accent transition-colors text-[hsl(var(--foreground))]"
             aria-label="Reset scores">
-            
+
             <RotateCcw size={22} strokeWidth={2} />
           </button>
         </div>
@@ -422,35 +419,6 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Bottom action bar — two equal halves hugging the bottom edge. Left
-            ends the game (opens the results/confirm modal), right pauses it.
-            Slides down out of view while any modal is open. */}
-        <motion.div
-          className="absolute inset-x-0 bottom-0 z-30"
-          animate={{ y: slideControlHidden ? 140 : 0 }}
-          transition={SPRING_SHEET}
-          style={{ pointerEvents: slideControlHidden ? "none" : "auto" }}>
-
-          <div
-            className="flex items-stretch border-t border-border"
-            style={{ backgroundColor: "hsl(var(--card))", paddingBottom: "env(safe-area-inset-bottom)" }}>
-            <button
-              onClick={() => setShowEndGame(true)}
-              className="flex-1 flex items-center justify-center gap-2 font-semibold text-foreground hover:bg-accent active:bg-accent/80 transition-colors"
-              style={{ paddingTop: 16, paddingBottom: 16, fontSize: 14 }}>
-              <Flag size={16} strokeWidth={2.5} />
-              End
-            </button>
-            <button
-              onClick={() => setShowPauseModal(true)}
-              className="flex-1 flex items-center justify-center gap-2 font-semibold text-foreground hover:bg-accent active:bg-accent/80 transition-colors"
-              style={{ paddingTop: 16, paddingBottom: 16, fontSize: 14 }}>
-              <Bookmark size={16} strokeWidth={2.5} />
-              Save
-            </button>
-          </div>
-        </motion.div>
       </div>
 
       <ScoreInputModal

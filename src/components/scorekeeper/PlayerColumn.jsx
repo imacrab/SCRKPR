@@ -102,16 +102,16 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
   const streakBg = isGradient ? "rgba(255,255,255,0.12)" : isDarkText ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.25)";
   const subtleText = isGradient ? "hsl(var(--muted-foreground))" : isDarkText ? "rgba(17,17,17,0.65)" : "rgba(255,255,255,0.75)";
 
-  // Roomy mode: with 4 or fewer players the cards are tall, so lean into the
+  // Roomy mode: with 3 or fewer players the cards are tall, so lean into the
   // real estate — vertically center the content, enlarge the emoji flourish,
-  // and scale up the name/score. Everything keys off the player count so the
-  // treatment eases back as more players (shorter cards) join.
-  const spacious = playerCount > 0 && playerCount <= 4;
-  const flourishSize = !spacious ? 96 : playerCount <= 2 ? 150 : playerCount === 3 ? 126 : 108;
+  // and scale up the name/score. At 4+ players we transition back to the normal
+  // compact card. Everything keys off the player count.
+  const spacious = playerCount > 0 && playerCount <= 3;
+  const flourishSize = !spacious ? 96 : playerCount <= 2 ? 150 : 126;
   const flourishSlide = flourishSize + 8; // travel far enough to fully clear on the swap
   const nameSize = !spacious ? "text-xl" : playerCount <= 2 ? "text-3xl" : "text-2xl";
   const totalSize = !spacious ? "text-3xl" : playerCount <= 2 ? "text-5xl" : "text-4xl";
-  const nameGutter = isBestOf ? 8 : !spacious ? 68 : playerCount <= 2 ? 96 : playerCount === 3 ? 84 : 76;
+  const nameGutter = isBestOf ? 8 : !spacious ? 68 : playerCount <= 2 ? 96 : 84;
 
   return (
     <div className="flex flex-col rounded-xl overflow-hidden flex-1">

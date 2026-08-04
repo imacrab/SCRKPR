@@ -102,16 +102,21 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
   const streakBg = isGradient ? "rgba(255,255,255,0.12)" : isDarkText ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.25)";
   const subtleText = isGradient ? "hsl(var(--muted-foreground))" : isDarkText ? "rgba(17,17,17,0.65)" : "rgba(255,255,255,0.75)";
 
-  // Roomy mode: with 3 or fewer players the cards are tall, so lean into the
-  // real estate — vertically center the content, enlarge the emoji flourish,
-  // and scale up the name/score. At 4+ players we transition back to the normal
-  // compact card. Everything keys off the player count.
+  // Roomy mode: with 3 or fewer players the cards are tall, so present the
+  // content as a big centered vertical stack — emoji, name, round score, total —
+  // with scaled-up type. At 4+ players we transition back to the normal compact
+  // card. Everything keys off the player count.
   const spacious = playerCount > 0 && playerCount <= 3;
-  const flourishSize = !spacious ? 96 : playerCount <= 2 ? 150 : 126;
+  // 3-player cards are much shorter than 1–2 player ones, so the centered stack
+  // (emoji + name + round score + total) has to fit a tighter box — keep the
+  // emoji and total a notch smaller there so nothing clips.
+  const flourishSize = !spacious ? 96 : playerCount <= 2 ? 132 : 104;
   const flourishSlide = flourishSize + 8; // travel far enough to fully clear on the swap
   const nameSize = !spacious ? "text-xl" : playerCount <= 2 ? "text-3xl" : "text-2xl";
-  const totalSize = !spacious ? "text-3xl" : playerCount <= 2 ? "text-5xl" : "text-4xl";
-  const nameGutter = isBestOf ? 8 : !spacious ? 68 : playerCount <= 2 ? 96 : 84;
+  const totalSize = !spacious ? "text-3xl" : playerCount <= 2 ? "text-5xl" : "text-3xl";
+  // Compact cards only — offsets the name past the corner flourish. Roomy cards
+  // are a centered stack and don't use it.
+  const nameGutter = isBestOf ? 8 : 68;
 
   return (
     <div className="flex flex-col rounded-xl overflow-hidden flex-1">
@@ -129,7 +134,7 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
         }}
         role="button"
         aria-label={`Add score for ${player.name}`}
-        className={`relative px-3 py-3 rounded-lg flex flex-col items-center flex-1 z-10 transition-all overflow-hidden cursor-pointer ${spacious ? "justify-center" : ""}`}
+        className={`relative px-3 ${spacious ? "py-2" : "py-3"} rounded-lg flex flex-col items-center flex-1 z-10 transition-all overflow-hidden cursor-pointer ${spacious ? "justify-center" : ""}`}
         style={
           isGradient
             ? {
@@ -181,18 +186,15 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
           )}
         </AnimatePresence>
 
-        {/* Flourish — oversized tilted player emoji bleeding off the left edge.
-            Once the player has logged this round it morphs into a green check;
-            it morphs back when the round resets. */}
-        {(player.emoji || scoredThisRound) &&
+        {/* Flourish (compact cards only) — oversized tilted player emoji bleeding
+            off the left edge; morphs to a green check once the round is logged.
+            Roomy cards render their own centered emoji in the stack below. */}
+        {!spacious && (player.emoji || scoredThisRound) &&
         <div
           className="absolute pointer-events-none select-none"
           style={{
             left: -12,
-            // Normally anchored near the top (aligned with the name row) so it
-            // rides with the content as the card grows. In roomy mode the
-            // content is vertically centered, so the flourish centers with it.
-            top: spacious ? "50%" : "40px",
+            top: "40px",
             transform: "rotate(-20deg) translateY(-50%)",
             opacity: 0.95,
             // Soft shadow lifts the emoji off the vivid card color (separation,
@@ -233,6 +235,92 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
           </div>
         }
 
+        {spacious ? (
+          /* Roomy card — a centered vertical stack: emoji, name, round score,
+             total, all down the middle to use the tall card's space. */
+          <div className="relative z-10 w-full flex flex-col items-center gap-1 text-center">
+            {(player.emoji || scoredThisRound) &&
+            <div
+              className="relative overflow-hidden flex items-center justify-center select-none mb-1"
+              style={{ height: flourishSize, width: flourishSize }}
+              aria-hidden="true">
+              <AnimatePresence mode="popLayout" initial={false}>
+                {scoredThisRound ? (
+                  <motion.div
+                    key="check"
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{ filter: "drop-shadow(0 3px 7px rgba(0,0,0,0.40))" }}
+                    initial={{ y: -flourishSlide, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -flourishSlide, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
+                    transition={SPRING_POP_SNAPPY}
+                  >
+                    <FluentEmoji emoji="✅" size={flourishSize} />
+                  </motion.div>
+                ) : player.emoji ? (
+                  <motion.div
+                    key="emoji"
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{ filter: "drop-shadow(0 3px 7px rgba(0,0,0,0.40))" }}
+                    initial={{ y: flourishSlide, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: flourishSlide, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
+                    transition={SPRING_POP_SNAPPY}
+                  >
+                    <FluentEmoji emoji={player.emoji} size={flourishSize} />
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
+            </div>
+            }
+
+            {/* Name (+ streak) */}
+            <div className="flex items-center justify-center gap-2 max-w-full px-2">
+              <span className={`font-bold truncate leading-tight ${nameSize}`} title={player.name} style={{ color: textColor }}>
+                {player.name}
+              </span>
+              {streak >= 2 &&
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={SPRING_POP}
+                className="inline-flex items-center gap-0.5 rounded-full px-1 py-1 flex-shrink-0"
+                style={{ backgroundColor: streakBg, color: textColor }}>
+                  <motion.span
+                    animate={{ scale: [1, 1.35, 1], rotate: [0, -8, 8, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                    className="flex"
+                  >
+                    <FluentEmoji emoji="🔥" size={14} />
+                  </motion.span>
+                  <span className="text-[10px] font-semibold leading-none">{streak}</span>
+                </motion.span>
+              }
+            </div>
+
+            {/* Round score (delta) — reserved so logging doesn't shift the stack */}
+            {!isBestOf &&
+            <div className="h-[20px] flex items-center justify-center">
+              {lastScore !== null &&
+              <motion.span
+                key={lastIdx}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={SPRING_SNAPPY}
+                onClick={(e) => {e.stopPropagation();onEditScore?.(lastIdx);}}
+                className="text-sm leading-none cursor-pointer [font-family:'Geist',_sans-serif] font-medium"
+                style={{ color: subtleText }}>
+
+                  ({lastScore > 0 ? `+${lastScore}` : lastScore})
+                </motion.span>
+              }
+            </div>
+            }
+
+            {/* Total */}
+            <AnimatedTotal value={total} color={totalColor} sizeClass={totalSize} />
+          </div>
+        ) : (
         <div className="relative z-10 flex items-center justify-between w-full gap-1">
           {/* Name (left) — display only; the whole card handles tap/long-press */}
           <div
@@ -290,6 +378,7 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
             <AnimatedTotal value={total} color={totalColor} sizeClass={totalSize} />
           </div>
         </div>
+        )}
       </div>
 
       {/* Best Of win dots (only in bestof mode) */}

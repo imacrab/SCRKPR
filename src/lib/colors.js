@@ -3,7 +3,7 @@
 
 export const ACCENT_BLUE = "#2DC5F8";
 export const ACCENT_RED = "#FF3A3A";
-export const INK = "#111111"; // near-black used for text on light/colored backgrounds
+export const INK = "#262729"; // dark ink used for text on light/colored backgrounds
 
 // Rainbow player palette (also used for confetti).
 export const PLAYER_COLORS = [

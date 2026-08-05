@@ -34,7 +34,7 @@ export default function BestOfModal({ isOpen, onConfirm, onClose }) {
           <Button
             onClick={() => onConfirm(bestOf)}
             className="flex-1 h-11 bg-white hover:bg-white/90 font-semibold"
-            style={{ color: "#111111", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}
+            style={{ color: "#262729", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}
           >
             Start Game
           </Button>

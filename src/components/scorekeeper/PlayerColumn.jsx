@@ -98,9 +98,9 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
   // player color for a pop of identity.
   const textColor = isGradient ? "hsl(var(--foreground))" : solidTextColor;
   const totalColor = isGradient ? (player.color || "#FFFFFF") : solidTextColor;
-  const isDarkText = !isGradient && solidTextColor === "#111111";
+  const isDarkText = !isGradient && solidTextColor === "#262729";
   const streakBg = isGradient ? "rgba(255,255,255,0.12)" : isDarkText ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.25)";
-  const subtleText = isGradient ? "hsl(var(--muted-foreground))" : isDarkText ? "rgba(17,17,17,0.65)" : "rgba(255,255,255,0.75)";
+  const subtleText = isGradient ? "hsl(var(--muted-foreground))" : isDarkText ? "rgba(38,39,41,0.65)" : "rgba(255,255,255,0.75)";
 
   // Roomy mode: with 3 or fewer players the cards are tall, so present the
   // content as a big centered vertical stack — emoji, name, round score, total —

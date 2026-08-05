@@ -28,7 +28,7 @@ export default function PauseGameModal({ isOpen, defaultName, onSave, onClose })
         <Button
           onClick={handleSave}
           className="w-full h-11 bg-white hover:bg-white/90 font-semibold"
-          style={{ color: "#111111" }}
+          style={{ color: "#262729" }}
         >
           Save game
         </Button>

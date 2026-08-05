@@ -387,7 +387,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 // with the player's color; otherwise use the theme foreground.
                 const rowText = selected ? readableTextColor(player.color) : "hsl(var(--foreground))";
                 const rowTextMuted = selected
-                  ? (readableTextColor(player.color) === "#111111" ? "rgba(17,17,17,0.55)" : "rgba(255,255,255,0.65)")
+                  ? (readableTextColor(player.color) === "#262729" ? "rgba(38,39,41,0.55)" : "rgba(255,255,255,0.65)")
                   : "hsl(var(--muted-foreground))";
 
                 // Derive tilt from the dnd transform's Y offset so the card leans into its drag direction
@@ -428,9 +428,12 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 onClick={() => toggleSelected(player.id)}
                 className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left cursor-pointer"
                 style={{
+                  // Raised card: the default --card surface (#313438) that the
+                  // player's chosen color trumps once they're selected to play.
+                  // No border — depth comes from the drop shadow instead.
                   backgroundColor: selected ? hexToRgba(player.color, 1) : "hsl(var(--card))",
-                  borderColor: selected ? "transparent" : "hsl(var(--border))",
-                  boxShadow: isLifted ? "0 20px 35px -8px rgba(0,0,0,0.45)" : "none",
+                  borderColor: "transparent",
+                  boxShadow: isLifted ? "0 20px 35px -8px rgba(0,0,0,0.45)" : "0 4px 20px rgba(0,0,0,0.1)",
                   transform: cinch,
                   transformOrigin: "center center",
                   transition: isDragging
@@ -567,7 +570,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
           onClick={handleStart}
           disabled={!canStart}
           className="w-full text-lg font-semibold bg-white hover:bg-white/90"
-          style={{ height: "72px", color: "#111111", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
+          style={{ height: "72px", color: "#262729", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
           
           <FluentEmoji emoji="♠️" size={28} className="mr-2" />
           Start Game

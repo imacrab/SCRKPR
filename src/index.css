@@ -7,7 +7,7 @@
 @layer base {
   /* Light mode defaults */
   :root {
-    --background: 0 0% 7%;
+    --background: 220 4% 15.5%;
     --foreground: 220 13% 9%;
     --card: 0 0% 100%;
     --card-foreground: 220 13% 9%;
@@ -31,9 +31,9 @@
 
   /* Dark mode - class-based */
   .dark {
-    --background: 0 0% 7%;
+    --background: 220 4% 15.5%;
     --foreground: 0 0% 93%;
-    --card: 220 13% 12%;
+    --card: 214 7% 20.5%;
     --card-foreground: 0 0% 93%;
     --popover: 220 13% 12%;
     --popover-foreground: 0 0% 93%;
@@ -55,9 +55,9 @@
   /* Fallback for system preference if no explicit theme set */
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme]) {
-      --background: 0 0% 7%;
+      --background: 220 4% 15.5%;
       --foreground: 0 0% 93%;
-      --card: 220 13% 12%;
+      --card: 214 7% 20.5%;
       --card-foreground: 0 0% 93%;
       --popover: 220 13% 12%;
       --popover-foreground: 0 0% 93%;

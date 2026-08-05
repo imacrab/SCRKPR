@@ -353,7 +353,7 @@ export default function Onboarding({ onDone }) {
 
           <Button
             onClick={() => (isLast ? finish() : go(step + 1))}
-            className="w-full h-12 rounded-full text-base font-semibold bg-white hover:bg-white/90 text-[#111111]"
+            className="w-full h-12 rounded-full text-base font-semibold bg-white hover:bg-white/90 text-[#262729]"
           >
             {isLast ? "Start scoring" : "Next"}
           </Button>

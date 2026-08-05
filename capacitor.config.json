@@ -2,15 +2,15 @@
   "appId": "com.illudcrab.scrkpr",
   "appName": "SCRKPR",
   "webDir": "dist",
-  "backgroundColor": "#111111",
+  "backgroundColor": "#262729",
   "ios": {
-    "backgroundColor": "#111111",
+    "backgroundColor": "#262729",
     "contentInset": "never"
   },
   "plugins": {
     "SplashScreen": {
       "launchAutoHide": false,
-      "backgroundColor": "#111111",
+      "backgroundColor": "#262729",
       "showSpinner": false
     },
     "Keyboard": {

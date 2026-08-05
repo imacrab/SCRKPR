@@ -66,7 +66,7 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
             onClick={handleSubmit}
             disabled={!isValid}
             className="flex-1 h-11 bg-white hover:bg-white/90 font-semibold"
-            style={{ color: "#111111" }}
+            style={{ color: "#262729" }}
           >
             {isEditing ? "Update" : "Add Score"}
           </Button>

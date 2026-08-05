@@ -63,11 +63,40 @@ export default function BottomSheetModal({
 
   // Opt-in keyboard avoidance: when `avoidKeyboard` is set, lift the sheet to
   // sit above the software keyboard so inputs near the bottom stay visible
-  // while typing. Uses the visualViewport API — the reliable cross-browser
-  // signal for keyboard height — rather than focus tracking. Modals whose
-  // inputs sit high (under the header) opt out and keep the overlay behavior.
+  // while typing. Modals whose inputs sit high (under the header) opt out and
+  // keep the overlay behavior.
+  //
+  // Preferred signal: the native Capacitor Keyboard plugin's keyboardWillShow
+  // event, which reports the exact keyboard height. This is the reliable path
+  // inside the iOS WKWebView, where `visualViewport` frequently does NOT shrink
+  // for the keyboard (so the web-only inset computes 0 and nothing lifts). We
+  // reach the plugin via the global `Capacitor.Plugins.Keyboard` rather than a
+  // static import, so the web build never depends on the package being present.
+  // Falls back to the visualViewport API on the web / PWA.
   useEffect(() => {
     if (!isOpen || !avoidKeyboard) return undefined;
+
+    const Keyboard = typeof window !== "undefined" && window.Capacitor?.Plugins?.Keyboard;
+    if (Keyboard?.addListener) {
+      let cancelled = false;
+      let showHandle;
+      let hideHandle;
+      const track = (promise, assign) => {
+        Promise.resolve(promise).then((handle) => {
+          if (cancelled) handle?.remove?.();
+          else assign(handle);
+        }).catch(() => {});
+      };
+      track(Keyboard.addListener("keyboardWillShow", (info) => setKeyboardInset(info?.keyboardHeight || 0)), (h) => (showHandle = h));
+      track(Keyboard.addListener("keyboardWillHide", () => setKeyboardInset(0)), (h) => (hideHandle = h));
+      return () => {
+        cancelled = true;
+        showHandle?.remove?.();
+        hideHandle?.remove?.();
+        setKeyboardInset(0);
+      };
+    }
+
     const vv = window.visualViewport;
     if (!vv) return undefined;
     const update = () => {

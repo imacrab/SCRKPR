@@ -12,6 +12,9 @@
       "launchAutoHide": false,
       "backgroundColor": "#111111",
       "showSpinner": false
+    },
+    "Keyboard": {
+      "resize": "none"
     }
   }
 }

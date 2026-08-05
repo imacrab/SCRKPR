@@ -34,7 +34,7 @@ export default function BottomNavigationBar({ hidden = false }) {
       style={{
         paddingBottom: "env(safe-area-inset-bottom)",
         pointerEvents: isHidden ? "none" : "auto",
-        backgroundColor: "hsl(var(--background))",
+        backgroundColor: "hsl(var(--card))",
       }}
     >
     <div className="relative flex flex-1 items-center" style={{ height: 56 }}>
@@ -47,7 +47,7 @@ export default function BottomNavigationBar({ hidden = false }) {
           transition: "transform 250ms cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
-        <div className="rounded-full bg-accent" style={{ width: 72, height: 44 }} />
+        <div className="rounded-full" style={{ width: 72, height: 44, backgroundColor: "rgba(255,255,255,0.15)" }} />
       </div>
       {TABS.map(({ label, icon: Icon, path }) => {
         const active = pathname === path;

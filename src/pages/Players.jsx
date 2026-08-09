@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 import { db } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Users, Check, Trash2, Star } from "lucide-react";
+import { Plus, Check, Trash2, Star } from "lucide-react";
 import PlayerEditModal from "@/components/scorekeeper/PlayerEditModal";
 import DeletePlayerConfirmModal from "@/components/scorekeeper/DeletePlayerConfirmModal";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
@@ -205,54 +205,81 @@ export default function Players({ onBack, onModalChange }) {
           }}
           onPointerDown={(e) => { if (!selectMode) primeIOSKeyboard(); startLongPress(e, p); }}
           onContextMenu={(e) => e.preventDefault()}
-          className={`w-full rounded-lg border bg-card overflow-hidden flex items-center gap-3 pl-3 pr-1 py-2.5 text-left transition-colors active:scale-[0.99] ${
-            isSelected ? "border-accent-red bg-accent-red/5" : "border-border"
-          }`}
+          className="relative w-full rounded-2xl overflow-hidden flex items-center text-left active:scale-[0.99]"
+          style={{
+            // Raised card on the app background; a red ring signals a row that's
+            // picked in select (bulk-delete) mode. Depth from the shadow, no border.
+            minHeight: 78,
+            backgroundColor: "hsl(var(--card))",
+            boxShadow: isSelected
+              ? "inset 0 0 0 2.5px #FF3A3A, 0 4px 20px rgba(0,0,0,0.1)"
+              : "0 4px 20px rgba(0,0,0,0.1)",
+            transition: "box-shadow 200ms ease-out, transform 120ms ease-out",
+          }}
         >
-          <div
-            className="w-9 h-9 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"
-            style={{ backgroundColor: p.color }}
-          >
-            {p.emoji && <FluentEmoji emoji={p.emoji} size={22} />}
-          </div>
-          <span className="flex-1 text-foreground text-base">{p.name}</span>
-          {!selectMode && (
-            <span
-              role="button"
-              tabIndex={0}
-              aria-label={p.favorite ? "Remove from favorites" : "Add to favorites"}
-              onClick={(e) => { e.stopPropagation(); toggleFavorite(p.id); }}
-              onPointerDown={(e) => e.stopPropagation()}
-              className="flex-shrink-0 w-11 h-11 flex items-center justify-center"
+          {/* Oversized player emoji bleeding off the left edge (clipped by the
+              card's overflow-hidden) — matches the New Game setup cards. */}
+          {p.emoji ? (
+            <div
+              className="absolute pointer-events-none select-none"
+              style={{
+                left: -22,
+                top: "50%",
+                transform: "translateY(-50%) rotate(-6deg)",
+                filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.35))",
+              }}
+              aria-hidden="true"
             >
-              <motion.span
-                animate={poppedId === p.id ? { scale: [1, p.favorite ? 1.4 : 1.18, 1] } : { scale: 1 }}
-                transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
-                style={{ display: "inline-flex" }}
+              <FluentEmoji emoji={p.emoji} size={100} />
+            </div>
+          ) : (
+            <div
+              className="absolute top-1/2 -translate-y-1/2 rounded-full border-2 border-white/20"
+              style={{ left: 20, width: 52, height: 52, backgroundColor: p.color }}
+            />
+          )}
+
+          {/* Content — offset right to clear the emoji */}
+          <div className="relative z-10 flex flex-1 items-center min-w-0" style={{ marginLeft: 94, marginRight: 16 }}>
+            <span className="flex-1 text-foreground text-2xl [font-family:'Geist',_sans-serif] font-bold truncate">{p.name}</span>
+            {!selectMode && (
+              <span
+                role="button"
+                tabIndex={0}
+                aria-label={p.favorite ? "Remove from favorites" : "Add to favorites"}
+                onClick={(e) => { e.stopPropagation(); toggleFavorite(p.id); }}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="flex-shrink-0 w-11 h-11 flex items-center justify-center"
               >
-                <Star
-                  size={18}
-                  strokeWidth={2}
-                  style={{
-                    fill: p.favorite ? "#FFC93C" : "transparent",
-                    color: p.favorite ? "#FFC93C" : "hsl(var(--muted-foreground))",
-                  }}
-                />
+                <motion.span
+                  animate={poppedId === p.id ? { scale: [1, p.favorite ? 1.4 : 1.18, 1] } : { scale: 1 }}
+                  transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
+                  style={{ display: "inline-flex" }}
+                >
+                  <Star
+                    size={20}
+                    strokeWidth={2}
+                    style={{
+                      fill: p.favorite ? "#FFC93C" : "transparent",
+                      color: p.favorite ? "#FFC93C" : "hsl(var(--muted-foreground))",
+                    }}
+                  />
+                </motion.span>
+              </span>
+            )}
+            {selectMode && (
+              <motion.span
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={SPRING_SHEET}
+                className={`w-7 h-7 ml-1 rounded-full flex-shrink-0 flex items-center justify-center border-2 transition-colors ${
+                  isSelected ? "bg-accent-red border-accent-red text-white" : "border-border text-transparent"
+                }`}
+              >
+                <Check size={16} strokeWidth={3} />
               </motion.span>
-            </span>
-          )}
-          {selectMode && (
-            <motion.span
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={SPRING_SHEET}
-              className={`w-6 h-6 mr-2 rounded-full flex-shrink-0 flex items-center justify-center border-2 transition-colors ${
-                isSelected ? "bg-accent-red border-accent-red text-white" : "border-border text-transparent"
-              }`}
-            >
-              <Check size={14} strokeWidth={3} />
-            </motion.span>
-          )}
+            )}
+          </div>
         </button>
       </div>
     );

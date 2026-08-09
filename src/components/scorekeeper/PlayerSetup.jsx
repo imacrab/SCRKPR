@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { Plus, Check, GripVertical, Star } from "lucide-react";
+import { Plus, Check, Star } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -378,7 +378,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 return `rgba(${r}, ${g}, ${b}, ${alpha})`;
               };
 
-              const renderRow = (player, { dragProvided, snapshot, selected, draggable, index = 0 }) => {
+              const renderRow = (player, { dragProvided, snapshot, selected, index = 0 }) => {
                 const baseStyle = dragProvided?.draggableProps?.style || {};
                 const isDragging = snapshot?.isDragging;
                 const isDropAnimating = snapshot?.isDropAnimating;
@@ -426,62 +426,72 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 {...dragProvided?.dragHandleProps || {}}>
                 <div
                 onClick={() => toggleSelected(player.id)}
-                className="w-full rounded-lg border overflow-hidden flex items-center gap-2 px-2 py-2.5 text-left cursor-pointer"
+                className="relative w-full rounded-2xl overflow-hidden flex items-center cursor-pointer"
                 style={{
                   // Raised card: the default --card surface (#313438) that the
                   // player's chosen color trumps once they're selected to play.
                   // No border — depth comes from the drop shadow instead.
+                  minHeight: 78,
                   backgroundColor: selected ? hexToRgba(player.color, 1) : "hsl(var(--card))",
-                  borderColor: "transparent",
                   boxShadow: isLifted ? "0 20px 35px -8px rgba(0,0,0,0.45)" : "0 4px 20px rgba(0,0,0,0.1)",
                   transform: cinch,
                   transformOrigin: "center center",
                   transition: isDragging
                     ? "transform 130ms ease-out, box-shadow 150ms ease-out"
-                    : "transform 260ms cubic-bezier(0.34, 1.6, 0.4, 1), background-color 200ms ease-out, border-color 200ms ease-out, box-shadow 220ms ease-out",
+                    : "transform 260ms cubic-bezier(0.34, 1.6, 0.4, 1), background-color 200ms ease-out, box-shadow 220ms ease-out",
                 }}>
 
-                    {draggable ?
-                <div className="flex-shrink-0 touch-none flex items-center justify-center w-6 h-7" style={{ color: rowText }}>
-                        <GripVertical size={18} strokeWidth={2} />
+                    {/* Oversized player emoji, bleeding off the left edge (clipped
+                        by the card's overflow-hidden) — the playful, tappable hero. */}
+                    {player.emoji ?
+                <div
+                  className="absolute pointer-events-none select-none"
+                  style={{
+                    left: -22,
+                    top: "50%",
+                    transform: "translateY(-50%) rotate(-6deg)",
+                    filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.35))",
+                  }}
+                  aria-hidden="true">
+                        <FluentEmoji emoji={player.emoji} size={100} />
                       </div> :
 
-                <div className="flex-shrink-0 w-6 h-7" />
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 rounded-full border-2 border-white/20"
+                  style={{ left: 20, width: 52, height: 52, backgroundColor: player.color }} />
                 }
-                    <div
-                  className="w-7 h-7 rounded-full flex-shrink-0 border-2 border-white/20 flex items-center justify-center leading-none overflow-hidden"
-                  style={{ backgroundColor: player.color }}>
-                  
-                      {player.emoji && <FluentEmoji emoji={player.emoji} size={18} style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.35))" }} />}
-                    </div>
-                    <span className="flex-1 text-base [font-family:'Geist',_sans-serif] font-semibold" style={{ color: rowText }}>{player.name}</span>
-                    <button
-                  type="button"
-                  onClick={(e) => toggleFavorite(player.id, e)}
-                  onPointerDown={(e) => e.stopPropagation()}
-                  aria-label={player.favorite ? "Remove from favorites" : "Add to favorites"}
-                  className="flex-shrink-0 w-11 h-11 -mr-2 flex items-center justify-center">
-                      <motion.span
-                    animate={poppedId === player.id ? { scale: [1, player.favorite ? 1.4 : 1.18, 1] } : { scale: 1 }}
-                    transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
-                    style={{ display: "inline-flex" }}>
-                        <Star
-                      size={18}
-                      strokeWidth={2}
-                      style={{
-                        fill: player.favorite ? "#FFC93C" : "transparent",
-                        color: player.favorite ? "#FFC93C" : rowTextMuted,
-                      }} />
-                      </motion.span>
-                    </button>
-                    <div
-                  className="w-6 h-6 rounded-full flex items-center justify-center transition-colors"
-                  style={{
-                    backgroundColor: selected ? rowText : "transparent",
-                    border: selected ? "none" : `2px solid ${rowTextMuted}`
-                  }}>
 
-                      {selected && <Check size={16} strokeWidth={3} style={{ color: player.color }} />}
+                    {/* Content — offset right to clear the emoji */}
+                    <div className="relative z-10 flex flex-1 items-center min-w-0" style={{ marginLeft: 94, marginRight: 16 }}>
+                      <span className="flex-1 text-2xl [font-family:'Geist',_sans-serif] font-bold truncate" style={{ color: rowText }}>{player.name}</span>
+                      <button
+                    type="button"
+                    onClick={(e) => toggleFavorite(player.id, e)}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    aria-label={player.favorite ? "Remove from favorites" : "Add to favorites"}
+                    className="flex-shrink-0 w-11 h-11 flex items-center justify-center">
+                        <motion.span
+                      animate={poppedId === player.id ? { scale: [1, player.favorite ? 1.4 : 1.18, 1] } : { scale: 1 }}
+                      transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
+                      style={{ display: "inline-flex" }}>
+                          <Star
+                        size={20}
+                        strokeWidth={2}
+                        style={{
+                          fill: player.favorite ? "#FFC93C" : "transparent",
+                          color: player.favorite ? "#FFC93C" : rowTextMuted,
+                        }} />
+                        </motion.span>
+                      </button>
+                      <div
+                    className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors ml-1"
+                    style={{
+                      backgroundColor: selected ? rowText : "transparent",
+                      border: selected ? "none" : `2px solid ${rowTextMuted}`
+                    }}>
+
+                        {selected && <Check size={18} strokeWidth={3} style={{ color: player.color }} />}
+                      </div>
                     </div>
                   </div>
                 </div>

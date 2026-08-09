@@ -51,7 +51,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest px-1 pb-2">
              Game Modes
            </p>
-           <div className="rounded-xl border border-border bg-card overflow-hidden">
+           <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
              {OPTIONAL_MODES.map((mode) => (
                <div key={mode.id} className="px-4 py-3 flex items-center justify-between gap-4">
                  <div className="flex items-center gap-3 min-w-0">
@@ -60,7 +60,6 @@ export default function AccountSettings({ onBack, onModalChange }) {
                    </div>
                    <div className="min-w-0">
                      <p className="text-sm font-medium text-foreground">{mode.label}</p>
-                     <p className="text-xs text-muted-foreground mt-0.5 truncate">{mode.description}</p>
                    </div>
                  </div>
                  <Toggle
@@ -78,7 +77,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest px-1 pb-2">
              System
            </p>
-           <div className="rounded-xl border border-border bg-card overflow-hidden divide-y divide-border">
+           <div className="rounded-2xl border border-border bg-card overflow-hidden divide-y divide-border shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
              {/* Saved on this device */}
              <div className="px-4 py-4 flex items-center gap-3">
                <div className="w-9 h-9 rounded-full bg-accent-blue/10 flex items-center justify-center flex-shrink-0">

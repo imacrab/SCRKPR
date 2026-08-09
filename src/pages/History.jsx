@@ -336,7 +336,7 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
                       animate={{ opacity: 1, y: 0, scale: 1, transition: { ...SPRING_SNAPPY, delay: enterDelay } }}
                       exit={{ opacity: 0, height: 0 }}
                       whileTap={{ scale: 0.985 }}
-                      className="mb-4 rounded-3xl overflow-hidden relative border cursor-pointer"
+                      className="mb-4 rounded-3xl overflow-hidden relative border cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.1)]"
                       style={{
                         borderColor: `${winner.color}66`,
                         background: `linear-gradient(155deg, ${winner.color}30 0%, ${winner.color}10 35%, hsl(var(--card)) 70%)`,
@@ -424,7 +424,7 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
                     animate={{ opacity: 1, y: 0, transition: { ...SPRING_SNAPPY, delay: enterDelay } }}
                     exit={{ opacity: 0, height: 0 }}
                     whileTap={{ scale: 0.985 }}
-                    className="mb-3 rounded-xl border border-border bg-card overflow-hidden cursor-pointer">
+                    className="mb-3 rounded-2xl border border-border bg-card overflow-hidden cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
 
                   {/* Game header */}
                   <div className="px-4 py-3 flex items-baseline justify-between border-b border-border">

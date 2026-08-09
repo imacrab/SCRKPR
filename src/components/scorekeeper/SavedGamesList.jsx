@@ -31,7 +31,7 @@ export default function SavedGamesList({ savedGames, onResume, onDelete }) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0, transition: { ...SPRING_SNAPPY, delay: enterDelay } }}
             exit={{ opacity: 0, height: 0 }}
-            className="mb-3 rounded-xl border border-border bg-card overflow-hidden"
+            className="mb-3 rounded-2xl border border-border bg-card overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)]"
           >
             {/* Header — name + meta, with delete */}
             <div className="px-4 py-3 flex items-start justify-between gap-3 border-b border-border">

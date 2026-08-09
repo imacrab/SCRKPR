@@ -179,7 +179,7 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
       {/* Games / Saved / Stats tabs */}
       {!loading && (games.length > 0 || savedGames.length > 0) && (
         <div className="px-5 pt-2 pb-2 flex-shrink-0">
-          <div className="relative flex rounded-full bg-secondary border border-border p-1">
+          <div className="relative flex rounded-full border border-border p-1">
             <StretchTabPill
               activeIndex={activeTabIndex}
               previousIndex={previousTabIndex}

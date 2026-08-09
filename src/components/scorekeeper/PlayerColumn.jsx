@@ -243,7 +243,7 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
           <div className="relative z-10 w-full flex flex-col items-center gap-1 text-center">
             {(player.emoji || scoredThisRound) &&
             <div
-              className="relative overflow-hidden flex items-center justify-center select-none mb-1"
+              className="relative flex items-center justify-center select-none mb-1"
               style={{ height: flourishSize, width: flourishSize }}
               aria-hidden="true">
               <AnimatePresence mode="popLayout" initial={false}>

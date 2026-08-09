@@ -131,7 +131,7 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
           />
 
           <div className="px-1 pt-1 pb-2 flex-shrink-0">
-            <div className="relative flex rounded-full bg-secondary border border-border p-1">
+            <div className="relative flex rounded-full border border-border p-1">
               <StretchTabPill
                 activeIndex={styleTabIndex}
                 previousIndex={previousStyleTabIndex}

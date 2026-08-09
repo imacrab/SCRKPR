@@ -59,7 +59,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
                      <FluentEmoji emoji={mode.emoji} size={28} />
                    </div>
                    <div className="min-w-0">
-                     <p className="text-sm font-medium text-foreground">{mode.label}</p>
+                     <p className="text-lg font-medium text-foreground">{mode.label}</p>
                    </div>
                  </div>
                  <Toggle
@@ -80,12 +80,12 @@ export default function AccountSettings({ onBack, onModalChange }) {
            <div className="rounded-2xl border border-border bg-card overflow-hidden divide-y divide-border shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
              {/* Saved on this device */}
              <div className="px-4 py-4 flex items-center gap-3">
-               <div className="w-9 h-9 rounded-full bg-accent-blue/10 flex items-center justify-center flex-shrink-0">
-                 <Smartphone size={18} strokeWidth={2} className="text-accent-blue" />
+               <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
+                 <Smartphone size={24} strokeWidth={2} className="text-accent-blue" />
                </div>
                <div>
-                 <p className="text-sm font-medium text-foreground">Saved on this device</p>
-                 <p className="text-xs text-muted-foreground mt-0.5">
+                 <p className="text-lg font-medium text-foreground">Saved on this device</p>
+                 <p className="text-sm text-muted-foreground mt-0.5">
                    Your players and games stay here — no account needed.
                  </p>
                </div>
@@ -94,12 +94,12 @@ export default function AccountSettings({ onBack, onModalChange }) {
              {/* Replay welcome */}
              <div className="px-4 py-4 flex items-center justify-between gap-4">
                <div className="flex items-center gap-3">
-                 <div className="w-9 h-9 rounded-full bg-accent-blue/10 flex items-center justify-center flex-shrink-0">
-                   <Sparkles size={18} strokeWidth={2} className="text-accent-blue" />
+                 <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
+                   <Sparkles size={24} strokeWidth={2} className="text-accent-blue" />
                  </div>
                  <div>
-                   <p className="text-sm font-medium text-foreground">Replay Welcome</p>
-                   <p className="text-xs text-muted-foreground mt-0.5">See the intro tour again.</p>
+                   <p className="text-lg font-medium text-foreground">Replay Welcome</p>
+                   <p className="text-sm text-muted-foreground mt-0.5">See the intro tour again.</p>
                  </div>
                </div>
                <button
@@ -114,8 +114,8 @@ export default function AccountSettings({ onBack, onModalChange }) {
              {SYNC_ENABLED && (
                <div className="px-4 py-4 flex items-center justify-between gap-4">
                  <div>
-                   <p className="text-sm font-medium text-foreground">Sign Out</p>
-                   <p className="text-xs text-muted-foreground mt-0.5">End your session and return to login.</p>
+                   <p className="text-lg font-medium text-foreground">Sign Out</p>
+                   <p className="text-sm text-muted-foreground mt-0.5">End your session and return to login.</p>
                  </div>
                  <button
                    onClick={() => base44.auth.logout("/")}
@@ -129,17 +129,17 @@ export default function AccountSettings({ onBack, onModalChange }) {
              {/* Clear all local data */}
              <div className="px-4 py-4 flex items-center justify-between gap-4">
                <div className="flex items-center gap-3">
-                 <div className="w-9 h-9 rounded-full bg-accent-red/10 flex items-center justify-center flex-shrink-0">
-                   <Trash2 size={18} strokeWidth={2} className="text-accent-red" />
+                 <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
+                   <Trash2 size={24} strokeWidth={2} className="text-accent-red" />
                  </div>
                  <div>
-                   <p className="text-sm font-medium text-foreground">Clear All Data</p>
-                   <p className="text-xs text-muted-foreground mt-0.5">Remove all saved players and game history from this device.</p>
+                   <p className="text-lg font-medium text-foreground">Clear All Data</p>
+                   <p className="text-sm text-muted-foreground mt-0.5">Remove all saved players and game history from this device.</p>
                  </div>
                </div>
                <button
                  onClick={() => setShowConfirm(true)}
-                 className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors text-white bg-accent-red/10 hover:bg-accent-red/20 flex-shrink-0"
+                 className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors text-white bg-accent-red hover:bg-accent-red/20 flex-shrink-0"
                >
                  Clear
                </button>

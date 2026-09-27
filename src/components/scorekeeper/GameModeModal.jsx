@@ -102,7 +102,7 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
               }}
             >
               <PlayerTile emoji={emoji} color={active ? "#FFFFFF" : "rgb(var(--paper))"} size={38} radius={9} border={2.5} />
-              <span className="flex-1 text-[17px] font-extrabold">{label}</span>
+              <span className={`flex-1 text-[17px] font-extrabold ${active ? "text-ink" : ""}`}>{label}</span>
               {active && (
                 <span className="w-7 h-7 flex items-center justify-center bg-ink rounded-lg">
                   <Check size={16} strokeWidth={3.5} color="#FFFFFF" />

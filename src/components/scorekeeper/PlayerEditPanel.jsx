@@ -16,9 +16,10 @@ export default function PlayerEditPanel({ player, usedColors, usedEmojis, onSave
   const isEditing = !!player?.id;
 
   // New players get focus (and the iOS keyboard) straight away — see the
-  // synchronous-focus note in PlayerEditModal.
+  // synchronous-focus note in PlayerEditModal. preventScroll because the panel
+  // is still off-screen mid-slide, and iOS would scroll the page sideways to it.
   const focusIfNew = useCallback((el) => {
-    if (el && !isEditing) el.focus();
+    if (el && !isEditing) el.focus({ preventScroll: true });
   }, [isEditing]);
 
   const handleSubmit = () => {

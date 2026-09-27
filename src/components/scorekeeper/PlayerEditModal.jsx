@@ -9,6 +9,8 @@ import { Check, Trash2 } from "lucide-react";
 import { NEO_COLORS, PLAYER_COLORS, toNeoColor, twoToneBackground } from "@/lib/colors";
 import { PlayerTile, SectionLabel, SegmentedControl } from "./neo";
 
+const SCROLL_AREA = "flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-2";
+
 const STYLE_TABS = [
   { id: "color", label: "Color" },
   { id: "icon", label: "Icon" },
@@ -87,66 +89,65 @@ export function PlayerEditFields({ draft, onChange, inputRef, onSubmit, onEscape
         </>
       )}
 
-      {/* Starts at the tabs' midline so content scrolls up behind them. */}
-      <div className={`flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-2 ${wide ? "pt-5" : "-mt-[22px] pt-9"}`}>
-        {styleTab === "color" ? (
-          <>
-            <div className="grid grid-cols-2 gap-3 mr-1">
-              {[
-                { id: "solid", label: "Solid" },
-                { id: "gradient", label: "Two-tone" },
-              ].map(({ id, label }) => {
-                const active = cardStyle === id;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    aria-pressed={active}
-                    onPointerDown={(e) => { e.preventDefault(); onChange({ cardStyle: id }); }}
-                    className="h-14 flex items-end px-3 pb-2 text-ink border-3 border-ink rounded-xl text-[15px] font-extrabold transition-shadow"
-                    style={{
-                      background: id === "solid" ? color : twoToneBackground(color, 50),
-                      boxShadow: active ? "3px 3px 0 rgb(var(--ink))" : "none",
-                    }}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
+      {styleTab === "color" ? (
+        // Starts at the tabs' midline so content scrolls up behind them.
+        <div className={`${SCROLL_AREA} ${wide ? "pt-5" : "-mt-[22px] pt-9"}`}>
+          <div className="grid grid-cols-2 gap-3 mr-1">
+            {[
+              { id: "solid", label: "Solid" },
+              { id: "gradient", label: "Two-tone" },
+            ].map(({ id, label }) => {
+              const active = cardStyle === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  aria-pressed={active}
+                  onPointerDown={(e) => { e.preventDefault(); onChange({ cardStyle: id }); }}
+                  className="h-14 flex items-end px-3 pb-2 text-ink border-3 border-ink rounded-xl text-[15px] font-extrabold transition-shadow"
+                  style={{
+                    background: id === "solid" ? color : twoToneBackground(color, 50),
+                    boxShadow: active ? "3px 3px 0 rgb(var(--ink))" : "none",
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
 
-            <SectionLabel className="mt-4 text-[11px]">Color</SectionLabel>
-            <div className={`mt-2 mr-1 grid gap-2.5 ${wide ? "grid-cols-8" : "grid-cols-5"}`}>
-              {NEO_COLORS.map(({ name: swatchName, hex }) => {
-                const active = color === hex;
-                return (
-                  <button
-                    key={hex}
-                    type="button"
-                    aria-label={swatchName}
-                    aria-pressed={active}
-                    onPointerDown={(e) => { e.preventDefault(); onChange({ color: hex }); }}
-                    className="aspect-square flex items-center justify-center text-ink border-3 border-ink rounded-xl transition-[transform,box-shadow] duration-100"
-                    style={{
-                      background: hex,
-                      boxShadow: active ? "3px 3px 0 rgb(var(--ink))" : "none",
-                      transform: active ? "translate(-2px, -2px)" : "none",
-                    }}
-                  >
-                    {active && <Check size={20} strokeWidth={3.5} />}
-                  </button>
-                );
-              })}
-            </div>
-          </>
-        ) : (
-          <IconPicker
-            selected={emoji}
-            onChange={(next) => onChange({ emoji: next })}
-            stickyClassName={wide ? "top-0 -mt-5 pt-5" : "top-[22px] -mt-3.5 pt-3.5"}
-          />
-        )}
-      </div>
+          <SectionLabel className="mt-4 text-[11px]">Color</SectionLabel>
+          <div className={`mt-2 mr-1 grid gap-2.5 ${wide ? "grid-cols-8" : "grid-cols-5"}`}>
+            {NEO_COLORS.map(({ name: swatchName, hex }) => {
+              const active = color === hex;
+              return (
+                <button
+                  key={hex}
+                  type="button"
+                  aria-label={swatchName}
+                  aria-pressed={active}
+                  onPointerDown={(e) => { e.preventDefault(); onChange({ color: hex }); }}
+                  className="aspect-square flex items-center justify-center text-ink border-3 border-ink rounded-xl transition-[transform,box-shadow] duration-100"
+                  style={{
+                    background: hex,
+                    boxShadow: active ? "3px 3px 0 rgb(var(--ink))" : "none",
+                    transform: active ? "translate(-2px, -2px)" : "none",
+                  }}
+                >
+                  {active && <Check size={20} strokeWidth={3.5} />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        <IconPicker
+          selected={emoji}
+          onChange={(next) => onChange({ emoji: next })}
+          searchClassName={wide ? "mt-5" : "mt-3"}
+          scrollAreaClassName={SCROLL_AREA}
+        />
+      )}
     </div>
   );
 }

@@ -8,9 +8,10 @@ import PlayerEditPanel, { PlayerEditPanelEmpty } from "@/components/scorekeeper/
 import DeletePlayerConfirmModal from "@/components/scorekeeper/DeletePlayerConfirmModal";
 import { PlayerTile, SectionLabel, PageTitle, HeaderLink, PAGE_TOP, WIDE_PAGE_TOP } from "@/components/scorekeeper/neo";
 import { toNeoColor } from "@/lib/colors";
-import { SPRING_SHEET } from "@/lib/motion";
+import { SPRING_PANEL_IN, SPRING_SHEET } from "@/lib/motion";
 import { primeIOSKeyboard } from "@/lib/iosKeyboardPrimer";
 import { useWideLayout } from "@/lib/useWideLayout";
+import { showToast } from "@/lib/neoToast";
 
 export default function Players({ onBack, onModalChange }) {
   const [players, setPlayers] = useState([]);
@@ -23,6 +24,27 @@ export default function Players({ onBack, onModalChange }) {
   const [discardCount, setDiscardCount] = useState(0); // remounts the inline editor to drop edits
   const wide = useWideLayout();
   const scrollRef = useRef(null);
+
+  // Tablet, no players yet: the empty state sits centered on its own until the
+  // editor slides in beside it.
+  const listAlone = wide && players.length === 0 && !editing;
+  const splitRowRef = useRef(null);
+  const listColumnRef = useRef(null);
+  const [centerOffset, setCenterOffset] = useState(0);
+  useLayoutEffect(() => {
+    if (!wide) return undefined;
+    const measure = () => setCenterOffset((splitRowRef.current.offsetWidth - listColumnRef.current.offsetWidth) / 2);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(splitRowRef.current);
+    return () => observer.disconnect();
+  }, [wide]);
+  // The first layout after loading snaps into place; only later changes animate.
+  const [splitAnimates, setSplitAnimates] = useState(false);
+  useEffect(() => {
+    if (!loading) setSplitAnimates(true);
+  }, [loading]);
+  const splitTransition = splitAnimates ? SPRING_PANEL_IN : { duration: 0 };
   // Fully manual entrance + FLIP for the player list — NO framer on the rows or
   // section headers. Framer re-writes transform/layout on render and fought the
   // FLIP (the snap/teleport when re-sorting or removing all favorites). Rows and
@@ -172,6 +194,7 @@ export default function Players({ onBack, onModalChange }) {
       await db.players.update(id, { name, color, emoji, cardStyle });
       saved = { ...players.find((p) => p.id === id), name, color, emoji, cardStyle };
       setPlayers((prev) => prev.map((p) => (p.id === id ? saved : p)));
+      showToast("Player updated");
     } else {
       saved = await db.players.create({ name, color, emoji, cardStyle });
       setPlayers((prev) => [saved, ...prev]);
@@ -294,8 +317,14 @@ export default function Players({ onBack, onModalChange }) {
         )}
       </div>
 
-      <div className="flex-1 min-h-0 flex lg:gap-6 lg:mt-5">
-      <div className="flex-1 lg:flex-none lg:w-[340px] landscape:lg:w-[400px] relative overflow-hidden">
+      <div ref={splitRowRef} className="flex-1 min-h-0 flex lg:gap-6 lg:mt-5">
+      <motion.div
+        ref={listColumnRef}
+        initial={false}
+        animate={{ x: listAlone ? centerOffset : 0 }}
+        transition={splitTransition}
+        className="flex-1 lg:flex-none lg:w-[340px] landscape:lg:w-[400px] relative overflow-hidden"
+      >
         <div
           ref={scrollRef}
           className="h-full overflow-y-auto px-5 pt-2"
@@ -328,14 +357,6 @@ export default function Players({ onBack, onModalChange }) {
               </div>
               <h2 className="font-display mt-10 text-[28px] leading-[1.1] uppercase">Add some players</h2>
               <p className="mt-3 text-[17px] font-medium text-subtle">Tap the + above to get started.</p>
-              <button
-                onPointerDown={primeIOSKeyboard}
-                onClick={() => setEditing({})}
-                className="neo-press mt-7 h-14 px-7 flex items-center gap-2.5 bg-surface border-3 border-ink rounded-xl shadow-neo-md text-[17px] font-extrabold"
-              >
-                <Plus size={20} strokeWidth={3} />
-                Add first player
-              </button>
             </div>
           ) : (
             (() => {
@@ -357,23 +378,36 @@ export default function Players({ onBack, onModalChange }) {
             })()
           )}
         </div>
-      </div>
+      </motion.div>
 
       {wide && (
         <div className="flex-1 min-w-0 pt-2 pr-5 pb-2">
-          {editing ? (
-            <PlayerEditPanel
-              key={`${editing.id ?? "new"}-${discardCount}`}
-              player={editing}
-              usedColors={players.map((p) => p.color)}
-              usedEmojis={players.map((p) => p.emoji).filter(Boolean)}
-              onSave={handleSave}
-              onDelete={handleDelete}
-              onDiscard={() => (editing.id ? setDiscardCount((n) => n + 1) : setEditing(null))}
-            />
-          ) : (
-            <PlayerEditPanelEmpty onAdd={() => setEditing({})} />
-          )}
+          <AnimatePresence initial={false}>
+            {!listAlone && (
+              <motion.div
+                key="editor"
+                className="h-full"
+                initial={{ x: "110%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "110%" }}
+                transition={splitTransition}
+              >
+                {editing ? (
+                  <PlayerEditPanel
+                    key={`${editing.id ?? "new"}-${discardCount}`}
+                    player={editing}
+                    usedColors={players.map((p) => p.color)}
+                    usedEmojis={players.map((p) => p.emoji).filter(Boolean)}
+                    onSave={handleSave}
+                    onDelete={handleDelete}
+                    onDiscard={() => (editing.id ? setDiscardCount((n) => n + 1) : setEditing(null))}
+                  />
+                ) : (
+                  <PlayerEditPanelEmpty onAdd={() => setEditing({})} />
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
       </div>

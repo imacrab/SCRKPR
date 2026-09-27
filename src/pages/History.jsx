@@ -19,7 +19,7 @@ import { PlayerTile, SegmentedControl, SectionLabel, PageTitle, HeaderLink, Winn
 import { toNeoColor } from "@/lib/colors";
 import HistoryGameDetail from "@/components/scorekeeper/HistoryGameDetail";
 import SavedGamesList from "@/components/scorekeeper/SavedGamesList";
-import { TRANSITION_PANEL, SPRING_SNAPPY } from "@/lib/motion";
+import { TRANSITION_PANEL, SPRING_ENTER } from "@/lib/motion";
 
 const HISTORY_TABS = [
   { id: "games", label: "Games" },
@@ -262,7 +262,7 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
                       key={game.id}
                       onClick={() => setSelectedGameId(game.id)}
                       initial={{ opacity: 0, y: 16, scale: 0.97 }}
-                      animate={{ opacity: 1, y: 0, scale: 1, transition: { ...SPRING_SNAPPY, delay: enterDelay } }}
+                      animate={{ opacity: 1, y: 0, scale: 1, transition: { ...SPRING_ENTER, delay: enterDelay } }}
                       exit={{ opacity: 0, height: 0 }}
                       whileTap={{ scale: 0.985 }}
                       className="cursor-pointer">
@@ -284,7 +284,7 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
                   <motion.div
                     onClick={() => setSelectedGameId(game.id)}
                     initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0, transition: { ...SPRING_SNAPPY, delay: enterDelay } }}
+                    animate={{ opacity: 1, y: 0, transition: { ...SPRING_ENTER, delay: enterDelay } }}
                     exit={{ opacity: 0, height: 0 }}
                     whileTap={{ scale: 0.985 }}
                     className="mb-3.5 mr-[5px] p-3.5 bg-surface border-3 border-ink rounded-2xl shadow-neo-md cursor-pointer">

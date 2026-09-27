@@ -168,7 +168,7 @@ export default function BottomSheetModal({
       </div>
 
       <div
-        className={scrollable ? "flex-1 overflow-y-auto px-[18px] pb-4" : "flex-shrink-0 px-[18px]"}
+        className={scrollable ? `flex-1 overflow-y-auto px-[18px] ${fullHeight ? "" : "pb-4"}` : "flex-shrink-0 px-[18px]"}
         onScroll={scrollable ? (e) => setScrolled(e.currentTarget.scrollTop > 0) : undefined}
       >
         {children}

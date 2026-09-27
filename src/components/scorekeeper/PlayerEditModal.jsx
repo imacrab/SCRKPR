@@ -55,7 +55,7 @@ export function PlayerEditFields({ draft, onChange, inputRef, onSubmit, onEscape
     />
   );
   const styleTabs = (
-    <SegmentedControl className={wide ? "w-[220px] flex-shrink-0 mr-1" : "mt-4 mr-1 flex-shrink-0"} height={wide ? 52 : 44} options={STYLE_TABS} value={styleTab} onChange={setStyleTab} />
+    <SegmentedControl className={wide ? "w-[220px] flex-shrink-0 mr-1" : "relative z-10 mt-4 mr-1 flex-shrink-0"} height={wide ? 52 : 44} options={STYLE_TABS} value={styleTab} onChange={setStyleTab} />
   );
 
   return (
@@ -86,7 +86,8 @@ export function PlayerEditFields({ draft, onChange, inputRef, onSubmit, onEscape
         </>
       )}
 
-      <div className={`flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-2 ${wide ? "pt-5" : "pt-3.5"}`}>
+      {/* Starts at the tabs' midline so content scrolls up behind them. */}
+      <div className={`flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-2 ${wide ? "pt-5" : "-mt-[22px] pt-9"}`}>
         {styleTab === "color" ? (
           <>
             <div className="grid grid-cols-2 gap-3 mr-1">
@@ -200,6 +201,9 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
                 <Trash2 size={22} strokeWidth={2.5} />
               </Button>
             )}
+            <Button variant="outline" onClick={onClose} className="px-6">
+              Cancel
+            </Button>
             <Button onClick={handleSubmit} disabled={!draft.name.trim()} className="flex-1">
               {isEditing ? "Save" : "Add player"}
             </Button>

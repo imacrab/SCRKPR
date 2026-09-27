@@ -619,7 +619,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
           <>
               {!hasPlayers &&
             <motion.div {...reveal(2)} className="flex flex-col">
-                  <div className="space-y-2.5 mr-1">
+                  <div aria-hidden="true" className="space-y-2.5 mr-1 opacity-40">
                     {[120, 90].map((w) => (
                       <div key={w} className="h-[60px] flex items-center gap-3 px-2.5 border-3 border-dashed border-dash rounded-xl">
                         <span className="w-10 h-10 border-3 border-dashed border-dash rounded-[9px]" />
@@ -632,7 +632,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   <button
                     onPointerDown={primeIOSKeyboard}
                     onClick={() => setShowAddPlayerWithNav(true)}
-                    className="neo-press mx-auto mt-5 h-14 px-7 flex items-center gap-2.5 bg-surface border-3 border-ink rounded-xl shadow-neo-md text-[17px] font-extrabold">
+                    className="neo-press mx-auto mt-5 h-14 px-7 flex items-center gap-2.5 bg-sun text-ink border-3 border-ink rounded-xl shadow-neo-md text-[17px] font-extrabold">
                     <Plus size={20} strokeWidth={3} />
                     Add player
                   </button>

@@ -64,7 +64,7 @@ export function PlayerEditFields({ draft, onChange, inputRef, onSubmit, onEscape
     <div className="flex flex-col h-full min-h-0">
       {!wide && (
         <div
-          className="mr-1 h-16 flex-shrink-0 flex items-center gap-3 px-3 border-3 border-ink rounded-[14px] shadow-neo"
+          className="mr-1 h-16 flex-shrink-0 flex items-center gap-3 px-3 text-ink border-3 border-ink rounded-[14px] shadow-neo"
           style={{ background: cardStyle === "gradient" ? twoToneBackground(color) : color }}
         >
           <PlayerTile emoji={emoji} color="#FFFFFF" size={42} radius={10} />
@@ -101,7 +101,7 @@ export function PlayerEditFields({ draft, onChange, inputRef, onSubmit, onEscape
                     type="button"
                     aria-pressed={active}
                     onPointerDown={(e) => { e.preventDefault(); onChange({ cardStyle: id }); }}
-                    className="h-14 flex items-end px-3 pb-2 border-3 border-ink rounded-xl text-[15px] font-extrabold transition-shadow"
+                    className="h-14 flex items-end px-3 pb-2 text-ink border-3 border-ink rounded-xl text-[15px] font-extrabold transition-shadow"
                     style={{
                       background: id === "solid" ? color : twoToneBackground(color, 50),
                       boxShadow: active ? "3px 3px 0 rgb(var(--ink))" : "none",
@@ -124,7 +124,7 @@ export function PlayerEditFields({ draft, onChange, inputRef, onSubmit, onEscape
                     aria-label={swatchName}
                     aria-pressed={active}
                     onPointerDown={(e) => { e.preventDefault(); onChange({ color: hex }); }}
-                    className="aspect-square flex items-center justify-center border-3 border-ink rounded-xl transition-[transform,box-shadow] duration-100"
+                    className="aspect-square flex items-center justify-center text-ink border-3 border-ink rounded-xl transition-[transform,box-shadow] duration-100"
                     style={{
                       background: hex,
                       boxShadow: active ? "3px 3px 0 rgb(var(--ink))" : "none",

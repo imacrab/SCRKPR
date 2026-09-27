@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { RotateCcw, Flag, Bookmark } from "lucide-react";
+import { LogoSticker, SectionLabel, SegmentedControl, PAGE_TOP } from "./neo";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { db } from "@/lib/store";
 import PlayerColumn from "./PlayerColumn";
@@ -8,11 +9,11 @@ import PlayerEditModal from "./PlayerEditModal";
 import EndGameModal from "./EndGameModal";
 import ResetConfirmModal from "./ResetConfirmModal";
 import ScoreHistoryPanel from "./ScoreHistoryPanel";
-import StretchTabPill from "./StretchTabPill";
 import PauseGameModal from "./PauseGameModal";
 import { isLowMode, isCircleMode, getModeMeta } from "@/lib/gameModes";
 import { SPRING_SHEET, TRANSITION_PANEL } from "@/lib/motion";
-import logoDark from "@/assets/scrkpr-logo.svg";
+
+const iconButtonClass = "neo-press w-11 h-11 flex items-center justify-center bg-surface border-3 border-ink rounded-[11px] shadow-neo-sm";
 
 const SCOREBOARD_TABS = [
   { id: "board", label: "Scoreboard" },
@@ -31,7 +32,6 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [endingGame, setEndingGame] = useState(false);
   const [showPauseModal, setShowPauseModal] = useState(false);
   const [view, setView] = useState("board"); // "board" | "rounds"
-  const [previousView, setPreviousView] = useState("board");
   const scrollContainerRef = useRef(null);
   const scoreCloseTimerRef = useRef(null);
   const endGameTimerRef = useRef(null);
@@ -56,19 +56,8 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   // available (e.g. mode change).
   const showTabs = !isCircleMode(winMode);
   useEffect(() => {
-    if (view === "rounds" && !showTabs) {
-      setPreviousView("board");
-      setView("board");
-    }
+    if (view === "rounds" && !showTabs) setView("board");
   }, [view, showTabs]);
-
-  const activeViewIndex = SCOREBOARD_TABS.findIndex((item) => item.id === view);
-  const previousViewIndex = SCOREBOARD_TABS.findIndex((item) => item.id === previousView);
-  const handleViewChange = (id) => {
-    if (id === view) return;
-    setPreviousView(view);
-    setView(id);
-  };
 
   useEffect(() => {
     db.games.list("-played_at", 20).then((games) => {
@@ -169,6 +158,19 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
       return lowWins ? totalA - totalB : totalB - totalA;
     });
   }, [players, winMode]);
+
+  const lowWins = isLowMode(winMode);
+  const totalOf = (p) => p.scores.reduce((s, n) => s + n, 0);
+  const bestTotal = sortedPlayers.length ? totalOf(sortedPlayers[0]) : 0;
+  const roundNumber = Math.max(1, ...players.map((p) => p.scores.length));
+  const modeMeta = getModeMeta(winMode);
+  const rulesLabel = circleMode
+    ? `First to ${winsNeeded} wins`
+    : [
+        winMode !== "low" && winMode !== "high" ? modeMeta.label : null,
+        lowWins ? "Low score wins" : "High score wins",
+        targetScore ? `Ends at ${targetScore}` : null,
+      ].filter(Boolean).join(" · ");
 
   // Track whether we've auto-triggered the end-game modal for the current game.
   // Without this guard, the effect re-fires on every score change after the threshold
@@ -287,70 +289,34 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
 
 
   return (
-    <div className="w-screen flex flex-col overflow-hidden bg-background" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-4 pt-10 pb-5 flex-shrink-0" style={{ backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
-        <button onClick={() => setShowEndGame(true)} className="hover:opacity-75 transition-opacity">
-          {/* Invisible anchor — see PlayerSetup note; the persistent logo
-              hoisted to ScoreKeeper floats over this slot. The button still
-              receives the tap (opens End Game) since the floating logo is
-              pointer-events:none. */}
-          <img src={logoDark} alt="SCRKPR!" data-logo-anchor style={{ maxWidth: 120, height: "auto", opacity: 0 }} />
+    <div className="w-screen flex flex-col overflow-hidden bg-background" style={{ height: "100dvh", paddingTop: PAGE_TOP, paddingBottom: "env(safe-area-inset-bottom)" }}>
+      <div className="flex items-center gap-2.5 h-[46px] px-5 flex-shrink-0">
+        <button onClick={() => setShowEndGame(true)} aria-label="End game">
+          <LogoSticker />
         </button>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowEndGame(true)}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:text-foreground hover:bg-accent transition-colors text-[hsl(var(--foreground))]"
-            aria-label="End game">
-
-            <Flag size={22} strokeWidth={2} />
-          </button>
-          <button
-            onClick={() => setShowPauseModal(true)}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:text-foreground hover:bg-accent transition-colors text-[hsl(var(--foreground))]"
-            aria-label="Save game">
-
-            <Bookmark size={22} strokeWidth={2} />
-          </button>
-          <button
-            onClick={() => setShowResetConfirm(true)}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:text-foreground hover:bg-accent transition-colors text-[hsl(var(--foreground))]"
-            aria-label="Reset scores">
-
-            <RotateCcw size={22} strokeWidth={2} />
-          </button>
-        </div>
+        <span className="font-mono flex-1 ml-1.5 text-xs font-bold tracking-[0.1em] uppercase">
+          {circleMode ? `Best of ${bestOf}` : `Round ${roundNumber}`}
+        </span>
+        <button onClick={() => setShowPauseModal(true)} className={iconButtonClass} aria-label="Save game">
+          <Bookmark size={20} strokeWidth={2.5} />
+        </button>
+        <button onClick={() => setShowResetConfirm(true)} className={`${iconButtonClass} mr-[3px]`} aria-label="Reset scores">
+          <RotateCcw size={20} strokeWidth={2.5} />
+        </button>
       </div>
 
-      {/* Scoreboard / Rounds tabs — appear once rounds have been logged */}
       {showTabs && (
-        <div className="px-4 pb-2 flex-shrink-0">
-          <div className="relative flex rounded-full border border-border p-1">
-            <StretchTabPill
-              activeIndex={activeViewIndex}
-              previousIndex={previousViewIndex}
-              onSettle={() => setPreviousView(view)}
-            />
-            {SCOREBOARD_TABS.map(({ id, label }) => {
-              const active = view === id;
-              return (
-                <button
-                  key={id}
-                  onClick={() => handleViewChange(id)}
-                  className="relative flex-1 h-9 rounded-full text-sm font-medium"
-                >
-                  <span className={`relative z-10 transition-colors ${active ? "text-foreground" : "text-muted-foreground"}`}>
-                    {label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+        <div className="px-5 mt-4 flex-shrink-0">
+          <SegmentedControl className="mr-1" options={SCOREBOARD_TABS} value={view} onChange={setView} />
         </div>
       )}
 
-      {/* Rows — one player per row, sorted by total */}
-      <div className="flex-1 px-4 pb-4 overflow-hidden w-full relative">
+      <SectionLabel className="px-5 mt-4 flex-shrink-0 flex items-center gap-2 truncate">
+        {view === "rounds" && <span className="w-4 h-3.5 flex-shrink-0 bg-sun text-ink border-2 border-ink rounded" />}
+        {view === "rounds" ? (lowWins ? "Lowest score that round" : "Top score that round") : rulesLabel}
+      </SectionLabel>
+
+      <div className="flex-1 px-5 overflow-hidden w-full relative">
         <AnimatePresence mode="wait" initial={false}>
           {view === "rounds" ? (
             <motion.div
@@ -359,23 +325,22 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 24 }}
               transition={TRANSITION_PANEL}
-              className="h-full overflow-y-auto relative z-0"
-              style={{ WebkitOverflowScrolling: "touch", paddingBottom: "calc(env(safe-area-inset-bottom) + 120px)" }}>
-              <ScoreHistoryPanel players={sortedPlayers} />
+              className="h-full overflow-y-auto relative z-0 pt-4 pb-4"
+              style={{ WebkitOverflowScrolling: "touch" }}>
+              <ScoreHistoryPanel players={sortedPlayers} winMode={winMode} />
             </motion.div>
           ) : (
             <motion.div
               key="board"
               initial={{ opacity: 0, x: -24 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -24 }}
+              exit={{ opacity: 0, x: 24 }}
               transition={TRANSITION_PANEL}
               className="h-full">
-              {/* paddingBottom clears the fixed End Game button + its 120px fade. */}
               <div
                 ref={scrollContainerRef}
-                className="flex flex-col h-full gap-2 w-full overflow-y-auto relative z-0"
-                style={{ WebkitOverflowScrolling: "touch", paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)" }}>
+                className="flex flex-col h-full gap-[18px] w-full overflow-y-auto relative z-0 pt-5 pb-4"
+                style={{ WebkitOverflowScrolling: "touch" }}>
                 <LayoutGroup>
                   {sortedPlayers.map((player, idx) =>
                   <motion.div
@@ -389,8 +354,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
                       scale: { ...SPRING_SHEET, delay: idx * 0.07 },
                       opacity: { duration: 0.25, delay: idx * 0.07 },
                     }}
-                    className="w-full flex-1 min-h-[72px] flex flex-col">
-
+                    className="w-full flex-shrink-0">
                       <PlayerColumn
                       player={player}
                       isLeader={player.id === leaderId}
@@ -398,14 +362,11 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
                       isHighlighted={player.id === lastAddedPlayerId}
                       streak={streakMap[player.name] || 0}
                       winsNeeded={winsNeeded}
-                      isFirst={idx === 0}
-                      isLast={idx === sortedPlayers.length - 1}
+                      behind={lowWins ? totalOf(player) - bestTotal : bestTotal - totalOf(player)}
                       scoredThisRound={!circleMode && player.scores.length > currentRound}
-                      playerCount={sortedPlayers.length}
                       onAddScore={() => handleOpenScore(player)}
                       onEditScore={(i) => handleEditScore(player, i)}
                       onEditPlayer={() => setEditingPlayer(player)} />
-
                     </motion.div>
                   )}
                 </LayoutGroup>
@@ -413,6 +374,15 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+
+      <div className="px-5 pt-2 pb-6 flex-shrink-0">
+        <button
+          onClick={() => setShowEndGame(true)}
+          className="neo-press font-display w-[calc(100%-6px)] h-16 flex items-center justify-center gap-2.5 bg-sun text-ink border-3 border-ink rounded-[14px] shadow-neo-lg text-xl uppercase">
+          <Flag size={22} strokeWidth={2.75} />
+          End game
+        </button>
       </div>
 
       <ScoreInputModal

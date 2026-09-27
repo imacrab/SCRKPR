@@ -1,11 +1,8 @@
 import { Delete } from "lucide-react";
 
-const KEYS = [
-  ["7", "8", "9"],
-  ["4", "5", "6"],
-  ["1", "2", "3"],
-  ["-", "0", "."],
-];
+const KEYS = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "±", "0", "⌫"];
+
+const keyClass = "neo-press font-display h-14 flex items-center justify-center border-3 border-ink rounded-xl shadow-neo-sm text-2xl select-none";
 
 export default function NumberPad({ value, onChange }) {
   const handleKey = (key) => {
@@ -13,14 +10,14 @@ export default function NumberPad({ value, onChange }) {
       onChange(value.slice(0, -1));
       return;
     }
-    if (key === "-") {
-      if (value.length === 0) onChange("-");
+    if (key === "±") {
+      if (value === "") onChange("-");
       else if (value === "-") onChange("");
+      else onChange(value.startsWith("-") ? value.slice(1) : `-${value}`);
       return;
     }
-    if (key === "." && value.includes(".")) return;
-    if (key === "0" && value === "0") return;
-    if (key !== "." && key !== "-" && value === "0") {
+    if (key === "0" && (value === "0" || value === "-0")) return;
+    if (value === "0") {
       onChange(key);
       return;
     }
@@ -28,36 +25,21 @@ export default function NumberPad({ value, onChange }) {
   };
 
   return (
-    <div className="w-full space-y-2">
-      {KEYS.map((row, ri) => (
-        <div key={ri} className="flex gap-2">
-          {row.map((key) => (
-            <button
-              key={key}
-              onPointerDown={(e) => { e.preventDefault(); handleKey(key); }}
-              className="flex-1 h-12 rounded-full bg-secondary hover:bg-accent text-white font-semibold text-lg transition-colors active:scale-95 select-none border border-border"
-            >
-              {key}
-            </button>
-          ))}
-        </div>
-      ))}
-      {/* Clear + Backspace */}
-      <div className="flex gap-2">
-        <button
-          onPointerDown={(e) => { e.preventDefault(); onChange(""); }}
-          className="flex-1 h-12 rounded-full bg-secondary hover:bg-accent text-white font-medium text-sm transition-colors active:scale-95 select-none border border-border"
-        >
-          Clear
-        </button>
-        <button
-          onPointerDown={(e) => { e.preventDefault(); handleKey("⌫"); }}
-          className="flex-1 h-12 rounded-full bg-secondary hover:bg-accent text-white flex items-center justify-center transition-colors active:scale-95 select-none border border-border"
-          aria-label="Backspace"
-        >
-          <Delete size={17} />
-        </button>
-      </div>
+    <div className="grid grid-cols-3 gap-2.5 pr-1">
+      {KEYS.map((key) => {
+        const utility = key === "±" || key === "⌫";
+        return (
+          <button
+            key={key}
+            type="button"
+            onPointerDown={(e) => { e.preventDefault(); handleKey(key); }}
+            aria-label={key === "⌫" ? "Delete last digit" : key === "±" ? "Switch between add and subtract" : undefined}
+            className={`${keyClass} ${utility ? "bg-putty" : "bg-surface"}`}
+          >
+            {key === "⌫" ? <Delete size={26} strokeWidth={2.5} /> : key}
+          </button>
+        );
+      })}
     </div>
   );
 }

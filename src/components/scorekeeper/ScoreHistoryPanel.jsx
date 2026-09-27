@@ -1,84 +1,86 @@
 import { motion } from "framer-motion";
 import FluentEmoji from "./FluentEmoji";
+import { PlayerTile } from "./neo";
+import { isLowMode } from "@/lib/gameModes";
+import { toNeoColor } from "@/lib/colors";
 import { TRANSITION_PANEL } from "@/lib/motion";
 
-// The per-round breakdown table. Lives behind the "Rounds" tab on the
-// scoreboard (no longer an inline collapsible panel). Renders nothing until at
-// least one round has been logged.
-export default function ScoreHistoryPanel({ players }) {
+function bestInRound(players, roundIdx, lowWins) {
+  const scores = players.map((p) => p.scores[roundIdx]);
+  if (scores.some((s) => s === undefined)) return null;
+  const best = lowWins ? Math.min(...scores) : Math.max(...scores);
+  return scores.every((s) => s === best) ? null : best;
+}
+
+export default function ScoreHistoryPanel({ players, winMode }) {
   const maxRounds = Math.max(0, ...players.map((p) => p.scores.length));
+  const lowWins = isLowMode(winMode);
+
   if (maxRounds === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center" style={{ gap: 32 }}>
-        <FluentEmoji emoji="🤷‍♀️" size={140} style={{ display: "block" }} />
-        <div className="flex flex-col items-center" style={{ gap: 8 }}>
-          <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No rounds played yet</p>
-          <p className="text-white/50 text-sm [font-family:'Geist',_sans-serif]">All previous round's score will appear here</p>
-        </div>
+      <div className="h-full flex flex-col items-center justify-center text-center pb-6">
+        <PlayerTile color="rgb(var(--surface))" size={104} radius={22} rotate={-6} className="shadow-neo-md">
+          <FluentEmoji emoji="🤷‍♀️" size={72} />
+        </PlayerTile>
+        <h2 className="font-display mt-8 text-[26px] leading-[1.1] uppercase">No rounds yet</h2>
+        <p className="mt-2.5 text-base font-medium text-subtle max-w-[280px]">Every round's scores will stack up here.</p>
       </div>
     );
   }
 
+  const columns = `56px repeat(${players.length}, minmax(44px, 1fr))`;
+
   return (
-    <div className="rounded-xl border border-border bg-card/50 overflow-hidden">
+    <div className="mr-1.5 bg-surface border-3 border-ink rounded-2xl shadow-neo-lg overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border">
-              <th className="text-left px-3 py-2.5 font-medium text-muted-foreground sticky left-0 bg-card/80 backdrop-blur-sm">
-                Round
-              </th>
-              {players.map((p) => (
-                <th key={p.id} className="px-3 py-2.5 text-center font-medium">
-                  {p.emoji ? (
-                    <FluentEmoji emoji={p.emoji} size={22} />
-                  ) : (
-                    <span
-                      className="inline-block w-4 h-4 rounded-full"
-                      style={{ backgroundColor: p.color }}
-                      aria-label={p.name}
-                    />
-                  )}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {Array.from({ length: maxRounds }).map((_, roundIdx) => (
-              <motion.tr
+        <div style={{ minWidth: 56 + players.length * 44 }}>
+          <div className="grid items-center h-[60px] border-b-3 border-ink bg-paper" style={{ gridTemplateColumns: columns }}>
+            <div className="font-mono pl-3.5 text-[11px] font-bold tracking-[0.1em]">RND</div>
+            {players.map((p) => (
+              <div key={p.id} className="flex justify-center" title={p.name}>
+                <PlayerTile emoji={p.emoji} color={toNeoColor(p.color)} size={34} radius={9} border={2.5} />
+              </div>
+            ))}
+          </div>
+
+          {Array.from({ length: maxRounds }).map((_, roundIdx) => {
+            const best = bestInRound(players, roundIdx, lowWins);
+            return (
+              <motion.div
                 key={roundIdx}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ ...TRANSITION_PANEL, delay: Math.min(roundIdx, 10) * 0.03 }}
-                className="border-b border-border/50 last:border-0">
-                <td className="text-left px-3 py-2.5 text-muted-foreground sticky left-0 bg-card/80 backdrop-blur-sm">
-                  {roundIdx + 1}
-                </td>
+                className="grid items-center h-[52px] border-b-2 border-hairline text-lg font-bold text-center"
+                style={{ gridTemplateColumns: columns }}
+              >
+                <div className="font-mono pl-3.5 text-left text-[15px]">{roundIdx + 1}</div>
                 {players.map((p) => {
                   const score = p.scores[roundIdx];
+                  if (score === undefined) return <div key={p.id} className="text-faint">—</div>;
                   return (
-                    <td key={p.id} className="px-3 py-2.5 text-center font-medium text-foreground">
-                      {score === undefined ? <span className="text-muted-foreground">—</span> : score}
-                    </td>
+                    <div key={p.id} className="flex justify-center">
+                      {score === best ? (
+                        <span className="min-w-[38px] h-8 px-1 flex items-center justify-center bg-sun text-ink border-2 border-ink rounded-lg">{score}</span>
+                      ) : (
+                        score
+                      )}
+                    </div>
                   );
                 })}
-              </motion.tr>
+              </motion.div>
+            );
+          })}
+
+          <div className="grid items-center h-[60px] bg-ink text-center font-display text-[22px]" style={{ gridTemplateColumns: columns }}>
+            <div className="font-mono pl-3.5 text-left text-white text-[11px] font-bold tracking-[0.1em]">TOTAL</div>
+            {players.map((p) => (
+              <div key={p.id} style={{ color: toNeoColor(p.color) }}>
+                {p.scores.reduce((s, n) => s + n, 0)}
+              </div>
             ))}
-            <tr className="bg-muted/30">
-              <td className="text-left px-3 py-2.5 font-semibold sticky left-0 bg-muted/60 backdrop-blur-sm">
-                Total
-              </td>
-              {players.map((p) => {
-                const total = p.scores.reduce((s, n) => s + n, 0);
-                return (
-                  <td key={p.id} className="px-3 py-2.5 text-center font-bold" style={{ color: p.color }}>
-                    {total}
-                  </td>
-                );
-              })}
-            </tr>
-          </tbody>
-        </table>
+          </div>
+        </div>
       </div>
     </div>
   );

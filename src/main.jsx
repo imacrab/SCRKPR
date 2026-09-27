@@ -4,10 +4,9 @@ import { Capacitor } from '@capacitor/core'
 import App from '@/App.jsx'
 import '@/index.css'
 import { preloadPlayerEmojis } from '@/lib/preloadEmojis'
+import { initTheme } from '@/lib/theme'
 
-// Force dark theme app-wide
-document.documentElement.classList.add('dark')
-document.documentElement.style.colorScheme = 'dark'
+initTheme()
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <App />
@@ -25,14 +24,11 @@ if (typeof window !== 'undefined') {
   }
 }
 
-// Native shell only (no-op on web): set a light-content status bar for the dark
-// UI, and hide the launch splash once React has painted. The plugins are
-// dynamically imported so none of their code touches the web/dev path.
+// Native shell only (no-op on web): hide the launch splash once React has
+// painted (initTheme sets the status bar style). The plugin is dynamically
+// imported so none of its code touches the web/dev path.
 if (Capacitor.isNativePlatform()) {
   requestAnimationFrame(() => {
-    import('@capacitor/status-bar')
-      .then(({ StatusBar, Style }) => StatusBar.setStyle({ style: Style.Dark }))
-      .catch(() => {})
     import('@capacitor/splash-screen')
       .then(({ SplashScreen }) => SplashScreen.hide())
       .catch(() => {})

@@ -2,6 +2,10 @@ import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BottomSheetModal from "./BottomSheetModal";
+import FluentEmoji from "./FluentEmoji";
+import { PlayerTile } from "./neo";
+
+const stepperClass = "neo-press w-14 h-14 flex items-center justify-center bg-surface border-3 border-ink rounded-xl shadow-neo disabled:opacity-40 disabled:shadow-none";
 
 const ODD_OPTIONS = [3, 5, 7, 9, 11, 13, 15];
 
@@ -24,50 +28,32 @@ export default function BestOfModal({ isOpen, onConfirm, onClose }) {
     <BottomSheetModal
       isOpen={isOpen}
       onClose={onClose}
+      leading={<PlayerTile color="#FFD23F" size={46} radius={11}><FluentEmoji emoji="🏆" size={30} /></PlayerTile>}
       eyebrow="Best Of"
       title="How many games?"
       footer={
-        <div className="flex gap-3">
-          <Button onClick={onClose} variant="outline" className="flex-1 h-11">
+        <div className="grid grid-cols-2 gap-3.5">
+          <Button onClick={onClose} variant="outline">
             Cancel
           </Button>
-          <Button
-            onClick={() => onConfirm(bestOf)}
-            className="flex-1 h-11 bg-white hover:bg-white/90 font-semibold"
-            style={{ color: "#262729", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}
-          >
-            Start Game
+          <Button onClick={() => onConfirm(bestOf)}>
+            Start game
           </Button>
         </div>
       }
     >
-      {/* Stepper */}
-      <div className="flex items-center justify-center gap-6 mb-3">
-        <button
-          onClick={decrement}
-          disabled={bestOf === ODD_OPTIONS[0]}
-          className="w-12 h-12 rounded-full border border-border flex items-center justify-center text-foreground disabled:opacity-30 transition-opacity"
-        >
-          <Minus size={20} strokeWidth={2} />
+      <div className="mr-1 flex items-center justify-between gap-4 px-3 py-4 bg-surface border-3 border-ink rounded-[14px] shadow-neo">
+        <button onClick={decrement} disabled={bestOf === ODD_OPTIONS[0]} aria-label="Fewer games" className={stepperClass}>
+          <Minus size={22} strokeWidth={3} />
         </button>
-
-        <div className="text-center min-w-[80px]">
-          <span className="text-5xl font-bold font-display" style={{ color: "hsl(var(--foreground))" }}>
-            {bestOf}
-          </span>
-        </div>
-
-        <button
-          onClick={increment}
-          disabled={bestOf === ODD_OPTIONS[ODD_OPTIONS.length - 1]}
-          className="w-12 h-12 rounded-full border border-border flex items-center justify-center text-foreground disabled:opacity-30 transition-opacity"
-        >
-          <Plus size={20} strokeWidth={2} />
+        <span className="font-display text-6xl leading-none">{bestOf}</span>
+        <button onClick={increment} disabled={bestOf === ODD_OPTIONS[ODD_OPTIONS.length - 1]} aria-label="More games" className={stepperClass}>
+          <Plus size={22} strokeWidth={3} />
         </button>
       </div>
 
-      <p className="text-center text-sm text-muted-foreground pb-2">
-        First to <span className="font-semibold text-foreground">{winsNeeded}</span> wins takes it all
+      <p className="font-mono text-center text-xs font-bold tracking-[0.1em] uppercase pt-4 pb-1">
+        First to {winsNeeded} wins takes it all
       </p>
     </BottomSheetModal>
   );

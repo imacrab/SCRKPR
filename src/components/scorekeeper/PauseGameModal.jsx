@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Bookmark } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import BottomSheetModal from "./BottomSheetModal";
+import { PlayerTile, SectionLabel } from "./neo";
 
 // Naming sheet for "Pause for later". Pre-fills a sensible default name so
 // Save always works; the user can overwrite it. Uses avoidKeyboard so the
@@ -21,24 +24,22 @@ export default function PauseGameModal({ isOpen, defaultName, onSave, onClose })
     <BottomSheetModal
       isOpen={isOpen}
       onClose={onClose}
+      leading={<PlayerTile color="#1FBFFF" size={46} radius={11}><Bookmark size={22} strokeWidth={2.5} /></PlayerTile>}
       eyebrow="Pause"
       title="Save for later"
       avoidKeyboard
       footer={
-        <Button
-          onClick={handleSave}
-          className="w-full h-11 bg-white hover:bg-white/90 font-semibold"
-          style={{ color: "#262729" }}
-        >
+        <Button onClick={handleSave} className="w-full">
           Save game
         </Button>
       }
     >
-      <div className="px-1 pb-2">
-        <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">
+      <div className="pb-1">
+        <SectionLabel as="label" htmlFor="pause-name" className="text-[11px]">
           Game name
-        </label>
-        <input
+        </SectionLabel>
+        <Input
+          id="pause-name"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -50,9 +51,9 @@ export default function PauseGameModal({ isOpen, defaultName, onSave, onClose })
           onKeyDown={(e) => { if (e.key === "Enter") handleSave(); }}
           placeholder="e.g. Friday Night Skip-Bo"
           maxLength={60}
-          className="mt-2 w-full h-12 rounded-xl bg-secondary border border-border px-4 text-foreground text-base placeholder:text-muted-foreground/40 focus:outline-none focus:border-accent-blue transition-colors"
+          className="mt-1.5 mr-1 w-[calc(100%-4px)]"
         />
-        <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+        <p className="text-sm font-medium text-subtle mt-2.5 leading-relaxed">
           Pick up right where you left off from History → Saved.
         </p>
       </div>

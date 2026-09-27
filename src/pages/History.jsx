@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { db } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
-import { RefreshCw, Handshake, AlertTriangle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { RefreshCw, AlertTriangle, Trash2, Spade } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
@@ -14,7 +15,8 @@ const safeFormat = (value, fmt) => {
 };
 import HistoryStats from "@/components/scorekeeper/HistoryStats";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
-import StretchTabPill from "@/components/scorekeeper/StretchTabPill";
+import { PlayerTile, SegmentedControl, SectionLabel, PageTitle, HeaderLink, WinnerCard, ColorChip, PAGE_TOP } from "@/components/scorekeeper/neo";
+import { toNeoColor } from "@/lib/colors";
 import HistoryGameDetail from "@/components/scorekeeper/HistoryGameDetail";
 import SavedGamesList from "@/components/scorekeeper/SavedGamesList";
 import { TRANSITION_PANEL, SPRING_SNAPPY } from "@/lib/motion";
@@ -33,9 +35,8 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
   const [pullDistance, setPullDistance] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
   const [clearing, setClearing] = useState(false);
-  const [canScroll, setCanScroll] = useState(false);
-  const [tab, setTab] = useState("games"); // "games" | "stats"
-  const [previousTab, setPreviousTab] = useState("games");
+  const [tab, setTab] = useState("games"); // "games" | "saved" | "stats"
+  const navigate = useNavigate();
   const [selectedGameId, setSelectedGameId] = useState(null);
   const [savedToDelete, setSavedToDelete] = useState(null); // saved game pending delete confirmation
   const scrollRef = useRef(null);
@@ -67,7 +68,6 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
     didInitTab.current = true;
     if (games.length === 0 && savedGames.length > 0) {
       setTab("saved");
-      setPreviousTab("saved");
     }
   }, [loading, games.length, savedGames.length]);
 
@@ -128,18 +128,6 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
     setClearing(false);
   };
 
-  // Check if content can scroll
-  useEffect(() => {
-    const checkScroll = () => {
-      if (scrollRef.current) {
-        setCanScroll(scrollRef.current.scrollHeight > scrollRef.current.clientHeight);
-      }
-    };
-    checkScroll();
-    window.addEventListener("resize", checkScroll);
-    return () => window.removeEventListener("resize", checkScroll);
-  }, [games, loading]);
-
   // Update parent when modal / detail view opens/closes — hides the bottom
   // nav bar so the detail view feels full-screen.
   useEffect(() => {
@@ -148,108 +136,75 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
 
   const selectedGame = selectedGameId !== null ? games.find((g) => g.id === selectedGameId) : null;
 
-  const activeTabIndex = HISTORY_TABS.findIndex((item) => item.id === tab);
-  const previousTabIndex = HISTORY_TABS.findIndex((item) => item.id === previousTab);
-  const handleTabChange = (id) => {
-    if (id === tab) return;
-    setPreviousTab(tab);
-    setTab(id);
-  };
+  const emptyPanel = (emoji, title, body) => (
+    <div className="flex flex-col items-center justify-center text-center px-5" style={{ minHeight: "50vh" }}>
+      <PlayerTile color="rgb(var(--surface))" size={104} radius={22} rotate={-6} className="shadow-neo-md">
+        <FluentEmoji emoji={emoji} size={72} />
+      </PlayerTile>
+      <h2 className="font-display mt-8 text-[26px] leading-[1.1] uppercase">{title}</h2>
+      <p className="mt-2.5 text-base font-medium text-subtle max-w-[280px]">{body}</p>
+    </div>
+  );
 
   return (
-    <div className="relative bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
-      {/* Header */}
-      <div className="pt-10 pb-2 px-5 flex items-baseline flex-shrink-0 relative" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
-        {/* Spacer mirrors the right-side controls so the title stays visually centered */}
-        <div className="flex-1" />
-        <h1 className="font-sans font-medium text-lg text-foreground text-center">Past Rounds</h1>
-        <div className="flex-1 flex items-baseline justify-end gap-2">
-          {refreshing && <RefreshCw size={16} strokeWidth={2} className="text-muted-foreground animate-spin self-center" />}
-          {games.length > 0 &&
-          <button
-            onClick={() => setShowConfirm(true)}
-            className="text-xs font-medium text-white/70 hover:text-white transition-colors px-2 py-1">
-            
-              Clear All
-            </button>
-          }
-        </div>
+    <div className="relative bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: PAGE_TOP, paddingBottom: "env(safe-area-inset-bottom)" }}>
+      <div className="px-5 h-12 flex items-center gap-2 flex-shrink-0">
+        <PageTitle className="flex-1">Past rounds</PageTitle>
+        {refreshing && <RefreshCw size={18} strokeWidth={2.5} className="animate-spin" />}
+        {games.length > 0 && <HeaderLink onClick={() => setShowConfirm(true)}>Clear all</HeaderLink>}
       </div>
 
-      {/* Games / Saved / Stats tabs */}
       {!loading && (games.length > 0 || savedGames.length > 0) && (
-        <div className="px-5 pt-2 pb-2 flex-shrink-0">
-          <div className="relative flex rounded-full border border-border p-1">
-            <StretchTabPill
-              activeIndex={activeTabIndex}
-              previousIndex={previousTabIndex}
-              onSettle={() => setPreviousTab(tab)}
-              count={HISTORY_TABS.length}
-            />
-            {HISTORY_TABS.map(({ id, label }) => {
-              const active = tab === id;
-              return (
-                <button
-                  key={id}
-                  onClick={() => handleTabChange(id)}
-                  className="relative flex-1 h-9 rounded-full text-sm font-medium"
-                >
-                  <span className={`relative z-10 inline-flex items-center gap-1.5 transition-colors ${active ? "text-foreground" : "text-muted-foreground"}`}>
-                    {label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+        <div className="px-5 mt-4 flex-shrink-0">
+          <SegmentedControl className="mr-1" options={HISTORY_TABS} value={tab} onChange={setTab} />
         </div>
       )}
 
-      {/* Pull indicator */}
       {pullDistance > 0 &&
-      <div className="flex justify-center py-2 text-muted-foreground" style={{ height: pullDistance }}>
-          <RefreshCw size={16} strokeWidth={2} className={pullDistance >= PULL_THRESHOLD ? "text-foreground" : ""} style={{ transform: `rotate(${pullDistance * 4}deg)` }} />
+      <div className="flex justify-center py-2" style={{ height: pullDistance }}>
+          <RefreshCw size={18} strokeWidth={2.5} className={pullDistance >= PULL_THRESHOLD ? "" : "opacity-40"} style={{ transform: `rotate(${pullDistance * 4}deg)` }} />
         </div>
       }
 
       <div className="flex-1 relative overflow-hidden">
-        {/* Top fade */}
-        {canScroll && <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />}
-        {/* Bottom fade — the list dissolves into the tab bar instead of ending on
-            a hard edge. Anchored to the very bottom (bottom:0) with the gradient
-            baked in: the top 32px dissolves the list, and the bottom 56px is
-            SOLID background. That solid base sits behind the tab bar's content
-            row, so even if the page's 100dvh + safe-area and the fixed bar's
-            safe-area disagree by a pixel or two on a notched device, the seam
-            shows solid background — never a sliver of the card behind it. */}
-        {canScroll && (
-          <div
-            className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
-            style={{
-              height: "88px",
-              background: "linear-gradient(to top, hsl(var(--background)) 0, hsl(var(--background)) 56px, transparent 88px)",
-            }}
-          />
-        )}
-
         <div
           ref={scrollRef}
-          className="h-full overflow-y-auto px-5 py-4"
-          style={{ paddingBottom: "calc(56px + 16px + 16px)" }}
+          className="h-full overflow-y-auto px-5 pt-5"
+          style={{ paddingBottom: "calc(69px + 24px + env(safe-area-inset-bottom))" }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}>
-          
+
         {loading ?
           <div className="flex items-center justify-center py-20">
-            <div className="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
+            <div className="w-6 h-6 border-3 border-ink/20 border-t-ink rounded-full animate-spin" />
           </div> :
           games.length === 0 && savedGames.length === 0 ?
-          <div className="h-full flex flex-col items-center justify-center text-center px-5" style={{ gap: 20 }}>
-            <FluentEmoji emoji="🙀" size={140} style={{ display: "block" }} />
-            <div className="flex flex-col items-center" style={{ gap: 8 }}>
-              <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No rounds saved yet</p>
-              <p className="text-white/60 text-base [font-family:'Geist',_sans-serif]">All past games and stats will appear here</p>
+          <div className="flex flex-col items-center text-center">
+            <div className="relative w-[300px] h-[250px] mt-16">
+              <div className="absolute left-[40px] top-[14px] w-[220px] h-[210px] bg-surface border-3 border-ink rounded-2xl shadow-neo-md" style={{ transform: "rotate(6deg)" }} />
+              <div className="absolute left-[46px] top-2 w-[220px] h-[210px] p-[18px] flex flex-col gap-3.5 text-left bg-surface border-3 border-ink rounded-2xl shadow-neo-md" style={{ transform: "rotate(-4deg)" }}>
+                <div className="font-mono text-[11px] font-bold tracking-[0.12em]">SCORECARD</div>
+                <div className="grid grid-cols-3 gap-2.5">
+                  {Array.from({ length: 9 }).map((_, i) => <div key={i} className="h-3 rounded-md bg-hairline" />)}
+                </div>
+                <div className="flex-1" />
+                <div className="h-[3px] bg-ink" />
+                <div className="font-display text-[30px] leading-none">0</div>
+              </div>
+              <div className="font-mono absolute left-[180px] top-[157px] px-2.5 py-1.5 bg-danger text-ink border-3 border-ink rounded-lg shadow-neo-sm text-xs font-bold tracking-[0.1em]" style={{ transform: "rotate(-10deg)" }}>
+                BLANK!
+              </div>
             </div>
+            <h2 className="font-display mt-9 text-[26px] leading-[1.1] uppercase">No rounds saved yet</h2>
+            <p className="mt-3 text-[17px] font-medium leading-[1.45] text-subtle max-w-[290px]">Finished games and stats will show up here.</p>
+            <button
+              onClick={() => navigate("/")}
+              className="neo-press font-display mt-7 h-[58px] px-[26px] flex items-center gap-2.5 bg-sun text-ink border-3 border-ink rounded-xl shadow-neo-md text-[17px] uppercase"
+            >
+              <Spade size={20} strokeWidth={2} fill="currentColor" />
+              Start a game
+            </button>
           </div> :
 
           <>
@@ -262,17 +217,9 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
                 exit={{ opacity: 0, x: 24 }}
                 transition={TRANSITION_PANEL}
               >
-                {games.length > 0 ? (
-                  <HistoryStats games={games} />
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-center px-5" style={{ gap: 20, minHeight: "55vh" }}>
-                    <FluentEmoji emoji="📊" size={140} style={{ display: "block" }} />
-                    <div className="flex flex-col items-center" style={{ gap: 8 }}>
-                      <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No stats yet</p>
-                      <p className="text-white/60 text-base [font-family:'Geist',_sans-serif]">Finish a game to see your stats here</p>
-                    </div>
-                  </div>
-                )}
+                {games.length > 0
+                  ? <HistoryStats games={games} />
+                  : emptyPanel("📊", "No stats yet", "Finish a game to see your stats here.")}
               </motion.div>
             ) : tab === "saved" ? (
               <motion.div
@@ -288,15 +235,7 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
                     onResume={onResumeGame}
                     onDelete={(id) => setSavedToDelete(savedGames.find((g) => g.id === id) || null)}
                   />
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-center px-5" style={{ gap: 20, minHeight: "55vh" }}>
-                    <FluentEmoji emoji="🔖" size={140} style={{ display: "block" }} />
-                    <div className="flex flex-col items-center" style={{ gap: 8 }}>
-                      <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No saved games</p>
-                      <p className="text-white/60 text-base [font-family:'Geist',_sans-serif]">Tap the bookmark icon during a game to save it here</p>
-                    </div>
-                  </div>
-                )}
+                ) : emptyPanel("🔖", "No saved games", "Tap the bookmark during a game to save it here.")}
               </motion.div>
             ) : (
             <motion.div
@@ -306,15 +245,7 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
               exit={{ opacity: 0, x: -24 }}
               transition={TRANSITION_PANEL}
             >
-            {games.length === 0 && (
-              <div className="flex flex-col items-center justify-center text-center px-5" style={{ gap: 20, minHeight: "55vh" }}>
-                <FluentEmoji emoji="🏆" size={140} style={{ display: "block" }} />
-                <div className="flex flex-col items-center" style={{ gap: 8 }}>
-                  <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">No completed games yet</p>
-                  <p className="text-white/60 text-base [font-family:'Geist',_sans-serif]">Finish a game and it'll show up here</p>
-                </div>
-              </div>
-            )}
+            {games.length === 0 && emptyPanel("🏆", "No finished games", "Finish a game and it'll show up here.")}
             <AnimatePresence>
             {games.map((game, gameIdx) => {
                 const isLowWin = isLowMode(game.win_mode);
@@ -322,12 +253,10 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
                 const sorted = [...game.players].sort((a, b) => isLowWin ? a.total - b.total : b.total - a.total);
                 const winner = sorted[0];
                 const isTie = sorted.length > 1 && sorted[0].total === sorted[1].total;
-                const isLatest = gameIdx === 0;
-                // Staggered rise on load, 60ms apart (capped). Delay lives on
-                // `animate` only so deletions (exit) stay instant.
+                // Delay lives on `animate` only so deletions (exit) stay instant.
                 const enterDelay = Math.min(gameIdx, 8) * 0.06;
 
-                if (isLatest) {
+                if (gameIdx === 0) {
                   return (
                     <motion.div
                       key={game.id}
@@ -336,136 +265,51 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
                       animate={{ opacity: 1, y: 0, scale: 1, transition: { ...SPRING_SNAPPY, delay: enterDelay } }}
                       exit={{ opacity: 0, height: 0 }}
                       whileTap={{ scale: 0.985 }}
-                      className="mb-4 rounded-3xl overflow-hidden relative border cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.1)]"
-                      style={{
-                        borderColor: `${winner.color}66`,
-                        background: `linear-gradient(155deg, ${winner.color}30 0%, ${winner.color}10 35%, hsl(var(--card)) 70%)`,
-                      }}>
-
-                      {/* Oversized winner emoji bleeding off the corner — same flourish as the scoreboard */}
-                      {!isTie && winner.emoji && (
-                        <div
-                          className="absolute pointer-events-none select-none"
-                          style={{ right: -18, top: -14, transform: "rotate(16deg)", opacity: 0.22 }}
-                          aria-hidden="true">
-                          <FluentEmoji emoji={winner.emoji} size={130} />
-                        </div>
-                      )}
-
-                      <div className="px-5 pt-4 pb-2 flex items-center justify-between relative z-10">
-                        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Latest Game</p>
-                        <p className="text-xs text-muted-foreground">{safeFormat(game.played_at, "MMM d · h:mm a")}</p>
-                      </div>
-
-                      {/* Winner hero */}
-                      <div className="px-5 pb-3 flex items-center gap-3 relative z-10">
-                        <div
-                          className="w-14 h-14 rounded-full flex-shrink-0 border-2 border-white/25 flex items-center justify-center overflow-hidden"
-                          style={{ backgroundColor: isTie ? "hsl(var(--muted))" : winner.color }}>
-                          {isTie
-                            ? <Handshake size={26} strokeWidth={2} className="text-muted-foreground" />
-                            : winner.emoji
-                              ? <FluentEmoji emoji={winner.emoji} size={34} />
-                              : <FluentEmoji emoji="🏆" size={30} />}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-0.5 flex items-center gap-1">
-                            {!isTie && <FluentEmoji emoji="🏆" size={12} />}
-                            {isTie ? "It's a Tie" : "Winner"}
-                          </p>
-                          <h2 className="font-display text-2xl font-bold text-foreground leading-tight truncate">
-                            {isTie ? sorted.filter((p) => p.total === winner.total).map((p) => p.name).join(" & ") : winner.name}
-                          </h2>
-                          <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                            {winner.total} pts
-                            <span>·</span>
-                            <FluentEmoji emoji={modeMeta.emoji} size={12} />
-                            {modeMeta.label}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Podium */}
-                      <div className="px-4 pb-4 space-y-1 relative z-10">
-                        {sorted.map((p, i) => (
-                          <motion.div
-                            key={p.name}
-                            initial={{ opacity: 0, x: -12 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.15 + i * 0.06 }}
-                            className="flex items-center gap-3 py-2 px-3 rounded-xl"
-                            style={{ backgroundColor: `${p.color}14` }}>
-                            <span className="text-xs text-muted-foreground w-5 text-right">
-                              {!isTie && i === 0 ? <FluentEmoji emoji="🥇" size={16} />
-                                : !isTie && i === 1 ? <FluentEmoji emoji="🥈" size={16} />
-                                : !isTie && i === 2 ? <FluentEmoji emoji="🥉" size={16} />
-                                : i + 1}
-                            </span>
-                            {p.emoji
-                              ? <span className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden" style={{ backgroundColor: p.color }}><FluentEmoji emoji={p.emoji} size={16} /></span>
-                              : <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 mx-[7px]" style={{ backgroundColor: p.color }} />}
-                            <span className="text-sm text-foreground flex-1 truncate font-medium">{p.name}</span>
-                            <span className="text-sm font-bold" style={{ color: p.color }}>{p.total}</span>
-                          </motion.div>
-                        ))}
-                      </div>
+                      className="cursor-pointer">
+                      <WinnerCard
+                        label="Latest game"
+                        date={safeFormat(game.played_at, "MMM d · h:mm a")}
+                        sorted={sorted}
+                        isTie={isTie}
+                        modeLabel={modeMeta.label}
+                      />
                     </motion.div>
                   );
                 }
 
+                const others = sorted.slice(1);
                 return (
                   <div key={game.id}>
-                  {gameIdx === 1 && (
-                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-1 pt-1 pb-2">Earlier</p>
-                  )}
+                  {gameIdx === 1 && <SectionLabel className="mt-[26px] mb-2.5">Earlier</SectionLabel>}
                   <motion.div
                     onClick={() => setSelectedGameId(game.id)}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0, transition: { ...SPRING_SNAPPY, delay: enterDelay } }}
                     exit={{ opacity: 0, height: 0 }}
                     whileTap={{ scale: 0.985 }}
-                    className="mb-3 rounded-2xl border border-border bg-card overflow-hidden cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
-
-                  {/* Game header */}
-                  <div className="px-4 py-3 flex items-baseline justify-between border-b border-border">
-                    <div className="flex flex-col gap-2">
-                      <p className="text-lg text-foreground flex items-center gap-1.5 [font-family:'Geist',_sans-serif] font-semibold">
-                        {isTie ?
-                          <Handshake size={20} strokeWidth={2} className="text-muted-foreground" /> :
-                          <FluentEmoji emoji="🏆" size={24} />
-                          }
-                        {isTie ? "Tie" : winner.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <span>{safeFormat(game.played_at, "MMM d, yyyy · h:mm a")}</span>
-                        <span>·</span>
-                        <span className="inline-flex items-center gap-1">
-                          <FluentEmoji emoji={modeMeta.emoji} size={14} />
-                          {modeMeta.label}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Player scores */}
-                  <div className="px-4 py-3 space-y-1">
-                    {sorted.map((p, i) =>
-                      <div key={p.name} className="flex items-center gap-3 py-1.5 min-h-touch">
-                        <span className="text-xs text-muted-foreground w-4 text-right">{i + 1}</span>
-                        <div
-                          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: p.color }} />
-
-                        <span className="text-sm text-foreground flex-1 truncate">{p.name}</span>
-                        <span className="text-sm font-semibold" style={{ color: p.color }}>
-                          {p.total}
-                        </span>
+                    className="mb-3.5 mr-[5px] p-3.5 bg-surface border-3 border-ink rounded-2xl shadow-neo-md cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <PlayerTile emoji={isTie ? "🤝" : winner.emoji || "🏆"} color={isTie ? "rgb(var(--surface))" : toNeoColor(winner.color)} size={44} radius={10} />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-lg font-extrabold truncate">{isTie ? "It's a tie" : `${winner.name} won`}</div>
+                        <div className="font-mono mt-0.5 text-[11px] font-bold tracking-[0.08em] uppercase text-subtle">
+                          {safeFormat(game.played_at, "MMM d")} · {modeMeta.label}
+                        </div>
                       </div>
-                      )}
-                  </div>
-                </motion.div>
-                </div>);
-
+                      <div className="font-display text-[26px]">{winner.total}</div>
+                    </div>
+                    {others.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {others.map((p, i) => (
+                          <span key={`${i}-${p.name}`} className="flex items-center gap-1.5 px-2.5 py-[5px] border-2 border-ink rounded-full text-[13px] font-bold">
+                            <ColorChip color={p.color} size={10} radius={3} />
+                            {p.name} {p.total}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                  </div>);
               })}
           </AnimatePresence>
           </motion.div>
@@ -491,20 +335,17 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
       <BottomSheetModal
         isOpen={showConfirm}
         onClose={() => !clearing && setShowConfirm(false)}
-        icon={<AlertTriangle size={32} strokeWidth={2} className="text-accent-red" />}
-        title="Clear All Games?"
+        icon={<AlertTriangle size={30} strokeWidth={2.75} />}
+        eyebrow="Confirm"
+        title="Clear all games?"
         description={`This will permanently delete all ${games.length} game record${games.length !== 1 ? "s" : ""}. This cannot be undone.`}
         footer={
-          <div className="flex gap-3">
-            <Button onClick={() => setShowConfirm(false)} variant="outline" className="flex-1 h-11" disabled={clearing}>
+          <div className="grid grid-cols-2 gap-3.5">
+            <Button onClick={() => setShowConfirm(false)} variant="outline" disabled={clearing}>
               Cancel
             </Button>
-            <Button
-              onClick={clearAllGames}
-              disabled={clearing}
-              className="flex-1 h-11 font-semibold bg-accent-red hover:bg-accent-red/90 text-white"
-            >
-              {clearing ? "Clearing..." : "Yes, Clear All"}
+            <Button onClick={clearAllGames} disabled={clearing} variant="destructive">
+              {clearing ? "Clearing..." : "Yes, clear all"}
             </Button>
           </div>
         }
@@ -514,12 +355,13 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
       <BottomSheetModal
         isOpen={savedToDelete !== null}
         onClose={() => setSavedToDelete(null)}
-        icon={<AlertTriangle size={32} strokeWidth={2} className="text-accent-red" />}
-        title="Delete Saved Game?"
+        icon={<Trash2 size={30} strokeWidth={2.5} />}
+        eyebrow="Confirm"
+        title="Delete saved game?"
         description={savedToDelete ? `"${savedToDelete.name}" will be permanently deleted. This cannot be undone.` : ""}
         footer={
-          <div className="flex gap-3">
-            <Button onClick={() => setSavedToDelete(null)} variant="outline" className="flex-1 h-11">
+          <div className="grid grid-cols-2 gap-3.5">
+            <Button onClick={() => setSavedToDelete(null)} variant="outline">
               Cancel
             </Button>
             <Button
@@ -527,9 +369,9 @@ export default function History({ onBack, onResumeGame, onModalChange }) {
                 if (savedToDelete) deleteSavedGame(savedToDelete.id);
                 setSavedToDelete(null);
               }}
-              className="flex-1 h-11 font-semibold bg-accent-red hover:bg-accent-red/90 text-white"
+              variant="destructive"
             >
-              Yes, Delete
+              Yes, delete
             </Button>
           </div>
         }

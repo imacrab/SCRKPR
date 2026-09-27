@@ -1,11 +1,13 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Check, Plus } from "lucide-react";
 
-import { readableTextColor } from "@/lib/contrast";
 import FluentEmoji from "./FluentEmoji";
+import { PlayerTile, Tag, CrownGlyph } from "./neo";
+import { toNeoColor, twoToneBackground } from "@/lib/colors";
 import { SPRING_POP, SPRING_POP_SNAPPY, SPRING_SNAPPY, TRANSITION_SLIDE_OUT } from "@/lib/motion";
 
-function AnimatedTotal({ value, color, sizeClass = "text-3xl" }) {
+function AnimatedTotal({ value }) {
   const [displayValue, setDisplayValue] = useState(value);
   const [animKey, setAnimKey] = useState(0);
   const [isResetting, setIsResetting] = useState(false);
@@ -13,18 +15,14 @@ function AnimatedTotal({ value, color, sizeClass = "text-3xl" }) {
 
   useEffect(() => {
     if (value === 0 && prevValue.current > 0) {
-      // Countdown animation from previous value to 0
       setIsResetting(true);
       const startValue = prevValue.current;
-      const duration = 600; // ms
+      const duration = 600;
       const startTime = Date.now();
 
       const countdownInterval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const current = Math.round(startValue * (1 - progress));
-        setDisplayValue(current);
-
+        const progress = Math.min((Date.now() - startTime) / duration, 1);
+        setDisplayValue(Math.round(startValue * (1 - progress)));
         if (progress === 1) {
           clearInterval(countdownInterval);
           setIsResetting(false);
@@ -41,12 +39,8 @@ function AnimatedTotal({ value, color, sizeClass = "text-3xl" }) {
   }, [value]);
 
   return (
-    // overflow is intentionally NOT clipped here — the sliding digits are
-    // allowed to travel beyond this little number box and get clipped by the
-    // player card instead (the card header has overflow-hidden). This gives
-    // the digit a full runway: the old value slides up and fades out the top,
-    // the new value rises in from below.
-    <span className={`font-bold leading-none block ${sizeClass} relative`} style={{ color, opacity: isResetting ? 0.7 : 1, height: "1em", minWidth: "1ch" }}>
+    // Not clipped: digits slide past this box and are clipped by the card.
+    <span className="font-display leading-none block text-[34px] relative" style={{ opacity: isResetting ? 0.7 : 1, height: "1em", minWidth: "1ch" }}>
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
           key={animKey}
@@ -55,391 +49,175 @@ function AnimatedTotal({ value, color, sizeClass = "text-3xl" }) {
           exit={{ y: "-120%", opacity: 0, scale: 0.7 }}
           transition={SPRING_SNAPPY}
           className="block">
-
           {displayValue}
         </motion.span>
       </AnimatePresence>
-    </span>);
-
+    </span>
+  );
 }
 
-export default function PlayerColumn({ player, isLeader = false, isWorst = false, isHighlighted = false, streak = 0, winsNeeded = null, isFirst = false, isLast = false, scoredThisRound = false, playerCount = 0, onAddScore, onEditScore, onEditPlayer }) {
-  // If the leader is also somehow the worst (single player, everyone tied on 0
-  // — edge cases only), the crying emoji wins and the crown is suppressed.
+const formatDelta = (n) => (n > 0 ? `+${n}` : `${n}`);
+
+export default function PlayerColumn({ player, isLeader = false, isWorst = false, isHighlighted = false, streak = 0, winsNeeded = null, behind = 0, scoredThisRound = false, onAddScore, onEditScore, onEditPlayer }) {
+  // If the leader is also the worst (single player / everyone tied on 0), the
+  // worst flair wins and the crown is suppressed.
   const showLeader = isLeader && !isWorst;
-  const baseTotal = player.scores.reduce((s, n) => s + n, 0);
+  const total = player.scores.reduce((s, n) => s + n, 0);
   const isBestOf = winsNeeded !== null;
   const lastIdx = player.scores.length - 1;
   const lastScore = lastIdx >= 0 ? player.scores[lastIdx] : null;
+  const color = toNeoColor(player.color);
+  const background = player.cardStyle === "gradient"
+    ? twoToneBackground(color)
+    : color;
 
-  const total = baseTotal;
-
-  // Full-opacity player color for the card background — bright & playful.
-  // (Was 0.7 alpha over the near-black page, which muted the color into a
-  // muddy tint; full opacity lets the light palette read as intended.)
-  const bgTint = useMemo(() => {
-    const hex = (player.color || "#000000").replace("#", "");
-    const full = hex.length === 3 ? hex.split("").map((c) => c + c).join("") : hex;
-    const r = parseInt(full.slice(0, 2), 16);
-    const g = parseInt(full.slice(2, 4), 16);
-    const b = parseInt(full.slice(4, 6), 16);
-    return `rgb(${r}, ${g}, ${b})`;
-  }, [player.color]);
-
-  // Card look: "solid" (full-bleed player color) or "gradient" (a bordered card
-  // whose player color bleeds off the top-left and fades into the dark board —
-  // the same hero treatment as the Latest Game card in History).
-  const isGradient = player.cardStyle === "gradient";
-
-  // WCAG 2.2 — pick text color that contrasts with the player's SOLID background.
-  const solidTextColor = useMemo(() => readableTextColor(player.color || "#000000"), [player.color]);
-  // Gradient cards are mostly dark board, so their text/accents follow the
-  // dark-UI tokens instead of the per-color contrast; the total keeps the
-  // player color for a pop of identity.
-  const textColor = isGradient ? "hsl(var(--foreground))" : solidTextColor;
-  const totalColor = isGradient ? (player.color || "#FFFFFF") : solidTextColor;
-  const isDarkText = !isGradient && solidTextColor === "#262729";
-  const streakBg = isGradient ? "rgba(255,255,255,0.12)" : isDarkText ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.25)";
-  const subtleText = isGradient ? "hsl(var(--muted-foreground))" : isDarkText ? "rgba(38,39,41,0.65)" : "rgba(255,255,255,0.75)";
-
-  // Roomy mode: with 3 or fewer players the cards are tall, so present the
-  // content as a big centered vertical stack — emoji, name, round score, total —
-  // with scaled-up type. At 4+ players we transition back to the normal compact
-  // card. Everything keys off the player count.
-  const spacious = playerCount > 0 && playerCount <= 3;
-  // 3-player cards are much shorter than 1–2 player ones, so the centered stack
-  // (emoji + name + round score + total) has to fit a tighter box — keep the
-  // emoji and total a notch smaller there so nothing clips.
-  const flourishSize = !spacious ? 96 : playerCount <= 2 ? 132 : 104;
-  const flourishSlide = flourishSize + 8; // travel far enough to fully clear on the swap
-  const nameSize = !spacious ? "text-xl" : playerCount <= 2 ? "text-3xl" : "text-2xl";
-  const totalSize = !spacious ? "text-3xl" : playerCount <= 2 ? "text-5xl" : "text-3xl";
-  // Compact cards only — offsets the name past the corner flourish. Roomy cards
-  // are a centered stack and don't use it.
-  const nameGutter = isBestOf ? 8 : 68;
+  let subline = null;
+  if (lastScore !== null) {
+    if (showLeader) subline = `${formatDelta(lastScore)} ${scoredThisRound ? "this round" : "last round"}`;
+    else if (behind > 0) subline = `${formatDelta(lastScore)} · ${behind} behind`;
+    else subline = `${formatDelta(lastScore)} · tied`;
+  }
 
   return (
-    <div className="flex flex-col rounded-xl overflow-hidden flex-1">
-      {/* Header — player color background. flex-1 lets the card grow to fill its
-          row; content stays pinned to the top (justify-start). */}
-      <div
-        onClick={onAddScore}
-        onContextMenu={(e) => {e.preventDefault();onEditPlayer?.();}}
-        onPointerDown={(e) => {
-          const timer = setTimeout(() => onEditPlayer?.(), 500);
-          const cancel = () => clearTimeout(timer);
-          e.currentTarget.addEventListener("pointerup", cancel, { once: true });
-          e.currentTarget.addEventListener("pointerleave", cancel, { once: true });
-          e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
-        }}
-        role="button"
-        aria-label={`Add score for ${player.name}`}
-        className={`relative px-3 ${spacious ? "py-2" : "py-3"} rounded-lg flex flex-col items-center flex-1 z-10 transition-all overflow-hidden cursor-pointer ${spacious ? "justify-center" : ""}`}
-        style={
-          isGradient
-            ? {
-                background: `linear-gradient(150deg, ${player.color}40 0%, ${player.color}14 40%, hsl(var(--card)) 78%)`,
-                borderWidth: 1,
-                borderStyle: "solid",
-                borderColor: isHighlighted ? "hsl(var(--primary))" : `${player.color}66`,
-              }
-            : {
-                backgroundColor: bgTint,
-                borderColor: isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))",
-              }
-        }>
+    <div
+      onClick={onAddScore}
+      onContextMenu={(e) => { e.preventDefault(); onEditPlayer?.(); }}
+      onPointerDown={(e) => {
+        const timer = setTimeout(() => onEditPlayer?.(), 500);
+        const cancel = () => clearTimeout(timer);
+        e.currentTarget.addEventListener("pointerup", cancel, { once: true });
+        e.currentTarget.addEventListener("pointerleave", cancel, { once: true });
+        e.currentTarget.addEventListener("pointercancel", cancel, { once: true });
+      }}
+      role="button"
+      aria-label={`Add score for ${player.name}`}
+      className="relative mr-[5px] h-24 flex items-center gap-3 px-3 text-ink border-3 border-ink rounded-2xl cursor-pointer select-none transition-[box-shadow,transform] duration-150 active:translate-x-[2px] active:translate-y-[2px] active:shadow-neo-sm"
+      style={{
+        background,
+        boxShadow: isHighlighted ? "7px 7px 0 rgb(var(--ink))" : "5px 5px 0 rgb(var(--ink))",
+      }}
+    >
+      <AnimatePresence>
+        {showLeader && (
+          <motion.div
+            layoutId="leader-tag"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={SPRING_POP}
+            className="absolute -top-[15px] left-3 z-20 pointer-events-none"
+            aria-hidden="true"
+          >
+            <Tag><CrownGlyph />Leader</Tag>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isWorst && (
+          <motion.div
+            layoutId="worst-tag"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={SPRING_POP}
+            className="absolute -top-[15px] left-3 z-20 pointer-events-none"
+            aria-hidden="true"
+          >
+            <Tag bg="#FF4B3E" rotate={3}><FluentEmoji emoji="😭" size={13} />Worst round</Tag>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        {/* Leader crown — flies between players when the lead changes (shared
-            layoutId). Compact cards only; roomy cards perch it on the name. */}
-        <AnimatePresence>
-          {!spacious && showLeader && (
-            <motion.div
-              layoutId="leader-crown"
-              initial={{ scale: 0, rotate: -40, opacity: 0 }}
-              animate={{ scale: 1, rotate: 14, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={SPRING_POP}
-              className="absolute pointer-events-none select-none z-20"
-              style={{ top: 4, right: 8 }}
-              aria-hidden="true"
+      <PlayerTile color={scoredThisRound ? "rgb(var(--ink))" : "#FFFFFF"} size={48} radius={11} className="relative overflow-hidden">
+        <AnimatePresence mode="popLayout" initial={false}>
+          {scoredThisRound ? (
+            <motion.span
+              key="check"
+              className="flex"
+              initial={{ y: -48, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -48, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
+              transition={SPRING_POP_SNAPPY}
             >
-              <FluentEmoji emoji="👑" size={26} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Worst flair (low-score modes only) — mirrors the crown; flies between
-            players when last place changes via shared layoutId. Compact cards
-            only; roomy cards perch it on the name. */}
-        <AnimatePresence>
-          {!spacious && isWorst && (
-            <motion.div
-              layoutId="worst-cry"
-              initial={{ scale: 0, rotate: 40, opacity: 0 }}
-              animate={{ scale: 1, rotate: -14, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={SPRING_POP}
-              className="absolute pointer-events-none select-none z-20"
-              style={{ top: 4, right: 8 }}
-              aria-hidden="true"
+              <Check size={26} strokeWidth={3.5} color="#FFFFFF" />
+            </motion.span>
+          ) : player.emoji ? (
+            <motion.span
+              key="emoji"
+              className="flex"
+              initial={{ y: 48, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 48, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
+              transition={SPRING_POP_SNAPPY}
             >
-              <FluentEmoji emoji="😭" size={26} />
-            </motion.div>
-          )}
+              <FluentEmoji emoji={player.emoji} size={34} />
+            </motion.span>
+          ) : null}
         </AnimatePresence>
+      </PlayerTile>
 
-        {/* Flourish (compact cards only) — oversized tilted player emoji bleeding
-            off the left edge; morphs to a green check once the round is logged.
-            Roomy cards render their own centered emoji in the stack below. */}
-        {!spacious && (player.emoji || scoredThisRound) &&
-        <div
-          className="absolute pointer-events-none select-none"
-          style={{
-            left: -12,
-            top: "40px",
-            transform: "rotate(-20deg) translateY(-50%)",
-            opacity: 0.95,
-            // Soft shadow lifts the emoji off the vivid card color (separation,
-            // not opacity) so the 3D art reads crisply on saturated backgrounds.
-            filter: "drop-shadow(0 3px 7px rgba(0,0,0,0.40))",
-            zIndex: 0
-          }}
-          aria-hidden="true">
-            <AnimatePresence mode="popLayout" initial={false}>
-              {scoredThisRound ? (
-                // Check lives on the TOP: slides down from above into place on
-                // capture, slides back up and out when the round resets.
-                <motion.div
-                  key="check"
-                  initial={{ y: -flourishSlide, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -flourishSlide, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
-                  transition={SPRING_POP_SNAPPY}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-xl font-extrabold truncate leading-tight" title={player.name}>{player.name}</span>
+          {streak >= 2 && (
+            <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_POP} className="flex-shrink-0">
+              <Tag bg="#FFFFFF" rotate={0} className="!px-1.5 !gap-0.5">
+                <motion.span
+                  animate={{ scale: [1, 1.3, 1], rotate: [0, -8, 8, 0] }}
+                  transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                  className="flex"
                 >
-                  <FluentEmoji emoji="✅" size={flourishSize} />
-                </motion.div>
-              ) : player.emoji ? (
-                // Emoji lives on the BOTTOM: slides down and out on capture,
-                // slides back up into place from below on the next round.
-                <motion.div
-                  key="emoji"
-                  initial={{ y: flourishSlide, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: flourishSlide, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
-                  transition={SPRING_POP_SNAPPY}
-                >
-                  <span className="block" style={{ transform: "scaleX(-1)" }}>
-                    <FluentEmoji emoji={player.emoji} size={flourishSize} />
-                  </span>
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
-          </div>
-        }
-
-        {spacious ? (
-          /* Roomy card — a centered vertical stack: emoji, name, round score,
-             total, all down the middle to use the tall card's space. */
-          <div className="relative z-10 w-full flex flex-col items-center gap-1 text-center">
-            {(player.emoji || scoredThisRound) &&
-            <div
-              className="relative flex items-center justify-center select-none mb-1"
-              style={{ height: flourishSize, width: flourishSize }}
-              aria-hidden="true">
-              <AnimatePresence mode="popLayout" initial={false}>
-                {scoredThisRound ? (
-                  <motion.div
-                    key="check"
-                    className="absolute inset-0 flex items-center justify-center"
-                    style={{ filter: "drop-shadow(0 3px 7px rgba(0,0,0,0.40))" }}
-                    initial={{ y: -flourishSlide, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -flourishSlide, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
-                    transition={SPRING_POP_SNAPPY}
-                  >
-                    <FluentEmoji emoji="✅" size={flourishSize} />
-                  </motion.div>
-                ) : player.emoji ? (
-                  <motion.div
-                    key="emoji"
-                    className="absolute inset-0 flex items-center justify-center"
-                    style={{ filter: "drop-shadow(0 3px 7px rgba(0,0,0,0.40))" }}
-                    initial={{ y: flourishSlide, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: flourishSlide, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
-                    transition={SPRING_POP_SNAPPY}
-                  >
-                    <FluentEmoji emoji={player.emoji} size={flourishSize} />
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
-            </div>
-            }
-
-            {/* Name — the crown/worst flair perches on its top-right (relative
-                wrapper + absolute emoji) so it reads as adorning the name rather
-                than floating in the card's corner. */}
-            <div className="flex items-center justify-center gap-2 max-w-full px-2">
-              <span className="relative inline-flex min-w-0 max-w-full">
-                <span className={`font-bold truncate leading-tight ${nameSize}`} title={player.name} style={{ color: textColor }}>
-                  {player.name}
-                </span>
-                <AnimatePresence>
-                  {showLeader && (
-                    <motion.div
-                      layoutId="leader-crown"
-                      initial={{ scale: 0, rotate: -40, opacity: 0 }}
-                      animate={{ scale: 1, rotate: 16, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
-                      transition={SPRING_POP}
-                      className="absolute pointer-events-none select-none z-20"
-                      style={{ top: -15, right: -14 }}
-                      aria-hidden="true"
-                    >
-                      <FluentEmoji emoji="👑" size={26} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                <AnimatePresence>
-                  {isWorst && (
-                    <motion.div
-                      layoutId="worst-cry"
-                      initial={{ scale: 0, rotate: 40, opacity: 0 }}
-                      animate={{ scale: 1, rotate: -16, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
-                      transition={SPRING_POP}
-                      className="absolute pointer-events-none select-none z-20"
-                      style={{ top: -15, right: -14 }}
-                      aria-hidden="true"
-                    >
-                      <FluentEmoji emoji="😭" size={26} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </span>
-              {streak >= 2 &&
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={SPRING_POP}
-                className="inline-flex items-center gap-0.5 rounded-full px-1 py-1 flex-shrink-0"
-                style={{ backgroundColor: streakBg, color: textColor }}>
-                  <motion.span
-                    animate={{ scale: [1, 1.35, 1], rotate: [0, -8, 8, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-                    className="flex"
-                  >
-                    <FluentEmoji emoji="🔥" size={14} />
-                  </motion.span>
-                  <span className="text-[10px] font-semibold leading-none">{streak}</span>
+                  <FluentEmoji emoji="🔥" size={12} />
                 </motion.span>
-              }
-            </div>
-
-            {/* Round score (delta) — reserved so logging doesn't shift the stack */}
-            {!isBestOf &&
-            <div className="h-[20px] flex items-center justify-center">
-              {lastScore !== null &&
-              <motion.span
-                key={lastIdx}
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={SPRING_SNAPPY}
-                onClick={(e) => {e.stopPropagation();onEditScore?.(lastIdx);}}
-                className="text-sm leading-none cursor-pointer [font-family:'Geist',_sans-serif] font-medium"
-                style={{ color: subtleText }}>
-
-                  ({lastScore > 0 ? `+${lastScore}` : lastScore})
-                </motion.span>
-              }
-            </div>
-            }
-
-            {/* Total */}
-            <AnimatedTotal value={total} color={totalColor} sizeClass={totalSize} />
+                {streak}
+              </Tag>
+            </motion.span>
+          )}
+        </div>
+        {isBestOf ? (
+          <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+            {Array.from({ length: winsNeeded }).map((_, idx) => {
+              const won = idx < total;
+              return (
+                <motion.span
+                  key={idx}
+                  initial={won ? { scale: 0 } : false}
+                  animate={{ scale: 1 }}
+                  transition={SPRING_SNAPPY}
+                  className="w-3.5 h-3.5 border-2 border-ink rounded-[4px] flex-shrink-0"
+                  style={{ backgroundColor: won ? "rgb(var(--ink))" : "#FFFFFF" }}
+                />
+              );
+            })}
           </div>
         ) : (
-        <div className="relative z-10 flex items-center justify-between w-full gap-1">
-          {/* Name (left) — display only; the whole card handles tap/long-press */}
-          <div
-            className="flex-1 flex flex-col items-start gap-1 min-w-0 text-left"
-            style={{ marginLeft: nameGutter }}>
-
-            <div className="flex items-center gap-2 w-full min-w-0">
-              <span className={`font-bold truncate leading-tight ${nameSize}`} title={player.name} style={{ color: textColor }}>
-                {player.name}
-              </span>
-              {streak >= 2 &&
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={SPRING_POP}
-                className="inline-flex items-center gap-0.5 rounded-full px-1 py-1 flex-shrink-0"
-                style={{ backgroundColor: streakBg, color: textColor }}>
-                  <motion.span
-                    animate={{ scale: [1, 1.35, 1], rotate: [0, -8, 8, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-                    className="flex"
-                  >
-                    <FluentEmoji emoji="🔥" size={14} />
-                  </motion.span>
-                  <span className="text-[10px] font-semibold leading-none">{streak}</span>
-                </motion.span>
-              }
-            </div>
-            {/* Reserve the subtext line always (high/low) so logging a score
-                doesn't change the card's height. */}
-            {!isBestOf &&
-            <div className="h-[18px] flex items-center">
-              {lastScore !== null &&
+          <div className="h-[18px] mt-[3px] flex items-center">
+            {subline && (
               <motion.span
                 key={lastIdx}
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={SPRING_SNAPPY}
-                onClick={(e) => {e.stopPropagation();onEditScore?.(lastIdx);}}
-                className="text-sm leading-none cursor-pointer [font-family:'Geist',_sans-serif] font-medium"
-                style={{ color: subtleText }}>
-
-                  ({lastScore > 0 ? `+${lastScore}` : lastScore})
-                </motion.span>
-              }
-            </div>
-            }
+                onClick={(e) => { e.stopPropagation(); onEditScore?.(lastIdx); }}
+                className="font-mono text-xs font-bold uppercase truncate cursor-pointer"
+              >
+                {subline}
+              </motion.span>
+            )}
           </div>
-
-          {/* Total (right) — display only; the whole card handles the tap */}
-          <div
-            className="flex-shrink-0"
-            style={{ marginRight: 8 }}>
-
-            <AnimatedTotal value={total} color={totalColor} sizeClass={totalSize} />
-          </div>
-        </div>
         )}
       </div>
 
-      {/* Best Of win dots (only in bestof mode) */}
-      {isBestOf &&
-      <div className="bg-background flex items-center justify-center gap-2 px-2 py-3">
-          {Array.from({ length: winsNeeded }).map((_, idx) => {
-          const won = idx < total;
-          return (
-            <motion.div
-              key={idx}
-              initial={won ? { scale: 0 } : false}
-              animate={{ scale: 1 }}
-              transition={SPRING_SNAPPY}
-              className="w-3 h-3 rounded-full border-2 flex-shrink-0"
-              style={{
-                backgroundColor: won ? player.color : "transparent",
-                borderColor: won ? player.color : "hsl(var(--border))"
-              }} />);
+      <div className="w-[60px] flex-shrink-0 flex justify-center">
+        <AnimatedTotal value={total} />
+      </div>
 
-
-        })}
-        </div>
-      }
-    </div>);
-
+      <span
+        aria-hidden="true"
+        className="w-11 h-11 flex-shrink-0 flex items-center justify-center bg-ink border-3 border-ink rounded-[10px]"
+      >
+        <Plus size={18} strokeWidth={3.5} color="#FFFFFF" />
+      </span>
+    </div>
+  );
 }

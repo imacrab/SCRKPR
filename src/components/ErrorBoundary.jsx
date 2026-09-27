@@ -1,5 +1,5 @@
 import React from "react";
-import logoDark from "@/assets/scrkpr-logo.svg";
+import { LogoSticker, PlayerTile } from "@/components/scorekeeper/neo";
 import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 
 /**
@@ -39,20 +39,19 @@ export default class ErrorBoundary extends React.Component {
         className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center px-8 text-center"
         style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <img src={logoDark} alt="SCRKPR!" className="mb-10" style={{ maxWidth: 130, height: "auto", opacity: 0.85 }} />
-        <div className="mb-5">
-          <FluentEmoji emoji="🎲" size={56} />
-        </div>
-        <h1 className="text-foreground text-xl font-bold mb-2">We had a little hiccup</h1>
-        <p className="text-muted-foreground text-sm leading-relaxed mb-9 max-w-[16rem]">
+        <LogoSticker size="lg" className="mb-12" />
+        <PlayerTile color="#FF4FA0" size={96} radius={22} rotate={-6} className="shadow-neo-md">
+          <FluentEmoji emoji="🎲" size={64} />
+        </PlayerTile>
+        <h1 className="font-display mt-8 text-[26px] leading-[1.1] uppercase">We had a little hiccup</h1>
+        <p className="mt-3 mb-8 text-base font-medium leading-relaxed text-subtle max-w-[18rem]">
           No worries — your games are still saved. Let's head back home and pick up where you left off.
         </p>
         <button
           onClick={this.handleHome}
-          className="py-3.5 px-8 rounded-full bg-white font-semibold text-base active:scale-95 transition-transform"
-          style={{ color: "#262729", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.2)" }}
+          className="neo-press h-14 px-8 bg-sun text-ink border-3 border-ink rounded-xl shadow-neo-md text-[17px] font-extrabold"
         >
-          Back to Home
+          Back to home
         </button>
       </div>
     );

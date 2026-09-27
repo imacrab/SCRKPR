@@ -1,19 +1,18 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { Plus, Check, Star } from "lucide-react";
+import { Plus, Check, Star, Spade, ChevronRight } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { db } from "@/lib/store";
 import BestOfModal from "./BestOfModal";
 import GameModeModal from "./GameModeModal";
 import PlayerEditModal from "./PlayerEditModal";
-import FluentEmoji from "./FluentEmoji";
 import { getModeMeta } from "@/lib/gameModes";
-import { readableTextColor } from "@/lib/contrast";
+import { toNeoColor } from "@/lib/colors";
+import { LogoSticker, SectionLabel, PlayerTile, PAGE_TOP } from "./neo";
 import { DUR_MEDIUM } from "@/lib/motion";
 import { primeIOSKeyboard } from "@/lib/iosKeyboardPrimer";
 import { useGameModeToggles } from "@/lib/useGameModeToggles";
-import logoDark from "@/assets/scrkpr-logo.svg";
+import { useIntroReveal } from "@/lib/useIntroReveal";
 
 // Order matches the picker; used to pick a sensible default when the
 // currently-selected mode is disabled in settings.
@@ -28,9 +27,9 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [allPlayers, setAllPlayers] = useState(null); // null = loading
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [showAddPlayer, setShowAddPlayer] = useState(false);
-  const [canScrollPlayers, setCanScrollPlayers] = useState(false);
   const [scrolledFromTop, setScrolledFromTop] = useState(false);
   const { toggles: modeToggles } = useGameModeToggles();
+  const { reveal } = useIntroReveal();
   // Initial default assumes all modes visible; the effect below corrects it
   // on mount using the real toggles from settings.
   const [winMode, setWinMode] = useState(() => firstVisibleMode({}));
@@ -197,17 +196,6 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     }).catch(() => setAllPlayers([]));
   }, []);
 
-  useEffect(() => {
-    const checkScroll = () => {
-      if (scrollRef.current) {
-        setCanScrollPlayers(scrollRef.current.scrollHeight > scrollRef.current.clientHeight);
-      }
-    };
-    checkScroll();
-    window.addEventListener("resize", checkScroll);
-    return () => window.removeEventListener("resize", checkScroll);
-  }, [allPlayers]);
-
   const handleDragStart = () => {
     isDraggingRef.current = true;
   };
@@ -301,291 +289,224 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   };
 
   const pullProgress = Math.min(pullY / PULL_THRESHOLD, 1);
+  const hasPlayers = (allPlayers || []).length > 0;
+  const modeMeta = getModeMeta(winMode);
+
+  const renderRow = (player, { dragProvided, snapshot, selected, index = 0 }) => {
+    const baseStyle = dragProvided?.draggableProps?.style || {};
+    const isDragging = snapshot?.isDragging;
+    const isDropAnimating = snapshot?.isDropAnimating;
+    const color = toNeoColor(player.color);
+
+    // Tilt follows the dnd transform's Y offset so the card leans into its drag.
+    let tiltDeg = 0;
+    if (isDragging && baseStyle.transform) {
+      const m = /translate\(([-\d.]+)px,\s*([-\d.]+)px\)/.exec(baseStyle.transform);
+      if (m) tiltDeg = Math.max(-5, Math.min(5, parseFloat(m[2]) / 14));
+    }
+
+    // isDragging stays true through dnd's drop animation, so gate the lift on
+    // !isDropAnimating to release it as the card lands.
+    const isLifted = isDragging && !isDropAnimating;
+    const isTapped = tappedId === player.id;
+    const cinch = isLifted
+      ? `scale(1.02) rotate(${tiltDeg}deg)`
+      : isTapped
+      ? "translate(2px, 2px)"
+      : "none";
+
+    // Three layers, each owning one transform so they never fight:
+    // wrapper (entrance + FLIP), dnd node (drag), card (lift/press visuals).
+    return (
+      <div data-row-id={player.id} data-idx={index}>
+        <motion.div {...reveal(2 + Math.min(index, 8))}>
+        <div
+          ref={dragProvided?.innerRef}
+          {...dragProvided?.draggableProps || {}}
+          {...dragProvided?.dragHandleProps || {}}
+          className="pb-2.5"
+        >
+          <div
+            onClick={() => toggleSelected(player.id)}
+            className="relative mr-1 h-[60px] flex items-center gap-3 pl-2 pr-1.5 border-3 border-ink rounded-xl cursor-pointer"
+            style={{
+              backgroundColor: selected ? color : "rgb(var(--surface))",
+              color: selected ? "rgb(var(--ink))" : "rgb(var(--fg))",
+              boxShadow: isLifted ? "7px 7px 0 rgb(var(--ink))" : selected && !isTapped ? "4px 4px 0 rgb(var(--ink))" : isTapped ? "1px 1px 0 rgb(var(--ink))" : "none",
+              transform: cinch,
+              transition: isDragging
+                ? "transform 130ms ease-out, box-shadow 150ms ease-out"
+                : "transform 120ms ease-out, background-color 160ms ease-out, box-shadow 160ms ease-out",
+            }}
+          >
+            <PlayerTile emoji={player.emoji} color={selected ? "#FFFFFF" : color} size={40} radius={9} />
+            <span className="flex-1 min-w-0 text-xl font-extrabold truncate">{player.name}</span>
+            <button
+              type="button"
+              onClick={(e) => toggleFavorite(player.id, e)}
+              onPointerDown={(e) => e.stopPropagation()}
+              aria-label={player.favorite ? "Remove from favorites" : "Add to favorites"}
+              className="flex-shrink-0 w-11 h-11 flex items-center justify-center"
+            >
+              <motion.span
+                animate={poppedId === player.id ? { scale: [1, player.favorite ? 1.4 : 1.18, 1] } : { scale: 1 }}
+                transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
+                style={{ display: "inline-flex" }}
+              >
+                <Star size={24} strokeWidth={2.25} fill={player.favorite ? "#FFD23F" : "transparent"} />
+              </motion.span>
+            </button>
+            <span className="flex-shrink-0 w-11 h-11 flex items-center justify-center" aria-hidden="true">
+              <span
+                className="w-[30px] h-[30px] flex items-center justify-center border-3 border-ink rounded-lg transition-colors"
+                style={{ backgroundColor: selected ? "rgb(var(--ink))" : "rgb(var(--surface))" }}
+              >
+                {selected && <Check size={18} strokeWidth={3.5} color="#FFFFFF" />}
+              </span>
+            </span>
+          </div>
+        </div>
+        </motion.div>
+      </div>
+    );
+  };
 
   return (
     <div
       className="bg-background flex flex-col overflow-hidden"
-      style={{ height: "100%", paddingTop: "env(safe-area-inset-top)" }}
+      style={{ height: "100%", paddingTop: PAGE_TOP }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}>
-      
-      {/* Pull-to-refresh indicator */}
+
       <div
         className="flex items-center justify-center overflow-hidden transition-all"
         style={{ height: pullY > 0 ? `${pullY * 0.5}px` : 0, opacity: pullProgress }}>
-        
         <div
-          className="w-6 h-6 rounded-full border-2 border-muted-foreground/40 border-t-foreground transition-transform"
+          className="w-6 h-6 rounded-full border-3 border-ink/20 border-t-ink transition-transform"
           style={{ transform: `rotate(${pullProgress * 360}deg)`, opacity: pullProgress >= 1 ? 1 : 0.5 }} />
-        
       </div>
 
-      {/* Header */}
-      <div className="pt-7 pb-4 px-6" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
-        {/* Invisible anchor — the visible logo is the persistent one hoisted to
-            ScoreKeeper, which measures this slot and floats over it (opacity:0
-            here keeps the layout space + position). */}
-        <img src={logoDark} alt="SCRKPR!" data-logo-anchor className="mx-auto" style={{ maxWidth: 150, height: "auto", opacity: 0 }} />
+      <div className="px-5 flex items-center justify-between h-11 flex-shrink-0">
+        <span data-logo-anchor>
+          <LogoSticker size="lg" />
+        </span>
+        {allPlayers !== null && (
+          <motion.span {...reveal(0)} className="inline-flex">
+          <span className="font-mono text-xs font-bold tracking-[0.08em] px-2.5 py-1.5 border-2.5 border-ink rounded-full bg-surface">
+            {hasPlayers ? `${selectedPlayers.length} OF ${allPlayers.length} IN` : "0 PLAYERS"}
+          </span>
+          </motion.span>
+        )}
       </div>
 
-      {/* Player list — pick who's playing */}
+      <motion.div {...reveal(1)} className="px-5 mt-[22px] mb-2.5 flex-shrink-0">
+        <SectionLabel>Who's playing</SectionLabel>
+      </motion.div>
+
       <div className="flex-1 relative overflow-hidden">
-        {/* Top fade — mirrors the bottom fade so the list dissolves under the
-            logo instead of meeting it at a hard edge. Fades in only once the
-            user has scrolled off the top, so first-load is a clean edge. */}
-        <div
-          className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none transition-opacity duration-200"
-          style={{ opacity: scrolledFromTop ? 1 : 0 }}
-        />
-        {canScrollPlayers && <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />}
-
         <div
           ref={scrollRef}
           onScroll={(e) => setScrolledFromTop(e.currentTarget.scrollTop > 4)}
-          className="h-full overflow-y-auto px-5 pt-2 pb-4 space-y-2">
-          
+          className={`h-full overflow-y-auto px-5 pb-3 ${scrolledFromTop ? "border-t-[2.5px] border-ink" : ""}`}
+          style={{ paddingTop: scrolledFromTop ? 8 : 0 }}>
+
           {allPlayers === null ?
           <div className="flex items-center justify-center py-20">
-              <div className="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
+              <div className="w-6 h-6 border-3 border-ink/20 border-t-ink rounded-full animate-spin" />
             </div> :
 
           <>
-              {allPlayers.length === 0 &&
-            <div className="h-full flex flex-col items-center justify-center text-center" style={{ gap: 32 }}>
-                  <FluentEmoji emoji="👇" size={140} style={{ display: "block" }} />
-                  <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">Let's add some players</p>
+              {!hasPlayers &&
+            <motion.div {...reveal(2)} className="flex flex-col">
+                  <div className="space-y-2.5 mr-1">
+                    {[120, 90].map((w) => (
+                      <div key={w} className="h-[60px] flex items-center gap-3 px-2.5 border-3 border-dashed border-dash rounded-xl">
+                        <span className="w-10 h-10 border-3 border-dashed border-dash rounded-[9px]" />
+                        <span className="h-3 rounded-md bg-hairline" style={{ width: w }} />
+                      </div>
+                    ))}
+                  </div>
+                  <h2 className="font-display mt-[30px] text-[26px] leading-[1.1] uppercase text-center">Let's add some players</h2>
+                  <p className="mt-2.5 text-base font-medium text-center text-subtle">You need at least two to start.</p>
                   <button
                     onPointerDown={primeIOSKeyboard}
                     onClick={() => setShowAddPlayerWithNav(true)}
-                    className="h-11 px-5 rounded-full flex items-center justify-center gap-2 text-white text-sm font-medium border border-dashed border-border hover:border-accent-blue/50 transition-colors">
-                    <Plus size={20} strokeWidth={2} />
-                    Add Player
+                    className="neo-press mx-auto mt-5 h-14 px-7 flex items-center gap-2.5 bg-surface border-3 border-ink rounded-xl shadow-neo-md text-[17px] font-extrabold">
+                    <Plus size={20} strokeWidth={3} />
+                    Add player
                   </button>
-                </div>
+                </motion.div>
             }
 
-              {allPlayers.length > 0 && (() => {
-              const selectedList = allPlayers.filter((p) => selectedIds.has(p.id));
-              const unselectedList = allPlayers.filter((p) => !selectedIds.has(p.id));
-
-              const hexToRgba = (hex, alpha) => {
-                const h = (hex || "#000000").replace("#", "");
-                const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
-                const r = parseInt(full.slice(0, 2), 16);
-                const g = parseInt(full.slice(2, 4), 16);
-                const b = parseInt(full.slice(4, 6), 16);
-                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-              };
-
-              const renderRow = (player, { dragProvided, snapshot, selected, index = 0 }) => {
-                const baseStyle = dragProvided?.draggableProps?.style || {};
-                const isDragging = snapshot?.isDragging;
-                const isDropAnimating = snapshot?.isDropAnimating;
-
-                // On a selected (color-filled) row, pick text that contrasts
-                // with the player's color; otherwise use the theme foreground.
-                const rowText = selected ? readableTextColor(player.color) : "hsl(var(--foreground))";
-                const rowTextMuted = selected
-                  ? (readableTextColor(player.color) === "#262729" ? "rgba(38,39,41,0.55)" : "rgba(255,255,255,0.65)")
-                  : "hsl(var(--muted-foreground))";
-
-                // Derive tilt from the dnd transform's Y offset so the card leans into its drag direction
-                let tiltDeg = 0;
-                if (isDragging && baseStyle.transform) {
-                  const m = /translate\(([-\d.]+)px,\s*([-\d.]+)px\)/.exec(baseStyle.transform);
-                  if (m) {
-                    const dy = parseFloat(m[2]);
-                    tiltDeg = Math.max(-5, Math.min(5, dy / 14));
-                  }
-                }
-
-                const isTapped = tappedId === player.id;
-                // Lifted ("cinch"): squeezed vertically + slight tilt, like
-                // pinching the card off the table. NB isDragging stays true
-                // through dnd's drop animation, so gate on !isDropAnimating to
-                // release the cinch as it lands.
-                const isLifted = isDragging && !isDropAnimating;
-                const cinch = isLifted
-                  ? `scale(1.03, 0.85) rotate(${tiltDeg}deg)`
-                  : isTapped
-                  ? "scale(0.92, 0.92) rotate(0deg)"
-                  : "scale(1, 1) rotate(0deg)";
-
-                // THREE layers, each owning ONE transform concern so they never
-                // fight (fighting dnd's transform was the source of the drop
-                // "snap"):
-                //   1. wrapper  — manual entrance + FLIP-on-toggle (data-row-id)
-                //   2. dnd node — pure @hello-pangea drag/drop transform (no overrides)
-                //   3. card     — the cinch/tap squish + all the visuals
-                return (
-                <div data-row-id={player.id} data-idx={index}>
-                <div
-                ref={dragProvided?.innerRef}
-                {...dragProvided?.draggableProps || {}}
-                {...dragProvided?.dragHandleProps || {}}>
-                <div
-                onClick={() => toggleSelected(player.id)}
-                className="relative w-full rounded-2xl overflow-hidden flex items-center cursor-pointer"
-                style={{
-                  // Raised card: the default --card surface (#313438) that the
-                  // player's chosen color trumps once they're selected to play.
-                  // No border — depth comes from the drop shadow instead.
-                  minHeight: 78,
-                  backgroundColor: selected ? hexToRgba(player.color, 1) : "hsl(var(--card))",
-                  boxShadow: isLifted ? "0 20px 35px -8px rgba(0,0,0,0.45)" : "0 4px 20px rgba(0,0,0,0.1)",
-                  transform: cinch,
-                  transformOrigin: "center center",
-                  transition: isDragging
-                    ? "transform 130ms ease-out, box-shadow 150ms ease-out"
-                    : "transform 260ms cubic-bezier(0.34, 1.6, 0.4, 1), background-color 200ms ease-out, box-shadow 220ms ease-out",
-                }}>
-
-                    {/* Oversized player emoji, bleeding off the left edge (clipped
-                        by the card's overflow-hidden) — the playful, tappable hero. */}
-                    {player.emoji ?
-                <div
-                  className="absolute pointer-events-none select-none"
-                  style={{
-                    left: -22,
-                    top: "50%",
-                    transform: "translateY(-50%) rotate(-6deg)",
-                    filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.35))",
-                  }}
-                  aria-hidden="true">
-                        <FluentEmoji emoji={player.emoji} size={100} />
-                      </div> :
-
-                <div
-                  className="absolute top-1/2 -translate-y-1/2 rounded-full border-2 border-white/20"
-                  style={{ left: 20, width: 52, height: 52, backgroundColor: player.color }} />
-                }
-
-                    {/* Content — offset right to clear the emoji */}
-                    <div className="relative z-10 flex flex-1 items-center min-w-0" style={{ marginLeft: 94, marginRight: 16 }}>
-                      <span className="flex-1 text-2xl [font-family:'Geist',_sans-serif] font-bold truncate" style={{ color: rowText }}>{player.name}</span>
-                      <button
-                    type="button"
-                    onClick={(e) => toggleFavorite(player.id, e)}
-                    onPointerDown={(e) => e.stopPropagation()}
-                    aria-label={player.favorite ? "Remove from favorites" : "Add to favorites"}
-                    className="flex-shrink-0 w-11 h-11 flex items-center justify-center">
-                        <motion.span
-                      animate={poppedId === player.id ? { scale: [1, player.favorite ? 1.4 : 1.18, 1] } : { scale: 1 }}
-                      transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
-                      style={{ display: "inline-flex" }}>
-                          <Star
-                        size={20}
-                        strokeWidth={2}
-                        style={{
-                          fill: player.favorite ? "#FFC93C" : "transparent",
-                          color: player.favorite ? "#FFC93C" : rowTextMuted,
-                        }} />
-                        </motion.span>
-                      </button>
-                      <div
-                    className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors ml-1"
-                    style={{
-                      backgroundColor: selected ? rowText : "transparent",
-                      border: selected ? "none" : `2px solid ${rowTextMuted}`
-                    }}>
-
-                        {selected && <Check size={18} strokeWidth={3} style={{ color: player.color }} />}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                </div>
-                );
-              };
-
-
+              {hasPlayers && (() => {
               // One list: selected (re-orderable) first, then unselected
               // (drag-disabled). Toggling moves a card between the two segments
               // without remounting it, so its FLIP glide is clean.
-              const displayList = [...selectedList, ...unselectedList];
+              const displayList = [
+                ...allPlayers.filter((p) => selectedIds.has(p.id)),
+                ...allPlayers.filter((p) => !selectedIds.has(p.id)),
+              ];
               return (
                 <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                   <Droppable droppableId="players">
                     {(dropProvided) =>
-                  <div
-                    ref={dropProvided.innerRef}
-                    {...dropProvided.droppableProps}
-                    className="space-y-2">
-
+                  <div ref={dropProvided.innerRef} {...dropProvided.droppableProps}>
                         {displayList.map((player, index) => {
                       const selected = selectedIds.has(player.id);
                       return (
                         <Draggable key={player.id} draggableId={player.id} index={index} isDragDisabled={!selected}>
                                 {(dragProvided, snapshot) =>
-                          renderRow(player, { dragProvided, snapshot, selected, draggable: selected, index })
+                          renderRow(player, { dragProvided, snapshot, selected, index })
                           }
                               </Draggable>);
-
                     })}
                         {dropProvided.placeholder}
                       </div>
                   }
                   </Droppable>
                 </DragDropContext>);
-
             })()}
 
-              {allPlayers.length > 0 && <motion.button
+              {hasPlayers && <motion.div {...reveal(2 + Math.min((allPlayers || []).length, 9))}><motion.button
               onPointerDown={primeIOSKeyboard}
               onClick={() => setShowAddPlayerWithNav(true)}
-              // Fades in only after the card stagger has played out: the last
-              // card's entrance delay + its spring settle. Guarded by
-              // entranceDone so it doesn't refade on selection toggles.
+              // Fades in only after the card stagger has played out.
               initial={entranceDone ? false : { opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: Math.min(allPlayers.length - 1, 8) * 0.07 + 0.45, duration: DUR_MEDIUM }}
-              className="w-full mt-1 h-11 rounded-full flex items-center justify-center gap-2 text-white text-sm font-medium transition-colors border border-dashed border-border hover:border-accent-blue/50">
-
-                <Plus size={24} strokeWidth={2} />
-                Add Player
-              </motion.button>}
+              className="w-[calc(100%-4px)] h-[54px] flex items-center justify-center gap-2 border-3 border-dashed border-ink rounded-xl text-[17px] font-extrabold active:bg-ink/5">
+                <Plus size={20} strokeWidth={3} />
+                Add player
+              </motion.button></motion.div>}
             </>
           }
         </div>
       </div>
 
-      {/* Win mode */}
-      <div className="px-5 pt-2 relative z-30" style={{ paddingBottom: "12px" }}>
+      <motion.div {...reveal(3 + Math.min((allPlayers || []).length, 9))} className="px-5 pt-4 flex-shrink-0 relative z-30">
+        <SectionLabel className="mb-2">Game mode</SectionLabel>
         <button
           onClick={() => {setShowGameMode(true);onModalChange?.(true);}}
-          className="w-full flex items-center justify-between gap-3 px-4 rounded-full border border-border bg-card hover:bg-accent transition-colors"
-          style={{ height: "52px" }}>
-          
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Game mode</span>
-          <span className="flex items-center gap-1.5">
-            {(() => {
-              const { emoji, label } = getModeMeta(winMode);
-              return (
-                <>
-                  <FluentEmoji emoji={emoji} size={18} />
-                  <span className="text-sm font-medium text-foreground">
-                    {label}
-                  </span>
-                </>);
-
-            })()}
-          </span>
+          className="neo-press w-[calc(100%-4px)] h-12 flex items-center gap-2.5 pl-2 pr-3 bg-surface border-3 border-ink rounded-xl shadow-neo-sm">
+          <PlayerTile emoji={modeMeta.emoji} color="#FFD23F" size={32} radius={8} border={2.5} />
+          <span className="flex-1 text-left text-base font-extrabold">{modeMeta.label}</span>
+          <span className="font-mono text-[11px] font-bold tracking-[0.1em] text-subtle">CHANGE</span>
+          <ChevronRight size={20} strokeWidth={3} />
         </button>
-      </div>
+      </motion.div>
 
-      {/* Actions */}
-      <div className="px-5 pt-0 flex flex-col gap-3 relative z-30" style={{ paddingBottom: "12px" }}>
-        <Button
+      {/* Both visible gaps land at 18px once each button's hard shadow (3px /
+          6px) is subtracted. */}
+      <motion.div {...reveal(4 + Math.min((allPlayers || []).length, 9))} className="px-5 pt-[21px] pb-6 flex-shrink-0 relative z-30">
+        <button
           onClick={handleStart}
           disabled={!canStart}
-          className="w-full text-lg font-semibold bg-white hover:bg-white/90"
-          style={{ height: "72px", color: "#262729", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}>
-          
-          <FluentEmoji emoji="♠️" size={28} className="mr-2" />
-          Start Game
-        </Button>
-      </div>
+          className="neo-press font-display w-[calc(100%-6px)] h-16 flex items-center justify-center gap-3 bg-sun text-ink border-3 border-ink rounded-[14px] shadow-neo-lg text-[21px] uppercase disabled:bg-putty disabled:text-faint disabled:border-dashed disabled:border-faint disabled:shadow-none">
+          <Spade size={24} strokeWidth={2} fill="currentColor" />
+          Start game
+        </button>
+      </motion.div>
 
       <PlayerEditModal
         isOpen={showAddPlayer}

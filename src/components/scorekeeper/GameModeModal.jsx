@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import BottomSheetModal from "./BottomSheetModal";
-import FluentEmoji from "./FluentEmoji";
+import { Check } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { PlayerTile, SectionLabel } from "./neo";
 import { useGameModeToggles } from "@/lib/useGameModeToggles";
 
 // Generic scoring shapes. High/Low take an optional target score that ends the
@@ -80,56 +82,57 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
       scrollable
       avoidKeyboard
       footer={
-        <Button
-          onClick={handleDone}
-          className="w-full h-11 bg-white hover:bg-white/90 font-semibold"
-          style={{ color: "#262729" }}
-        >
+        <Button onClick={handleDone} className="w-full">
           Done
         </Button>
       }
     >
-      <div className="flex flex-col gap-2 pb-1">
+      <div className="flex flex-col gap-2.5 pb-1 pr-1">
         {visibleModes.map(({ value, label, emoji }) => {
           const active = mode === value;
           return (
             <button
               key={value}
               onClick={() => setMode(value)}
-              className="w-full flex items-center gap-3 px-4 h-14 rounded-full transition-colors text-left border flex-shrink-0"
+              aria-pressed={active}
+              className="w-full h-14 flex items-center gap-3 pl-2 pr-3 border-3 border-ink rounded-xl text-left flex-shrink-0 transition-[background-color,box-shadow] duration-150"
               style={{
-                borderColor: active ? "hsl(199 94% 40% / 0.4)" : "hsl(var(--border))",
-                backgroundColor: active ? "hsl(199 94% 40% / 0.12)" : "hsl(var(--secondary))",
+                backgroundColor: active ? "#FFD23F" : "rgb(var(--surface))",
+                boxShadow: active ? "4px 4px 0 rgb(var(--ink))" : "none",
               }}
             >
-              <FluentEmoji emoji={emoji} size={36} />
-              <span className="text-foreground leading-tight [font-family:'Geist',_sans-serif] font-semibold text-base">{label}</span>
+              <PlayerTile emoji={emoji} color={active ? "#FFFFFF" : "rgb(var(--paper))"} size={38} radius={9} border={2.5} />
+              <span className="flex-1 text-[17px] font-extrabold">{label}</span>
+              {active && (
+                <span className="w-7 h-7 flex items-center justify-center bg-ink rounded-lg">
+                  <Check size={16} strokeWidth={3.5} color="#FFFFFF" />
+                </span>
+              )}
             </button>
           );
         })}
       </div>
 
-      {/* Optional target for High/Low */}
       {hasTarget && (
-        <div className="mt-4 px-1 pb-2">
-          <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">
+        <div className="mt-4 pb-2">
+          <SectionLabel as="label" htmlFor="target-score" className="text-[11px]">
             End at score (optional)
-          </label>
-          <input
+          </SectionLabel>
+          <Input
+            id="target-score"
             type="text"
             inputMode="numeric"
             value={target}
             onChange={(e) => setTarget(e.target.value.replace(/[^0-9]/g, ""))}
             onFocus={(e) => {
-              // Once the sheet has lifted above the keyboard, make sure the
-              // field is scrolled into view inside the sheet body.
+              // Once the sheet has lifted above the keyboard, keep the field in view.
               const el = e.target;
               setTimeout(() => el.scrollIntoView({ block: "center" }), 200);
             }}
             placeholder="e.g. 500"
-            className="mt-2 w-full h-12 rounded-xl bg-secondary border border-border px-4 text-foreground text-base placeholder:text-muted-foreground/40 focus:outline-none focus:border-accent-blue transition-colors"
+            className="mt-1.5 w-[calc(100%-4px)]"
           />
-          <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+          <p className="text-sm font-medium text-subtle mt-2.5 leading-relaxed">
             First to reach it ends the game{mode === "low" ? " — lowest total wins" : ""}. Leave blank for open-ended.
           </p>
         </div>

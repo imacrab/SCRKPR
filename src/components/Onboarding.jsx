@@ -183,6 +183,29 @@ function MiniScoreboard() {
 
 const PAPER = "rgb(var(--paper))";
 
+// The flying sticker morphs between the real computed styles of the header and
+// home-screen stickers (rather than scaling one of them) so both ends of the
+// flight are pixel-identical and the handoff can be an instant swap.
+function stickerGeometry(el) {
+  const rect = el.getBoundingClientRect();
+  const cs = getComputedStyle(el);
+  return {
+    width: rect.width,
+    cx: rect.left + rect.width / 2,
+    cy: rect.top + rect.height / 2,
+    style: {
+      fontSize: cs.fontSize,
+      paddingTop: cs.paddingTop,
+      paddingRight: cs.paddingRight,
+      paddingBottom: cs.paddingBottom,
+      paddingLeft: cs.paddingLeft,
+      borderRadius: cs.borderTopLeftRadius,
+      boxShadow: cs.boxShadow,
+      backgroundColor: cs.backgroundColor,
+    },
+  };
+}
+
 const SLIDES = [
   {
     key: "welcome",
@@ -223,7 +246,7 @@ export default function Onboarding({ onDone }) {
   const isLast = step === SLIDES.length - 1;
   const logoRef = useRef(null);
   // Completion morph: the header sticker flies into the home-screen logo slot.
-  const [flying, setFlying] = useState(null); // { from: DOMRect, dx, dy, scale } | null
+  const [flying, setFlying] = useState(null); // { from, to } sticker geometries | null
   const exiting = flying !== null;
 
   const go = (next) => {
@@ -239,13 +262,13 @@ export default function Onboarding({ onDone }) {
 
   const finish = () => {
     if (exiting) return;
-    const logoEl = logoRef.current;
-    const anchor = document.querySelector("[data-logo-anchor]");
-    if (logoEl && anchor) {
-      const f = logoEl.getBoundingClientRect();
-      const t = anchor.getBoundingClientRect();
+    const from = logoRef.current?.firstElementChild;
+    const to = document.querySelector("[data-logo-anchor]")?.firstElementChild;
+    if (from && to) {
+      const f = stickerGeometry(from);
+      const t = stickerGeometry(to);
       if (f.width && t.width) {
-        setFlying({ from: f, dx: t.left - f.left, dy: t.top - f.top, scale: t.width / f.width });
+        setFlying({ from: f, to: t });
         return;
       }
     }
@@ -266,7 +289,7 @@ export default function Onboarding({ onDone }) {
       className={`fixed inset-0 z-[60] overflow-hidden ${slide.bg === PAPER ? "text-fg" : "text-ink"}`}
       style={{ backgroundColor: exiting ? "transparent" : slide.bg, transition: `background-color ${DUR_MEDIUM}s ease, color ${DUR_MEDIUM}s ease` }}
       initial={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      exit={{ opacity: 0, transition: { duration: exiting ? 0 : DUR_MEDIUM } }}
       transition={{ duration: DUR_MEDIUM }}
     >
       <motion.div
@@ -355,13 +378,21 @@ export default function Onboarding({ onDone }) {
         <motion.span
           aria-hidden="true"
           className="fixed z-[70] pointer-events-none select-none"
-          style={{ left: flying.from.left, top: flying.from.top, transformOrigin: "top left" }}
-          initial={{ x: 0, y: 0, scale: 1 }}
-          animate={{ x: flying.dx, y: flying.dy, scale: flying.scale }}
+          style={{ left: flying.from.cx, top: flying.from.cy }}
+          initial={{ x: 0, y: 0 }}
+          animate={{ x: flying.to.cx - flying.from.cx, y: flying.to.cy - flying.from.cy }}
           transition={SPRING_SHEET}
           onAnimationComplete={dismiss}
         >
-          <LogoSticker />
+          <motion.span
+            className="font-display absolute left-0 top-0 whitespace-nowrap border-3 border-ink leading-none text-ink"
+            style={{ transform: "translate(-50%, -50%) rotate(-3deg)" }}
+            initial={flying.from.style}
+            animate={flying.to.style}
+            transition={SPRING_SHEET}
+          >
+            SCRKPR!
+          </motion.span>
         </motion.span>
       )}
     </motion.div>

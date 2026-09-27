@@ -62,32 +62,30 @@ export default function BottomSheetModal({
   // keep the overlay behavior.
   //
   // Preferred signal: the native Capacitor Keyboard plugin's keyboardWillShow
-  // event, which reports the exact keyboard height. This is the reliable path
-  // inside the iOS WKWebView, where `visualViewport` frequently does NOT shrink
-  // for the keyboard (so the web-only inset computes 0 and nothing lifts). We
-  // reach the plugin via the global `Capacitor.Plugins.Keyboard` rather than a
-  // static import, so the web build never depends on the package being present.
+  // event, which reports the exact keyboard height. Inside the iOS WKWebView
+  // (Keyboard resize: "none") `visualViewport` never shrinks for the keyboard,
+  // so the web fallback below would always compute 0. The plugin must be
+  // imported — Capacitor only exposes a plugin once its JS package registers it.
   // Falls back to the visualViewport API on the web / PWA.
   useEffect(() => {
     if (!isOpen || !avoidKeyboard) return undefined;
 
-    const Keyboard = typeof window !== "undefined" && window.Capacitor?.Plugins?.Keyboard;
-    if (Keyboard?.addListener) {
+    if (window.Capacitor?.isNativePlatform?.()) {
       let cancelled = false;
-      let showHandle;
-      let hideHandle;
-      const track = (promise, assign) => {
-        Promise.resolve(promise).then((handle) => {
-          if (cancelled) handle?.remove?.();
-          else assign(handle);
-        }).catch(() => {});
-      };
-      track(Keyboard.addListener("keyboardWillShow", (info) => setKeyboardInset(info?.keyboardHeight || 0)), (h) => (showHandle = h));
-      track(Keyboard.addListener("keyboardWillHide", () => setKeyboardInset(0)), (h) => (hideHandle = h));
+      let handles = [];
+      import("@capacitor/keyboard")
+        .then(({ Keyboard }) => Promise.all([
+          Keyboard.addListener("keyboardWillShow", (info) => setKeyboardInset(info?.keyboardHeight || 0)),
+          Keyboard.addListener("keyboardWillHide", () => setKeyboardInset(0)),
+        ]))
+        .then((added) => {
+          if (cancelled) added.forEach((h) => h.remove());
+          else handles = added;
+        })
+        .catch(() => {});
       return () => {
         cancelled = true;
-        showHandle?.remove?.();
-        hideHandle?.remove?.();
+        handles.forEach((h) => h.remove());
         setKeyboardInset(0);
       };
     }
@@ -115,6 +113,10 @@ export default function BottomSheetModal({
   };
 
   const backdropZ = zIndex - 10;
+  // The keyboard's height already covers the home-indicator area, so while it's
+  // up the sheet only needs a small gap instead of the safe-area inset.
+  const bottom = keyboardInset > 0 ? `${keyboardInset + 12}px` : "max(16px, env(safe-area-inset-bottom))";
+  const availableHeight = `calc(100dvh - 40px - env(safe-area-inset-top) - ${bottom})`;
 
   if (!shouldRender) return null;
 
@@ -231,13 +233,12 @@ export default function BottomSheetModal({
         className="fixed bg-paper text-fg border-3 border-ink rounded-[22px] shadow-neo-lg flex flex-col"
         style={{
           zIndex,
-          // keyboardInset is 0 unless avoidKeyboard is on and the keyboard is up.
-          bottom: `calc(max(16px, env(safe-area-inset-bottom)) + ${keyboardInset}px)`,
+          bottom,
           left: "16px",
           right: "22px",
           // Keeps the sheet's top clear of the notch / dynamic island.
-          maxHeight: `calc(100dvh - 40px - env(safe-area-inset-top) - max(16px, env(safe-area-inset-bottom)) - ${keyboardInset}px)`,
-          ...(fullHeight ? { height: `calc(100dvh - 40px - env(safe-area-inset-top) - max(16px, env(safe-area-inset-bottom)) - ${keyboardInset}px)` } : {}),
+          maxHeight: availableHeight,
+          ...(fullHeight ? { height: availableHeight } : {}),
           transition: "bottom 0.25s ease, max-height 0.25s ease",
         }}
       >

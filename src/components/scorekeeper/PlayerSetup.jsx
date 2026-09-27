@@ -38,7 +38,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [scrolledFromTop, setScrolledFromTop] = useState(false);
   const { toggles: modeToggles } = useGameModeToggles();
-  const { reveal } = useIntroReveal();
+  const { phase: introPhase, reveal } = useIntroReveal();
   const wide = useWideLayout();
   // Initial default assumes all modes visible; the effect below corrects it
   // on mount using the real toggles from settings.
@@ -587,7 +587,8 @@ export default function PlayerSetup({ onStart, onModalChange }) {
       </div>
 
       <div className="px-5 flex items-center justify-between h-11 flex-shrink-0">
-        <span data-logo-anchor>
+        {/* Hidden until the intro's flying sticker lands here and hands off. */}
+        <span data-logo-anchor style={{ visibility: introPhase === "hidden" ? "hidden" : "visible" }}>
           <LogoSticker size="lg" />
         </span>
         {allPlayers !== null && (

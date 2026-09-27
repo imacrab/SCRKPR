@@ -52,7 +52,7 @@ export default function PlayerEditPanel({ player, usedColors, usedEmojis, onSave
         />
       </div>
 
-      <div className="mt-5 flex items-center gap-3.5 flex-shrink-0">
+      <div className="-mx-7 px-7 pt-5 border-t-[2.5px] border-ink flex items-center gap-3.5 flex-shrink-0">
         {isEditing && onDelete && (
           <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)} className="px-5">
             <Trash2 size={20} strokeWidth={2.5} />

@@ -7,7 +7,7 @@ Everything in `capacitor.config.json` + `assets/` + the `.icon` is scaffolded. T
 
 ## One-time setup — already done (committed)
 
-The `ios/` Xcode project is scaffolded and committed (`ios/App/App.xcodeproj`, SPM-based). You do **not** re-run `npx cap add ios`. The splash imageset + raster icon are in the asset catalog. Also already applied (July 7): `ITSAppUsesNonExemptEncryption = NO` in `Info.plist`, `TARGETED_DEVICE_FAMILY = 1` (iPhone-only), and a fresh `npm run build && npx cap sync ios`.
+The `ios/` Xcode project is scaffolded and committed (`ios/App/App.xcodeproj`, SPM-based). You do **not** re-run `npx cap add ios`. The splash imageset + raster icon are in the asset catalog. Also already applied (July 7): `ITSAppUsesNonExemptEncryption = NO` in `Info.plist`, `TARGETED_DEVICE_FAMILY = "1,2"` (iPhone + iPad; iPad supports every orientation, iPhone stays portrait), and a fresh `npm run build && npx cap sync ios`.
 
 The only command you need after a web change:
 

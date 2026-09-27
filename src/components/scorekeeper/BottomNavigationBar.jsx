@@ -5,11 +5,11 @@ import { useRef } from "react";
 import { TRANSITION_PANEL, TRANSITION_SLIDE_OUT } from "@/lib/motion";
 import { useIntroReveal } from "@/lib/useIntroReveal";
 
-const TABS = [
-  { label: "New Game", icon: Spade,    path: "/" },
-  { label: "Players",  icon: Users,    path: "/players" },
-  { label: "History",  icon: History,  path: "/history" },
-  { label: "Account",  icon: Settings, path: "/account" },
+export const NAV_TABS = [
+  { label: "New game",    icon: Spade,    path: "/" },
+  { label: "Players",     icon: Users,    path: "/players" },
+  { label: "Past rounds", icon: History,  path: "/history" },
+  { label: "Settings",    icon: Settings, path: "/account" },
 ];
 
 export default function BottomNavigationBar({ hidden = false }) {
@@ -22,7 +22,7 @@ export default function BottomNavigationBar({ hidden = false }) {
   const isHidden = hidden || pathname === "/game" || introPhase === "hidden";
   const introRevealedRef = useRef(false);
   const playIntroDelay = introPhase === "play" && !introRevealedRef.current;
-  const activeIndex = Math.max(0, TABS.findIndex((tab) => tab.path === pathname));
+  const activeIndex = Math.max(0, NAV_TABS.findIndex((tab) => tab.path === pathname));
 
   return (
     <motion.nav
@@ -53,7 +53,7 @@ export default function BottomNavigationBar({ hidden = false }) {
         >
           <div className="w-full h-full bg-sun text-ink border-3 border-ink rounded-xl shadow-neo-sm" />
         </div>
-        {TABS.map(({ label, icon: Icon, path }) => {
+        {NAV_TABS.map(({ label, icon: Icon, path }) => {
           const active = pathname === path;
           return (
             <motion.button

@@ -8,11 +8,20 @@ import GameModeModal from "./GameModeModal";
 import PlayerEditModal from "./PlayerEditModal";
 import { getModeMeta } from "@/lib/gameModes";
 import { toNeoColor } from "@/lib/colors";
-import { LogoSticker, SectionLabel, PlayerTile, PAGE_TOP } from "./neo";
+import { LogoSticker, SectionLabel, PlayerTile, PageTitle, PAGE_TOP, WIDE_PAGE_TOP, WIDE_PANEL } from "./neo";
 import { DUR_MEDIUM } from "@/lib/motion";
 import { primeIOSKeyboard } from "@/lib/iosKeyboardPrimer";
 import { useGameModeToggles } from "@/lib/useGameModeToggles";
 import { useIntroReveal } from "@/lib/useIntroReveal";
+import { useWideLayout } from "@/lib/useWideLayout";
+import FluentEmoji from "./FluentEmoji";
+
+function lineupLabel(players) {
+  const names = players.map((p) => p.name);
+  if (names.length <= 2) return names.join(" & ");
+  if (names.length === 3) return `${names[0]}, ${names[1]} & ${names[2]}`;
+  return `${names[0]}, ${names[1]} & ${names.length - 2} more`;
+}
 
 // Order matches the picker; used to pick a sensible default when the
 // currently-selected mode is disabled in settings.
@@ -30,6 +39,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
   const [scrolledFromTop, setScrolledFromTop] = useState(false);
   const { toggles: modeToggles } = useGameModeToggles();
   const { phase: introPhase, reveal } = useIntroReveal();
+  const wide = useWideLayout();
   // Initial default assumes all modes visible; the effect below corrects it
   // on mount using the real toggles from settings.
   const [winMode, setWinMode] = useState(() => firstVisibleMode({}));
@@ -371,6 +381,195 @@ export default function PlayerSetup({ onStart, onModalChange }) {
     );
   };
 
+  const modals = (
+    <>
+        <PlayerEditModal
+          isOpen={showAddPlayer}
+          player={null}
+          usedColors={(allPlayers || []).map((p) => p.color)}
+          usedEmojis={(allPlayers || []).map((p) => p.emoji).filter(Boolean)}
+          onSave={handleAddPlayer}
+          onClose={() => setShowAddPlayerWithNav(false)} />
+      
+
+        <BestOfModal
+          isOpen={showBestOf}
+          onConfirm={handleBestOfConfirm}
+          onClose={() => {setShowBestOf(false);onModalChange?.(false);}} />
+      
+
+        <GameModeModal
+          isOpen={showGameMode}
+          winMode={winMode}
+          targetScore={targetScore}
+          onSelect={(mode, target) => { setWinMode(mode); setTargetScore(target); }}
+          onClose={() => {setShowGameMode(false);onModalChange?.(false);}} />
+    </>
+  );
+
+  if (wide) {
+    // The first-run intro owns the entrance while it plays; otherwise cards
+    // stagger in on first load and pop in when added later.
+    const cardEntrance = (index) => {
+      const intro = reveal(2 + Math.min(index, 8));
+      if (intro.initial) return intro;
+      return {
+        initial: entranceDone ? { opacity: 0, scale: 0.95 } : { opacity: 0, y: 32, scale: 0.95 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: entranceDone ? 0 : Math.min(index, 8) * 0.05 },
+      };
+    };
+    const startButton = (
+      <button
+        onClick={handleStart}
+        disabled={!canStart}
+        className="neo-press font-display w-[calc(100%-6px)] h-[68px] flex items-center justify-center gap-3 bg-sun text-ink border-3 border-ink rounded-[14px] shadow-neo-lg text-[22px] uppercase disabled:bg-putty disabled:text-faint disabled:border-dashed disabled:border-faint disabled:shadow-none">
+        <Spade size={24} strokeWidth={2} fill="currentColor" />
+        Start game
+      </button>
+    );
+
+    return (
+      <div className="bg-background flex flex-col overflow-hidden px-11" style={{ height: "100%", paddingTop: WIDE_PAGE_TOP, paddingBottom: "max(env(safe-area-inset-bottom), 28px)" }}>
+        <div className="h-16 flex items-center justify-between gap-4 flex-shrink-0">
+          <PageTitle>New game</PageTitle>
+          <button
+            onPointerDown={primeIOSKeyboard}
+            onClick={() => setShowAddPlayerWithNav(true)}
+            className="neo-press mr-1 h-[52px] px-5 flex items-center gap-2 bg-surface border-3 border-ink rounded-xl shadow-neo text-[17px] font-extrabold">
+            <Plus size={20} strokeWidth={3} />
+            Add player
+          </button>
+        </div>
+
+        <div className="flex-1 min-h-0 flex gap-8 mt-6">
+          <div className="flex-1 min-w-0 overflow-y-auto pb-4">
+            <SectionLabel>
+              {hasPlayers ? `Who's playing · ${selectedPlayers.length} of ${allPlayers.length}` : "Who's playing"}
+            </SectionLabel>
+
+            {allPlayers === null ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="w-6 h-6 border-3 border-ink/20 border-t-ink rounded-full animate-spin" />
+              </div>
+            ) : (
+              <div className="mt-3 grid grid-cols-2 landscape:grid-cols-3 gap-x-4 gap-y-5">
+                {allPlayers.map((player, index) => {
+                  const selected = selectedIds.has(player.id);
+                  const color = toNeoColor(player.color);
+                  return (
+                    <motion.div
+                      key={player.id}
+                      {...cardEntrance(index)}
+                      className="pr-[5px] pb-[5px]">
+                      <div
+                        role="checkbox"
+                        aria-checked={selected}
+                        aria-label={player.name}
+                        onClick={() => toggleSelected(player.id)}
+                        className="h-[136px] flex flex-col justify-between p-4 border-3 border-ink rounded-2xl cursor-pointer transition-[background-color,box-shadow,transform] duration-150"
+                        style={{
+                          backgroundColor: selected ? color : "rgb(var(--surface))",
+                          color: selected ? "rgb(var(--ink))" : "rgb(var(--fg))",
+                          boxShadow: selected && tappedId !== player.id ? "5px 5px 0 rgb(var(--ink))" : "none",
+                          transform: tappedId === player.id ? "translate(2px, 2px)" : "none",
+                        }}>
+                        <div className="flex items-start justify-between">
+                          <PlayerTile emoji={player.emoji} color={selected ? "#FFFFFF" : color} size={52} radius={12} />
+                          <span
+                            aria-hidden="true"
+                            className="w-8 h-8 flex items-center justify-center border-3 border-ink rounded-lg transition-colors"
+                            style={{ backgroundColor: selected ? "rgb(var(--ink))" : "rgb(var(--surface))" }}>
+                            {selected && <Check size={18} strokeWidth={3.5} color="#FFFFFF" />}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="flex-1 min-w-0 text-[22px] font-extrabold truncate">{player.name}</span>
+                          <button
+                            type="button"
+                            onClick={(e) => toggleFavorite(player.id, e)}
+                            aria-label={player.favorite ? "Remove from favorites" : "Add to favorites"}
+                            className="-mr-2 -mb-2 flex-shrink-0 w-11 h-11 flex items-center justify-center">
+                            <motion.span
+                              animate={poppedId === player.id ? { scale: [1, player.favorite ? 1.4 : 1.18, 1] } : { scale: 1 }}
+                              transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
+                              style={{ display: "inline-flex" }}>
+                              <Star size={24} strokeWidth={2.25} fill={player.favorite ? "#FFD23F" : "transparent"} />
+                            </motion.span>
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+                <motion.div {...reveal(2 + Math.min(allPlayers.length, 9))} className="pr-[5px] pb-[5px]">
+                  <button
+                    onPointerDown={primeIOSKeyboard}
+                    onClick={() => setShowAddPlayerWithNav(true)}
+                    className="w-full h-[136px] flex flex-col items-center justify-center gap-2 border-3 border-dashed border-ink rounded-2xl text-[17px] font-extrabold active:bg-ink/5">
+                    <Plus size={26} strokeWidth={3} />
+                    Add player
+                  </button>
+                </motion.div>
+              </div>
+            )}
+
+            {allPlayers !== null && !hasPlayers && (
+              <motion.div {...reveal(3)} className="mt-10 text-center">
+                <h2 className="font-display text-[28px] leading-[1.1] uppercase">Let's add some players</h2>
+                <p className="mt-2.5 text-base font-medium text-subtle">You need at least two to start.</p>
+              </motion.div>
+            )}
+          </div>
+
+          <motion.aside {...reveal(1)} className="w-[340px] flex-shrink-0 self-start mt-7 mr-1.5">
+            <div className={`p-6 ${WIDE_PANEL}`}>
+              <SectionLabel className="mb-2.5">Game mode</SectionLabel>
+              <button
+                onClick={() => {setShowGameMode(true);onModalChange?.(true);}}
+                className="neo-press w-[calc(100%-3px)] h-16 flex items-center gap-3 pl-2.5 pr-3 bg-surface border-3 border-ink rounded-xl shadow-neo-sm">
+                <PlayerTile emoji={modeMeta.emoji} color="#FFD23F" size={40} radius={10} border={2.5} />
+                <span className="flex-1 min-w-0 text-left">
+                  <span className="block text-[17px] font-extrabold truncate">{modeMeta.label}</span>
+                  <span className="block text-[13px] font-semibold text-subtle">
+                    {winMode === "bestof" ? "Pick rounds on start" : `${modeMeta.direction === "low" ? "Fewest" : "Most"} points wins${targetScore ? ` · to ${targetScore}` : ""}`}
+                  </span>
+                </span>
+                <ChevronRight size={20} strokeWidth={3} />
+              </button>
+
+              <SectionLabel className="mt-6 mb-2.5">Lineup</SectionLabel>
+              {selectedPlayers.length > 0 ? (
+                <div className="flex items-center gap-3.5 min-h-[52px]">
+                  <div className="flex flex-shrink-0">
+                    {selectedPlayers.slice(0, 4).map((p, i) => (
+                      <span key={p.id} className={i > 0 ? "-ml-3" : ""} style={{ zIndex: 10 - i }}>
+                        <PlayerTile emoji={p.emoji} color={toNeoColor(p.color)} size={46} radius={11} rotate={i % 2 ? 4 : -4} />
+                      </span>
+                    ))}
+                  </div>
+                  <span className="min-w-0 text-[17px] font-extrabold leading-tight">{lineupLabel(selectedPlayers)}</span>
+                </div>
+              ) : (
+                <div className="min-h-[52px] flex items-center gap-3 text-subtle">
+                  <FluentEmoji emoji="👆" size={28} />
+                  <span className="text-[15px] font-semibold">Tap players to add them.</span>
+                </div>
+              )}
+
+              <div className="mt-7">{startButton}</div>
+              {!canStart && hasPlayers && (
+                <p className="font-mono mt-3 text-center text-[11px] font-bold tracking-[0.1em] uppercase text-subtle">Pick at least two</p>
+              )}
+            </div>
+          </motion.aside>
+        </div>
+
+        {modals}
+      </div>
+    );
+  }
+
   return (
     <div
       className="bg-background flex flex-col overflow-hidden"
@@ -509,27 +708,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         </button>
       </motion.div>
 
-      <PlayerEditModal
-        isOpen={showAddPlayer}
-        player={null}
-        usedColors={(allPlayers || []).map((p) => p.color)}
-        usedEmojis={(allPlayers || []).map((p) => p.emoji).filter(Boolean)}
-        onSave={handleAddPlayer}
-        onClose={() => setShowAddPlayerWithNav(false)} />
-      
-
-      <BestOfModal
-        isOpen={showBestOf}
-        onConfirm={handleBestOfConfirm}
-        onClose={() => {setShowBestOf(false);onModalChange?.(false);}} />
-      
-
-      <GameModeModal
-        isOpen={showGameMode}
-        winMode={winMode}
-        targetScore={targetScore}
-        onSelect={(mode, target) => { setWinMode(mode); setTargetScore(target); }}
-        onClose={() => {setShowGameMode(false);onModalChange?.(false);}} />
+      {modals}
       
 
     </div>);

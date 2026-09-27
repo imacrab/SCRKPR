@@ -6,11 +6,13 @@ import PlayerSetup from "@/components/scorekeeper/PlayerSetup";
 import ScoreBoard from "@/components/scorekeeper/ScoreBoard";
 import PlayerEditModal from "@/components/scorekeeper/PlayerEditModal";
 import BottomNavigationBar from "@/components/scorekeeper/BottomNavigationBar";
+import SideNavigation from "@/components/scorekeeper/SideNavigation";
 import History from "./History";
 import Players from "./Players";
 import AccountSettings from "./AccountSettings";
 import { TRANSITION_PAGE } from "@/lib/motion";
 import { ACCENT_BLUE } from "@/lib/colors";
+import { useWideLayout } from "@/lib/useWideLayout";
 
 // Game state persists across route transitions and page refreshes via module scope + localStorage
 let _players = [];
@@ -60,6 +62,7 @@ export default function ScoreKeeper() {
   const navigate = useNavigate();
   const location = useLocation();
   const view = location.pathname; // "/", "/game", "/history", "/account"
+  const wide = useWideLayout();
 
   // Load saved game state on mount
   const [initialized, setInitialized] = useState(false);
@@ -256,18 +259,20 @@ export default function ScoreKeeper() {
     animate: { opacity: 1, filter: "blur(0px)", scale: 1, zIndex: 1, pointerEvents: "auto" },
   };
   const pageTransition = TRANSITION_PAGE;
-  const pageClassName = "absolute inset-0 w-screen overflow-hidden";
+  const pageClassName = "absolute inset-0 w-full overflow-hidden";
 
   // Pages reserve the tab bar's height (66pt + 3pt top border + safe area) so
-  // content never sits under it. Hidden on /game.
-  const navHeight = view === "/game" ? "0px" : "calc(69px + env(safe-area-inset-bottom))";
+  // content never sits under it. Hidden on /game and on wide layouts, where
+  // the sidebar sits beside the page instead.
+  const navHeight = view === "/game" || wide ? "0px" : "calc(69px + env(safe-area-inset-bottom))";
 
   return (
-    <>
-      <div className="relative w-screen overflow-hidden" style={{ height: "100%" }}>
+    <div className="flex w-screen overflow-hidden" style={{ height: "100%" }}>
+      {wide && view !== "/game" && <SideNavigation />}
+      <div className="relative flex-1 min-w-0 overflow-hidden" style={{ height: "100%" }}>
         {view === "/history" && (
           <motion.div key="history" variants={pageVariants} initial="initial" animate="animate" transition={pageTransition} className={pageClassName} style={{ height: "100%", paddingBottom: navHeight }}>
-            <History onBack={() => navigate(-1)} onResumeGame={handleResumeGame} onModalChange={setNavHidden} />
+            <History onBack={() => navigate(-1)} onResumeGame={handleResumeGame} onRematch={handleStartGame} onModalChange={setNavHidden} />
           </motion.div>
         )}
 
@@ -327,7 +332,7 @@ export default function ScoreKeeper() {
         )}
       </div>
 
-      <BottomNavigationBar hidden={navHidden} />
-    </>
+      {!wide && <BottomNavigationBar hidden={navHidden} />}
+    </div>
   );
 }

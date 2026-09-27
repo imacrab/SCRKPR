@@ -12,7 +12,7 @@ function bestInRound(players, roundIdx, lowWins) {
   return scores.every((s) => s === best) ? null : best;
 }
 
-export default function ScoreHistoryPanel({ players, winMode }) {
+export default function ScoreHistoryPanel({ players, winMode, bare = false }) {
   const maxRounds = Math.max(0, ...players.map((p) => p.scores.length));
   const lowWins = isLowMode(winMode);
 
@@ -31,7 +31,7 @@ export default function ScoreHistoryPanel({ players, winMode }) {
   const columns = `56px repeat(${players.length}, minmax(44px, 1fr))`;
 
   return (
-    <div className="mr-1.5 bg-surface border-3 border-ink rounded-2xl shadow-neo-lg overflow-hidden">
+    <div className={bare ? "bg-surface" : "mr-1.5 bg-surface border-3 border-ink rounded-2xl shadow-neo-lg overflow-hidden"}>
       <div className="overflow-x-auto">
         <div style={{ minWidth: 56 + players.length * 44 }}>
           <div className="grid items-center h-[60px] border-b-3 border-ink bg-paper" style={{ gridTemplateColumns: columns }}>

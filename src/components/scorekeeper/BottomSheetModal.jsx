@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, useDragControls } from "framer-motion";
 import { SPRING_SHEET, TRANSITION_FADE } from "@/lib/motion";
+import { useWideLayout } from "@/lib/useWideLayout";
 
 export default function BottomSheetModal({
   isOpen,
@@ -19,8 +20,10 @@ export default function BottomSheetModal({
   scrollable = false,
   fullHeight = false,
   avoidKeyboard = false,
+  wideMaxWidth = 560,
 }) {
   const dragControls = useDragControls();
+  const wide = useWideLayout();
   const [scrolled, setScrolled] = useState(false);
   const [shouldRender, setShouldRender] = useState(isOpen);
   const [keyboardInset, setKeyboardInset] = useState(0);
@@ -117,6 +120,68 @@ export default function BottomSheetModal({
 
   if (!shouldRender) return null;
 
+  const sheetContent = (
+    <>
+      <div
+        onPointerDown={wide ? undefined : (e) => dragControls.start(e)}
+        className={`flex-shrink-0 touch-none select-none ${wide ? "" : "cursor-grab active:cursor-grabbing"} border-b-[2.5px] transition-colors duration-200 ${
+          scrollable && scrolled ? "border-ink" : "border-transparent"
+        }`}
+      >
+        {icon ? (
+          <div className="flex flex-col items-center text-center px-5 pt-[30px] pb-5">
+            <div
+              className="w-16 h-16 flex items-center justify-center text-ink border-3 border-ink rounded-2xl shadow-neo"
+              style={{ background: iconColor, transform: "rotate(-6deg)" }}
+            >
+              {icon}
+            </div>
+            {eyebrow && (
+              <p className="font-mono mt-5 text-xs font-bold tracking-[0.14em] uppercase">{eyebrow}</p>
+            )}
+            {title && (
+              <h2 className={`font-display ${eyebrow ? "mt-1.5" : "mt-5"} text-[28px] leading-[1.1] uppercase`}>{title}</h2>
+            )}
+            {description && (
+              <p className="mt-3 text-base leading-[1.45] font-medium text-subtle max-w-[290px]">{description}</p>
+            )}
+          </div>
+        ) : (eyebrow || title || leading || trailing) ? (
+          <div className="flex items-center gap-3 px-[18px] pt-[22px] pb-4">
+            {leading}
+            <div className="flex-1 min-w-0">
+              {eyebrow && (
+                <p className="font-mono text-[11px] font-bold tracking-[0.14em] uppercase text-subtle">{eyebrow}</p>
+              )}
+              {title && (
+                <h2 className="font-display mt-0.5 text-2xl leading-[1.1] uppercase line-clamp-2 break-words">{title}</h2>
+              )}
+              {description && (
+                <p className="mt-2 text-[15px] leading-[1.45] font-medium text-subtle">{description}</p>
+              )}
+            </div>
+            {trailing && <span className="flex-shrink-0" onPointerDown={(e) => e.stopPropagation()}>{trailing}</span>}
+          </div>
+        ) : (
+          <div className="h-[22px]" />
+        )}
+      </div>
+
+      <div
+        className={scrollable ? "flex-1 overflow-y-auto px-[18px] pb-4" : "flex-shrink-0 px-[18px]"}
+        onScroll={scrollable ? (e) => setScrolled(e.currentTarget.scrollTop > 0) : undefined}
+      >
+        {children}
+      </div>
+
+      {footer && (
+        <div className={`flex-shrink-0 pl-[18px] pr-[22px] pt-4 pb-[18px] ${scrollable ? "border-t-[2.5px] border-ink" : ""}`}>
+          {footer}
+        </div>
+      )}
+    </>
+  );
+
   // Portal to <body> so the modal escapes the page wrapper's stacking context
   // (the page is transformed/blurred during transitions, which traps any
   // z-index inside it). At the document root the backdrop/sheet sit above the
@@ -131,6 +196,29 @@ export default function BottomSheetModal({
         style={{ zIndex: backdropZ, pointerEvents: isOpen ? "auto" : "none" }}
         onClick={onClose}
       />
+      {wide ? (
+        // Tablets get a centered dialog: a bottom sheet stretched across a
+        // 13" screen reads as a banner, and it's far from the thumb anyway.
+        <div
+          className="fixed inset-0 flex items-center justify-center px-8 pointer-events-none"
+          style={{ zIndex, paddingBottom: keyboardInset, transition: "padding-bottom 0.25s ease" }}
+        >
+          <motion.div
+            initial={{ y: 40, scale: 0.97, opacity: 0 }}
+            animate={isOpen ? { y: 0, scale: 1, opacity: 1 } : { y: 40, scale: 0.97, opacity: 0 }}
+            transition={SPRING_SHEET}
+            className="w-full bg-paper text-fg border-3 border-ink rounded-[22px] shadow-neo-lg flex flex-col"
+            style={{
+              maxWidth: wideMaxWidth,
+              pointerEvents: isOpen ? "auto" : "none",
+              maxHeight: `calc(100dvh - 80px - ${keyboardInset}px)`,
+              ...(fullHeight ? { height: `min(780px, calc(100dvh - 80px - ${keyboardInset}px))` } : {}),
+            }}
+          >
+            {sheetContent}
+          </motion.div>
+        </div>
+      ) : (
       <motion.div
         initial={{ y: "110%", opacity: 0 }}
         animate={{ y: isOpen ? 0 : "110%", opacity: isOpen ? 1 : 0 }}
@@ -154,64 +242,9 @@ export default function BottomSheetModal({
           transition: "bottom 0.25s ease, max-height 0.25s ease",
         }}
       >
-            <div
-              onPointerDown={(e) => dragControls.start(e)}
-              className={`flex-shrink-0 touch-none select-none cursor-grab active:cursor-grabbing border-b-[2.5px] transition-colors duration-200 ${
-                scrollable && scrolled ? "border-ink" : "border-transparent"
-              }`}
-            >
-              {icon ? (
-                <div className="flex flex-col items-center text-center px-5 pt-[30px] pb-5">
-                  <div
-                    className="w-16 h-16 flex items-center justify-center text-ink border-3 border-ink rounded-2xl shadow-neo"
-                    style={{ background: iconColor, transform: "rotate(-6deg)" }}
-                  >
-                    {icon}
-                  </div>
-                  {eyebrow && (
-                    <p className="font-mono mt-5 text-xs font-bold tracking-[0.14em] uppercase">{eyebrow}</p>
-                  )}
-                  {title && (
-                    <h2 className={`font-display ${eyebrow ? "mt-1.5" : "mt-5"} text-[28px] leading-[1.1] uppercase`}>{title}</h2>
-                  )}
-                  {description && (
-                    <p className="mt-3 text-base leading-[1.45] font-medium text-subtle max-w-[290px]">{description}</p>
-                  )}
-                </div>
-              ) : (eyebrow || title || leading || trailing) ? (
-                <div className="flex items-center gap-3 px-[18px] pt-[22px] pb-4">
-                  {leading}
-                  <div className="flex-1 min-w-0">
-                    {eyebrow && (
-                      <p className="font-mono text-[11px] font-bold tracking-[0.14em] uppercase text-subtle">{eyebrow}</p>
-                    )}
-                    {title && (
-                      <h2 className="font-display mt-0.5 text-2xl leading-[1.1] uppercase line-clamp-2 break-words">{title}</h2>
-                    )}
-                    {description && (
-                      <p className="mt-2 text-[15px] leading-[1.45] font-medium text-subtle">{description}</p>
-                    )}
-                  </div>
-                  {trailing && <span className="flex-shrink-0" onPointerDown={(e) => e.stopPropagation()}>{trailing}</span>}
-                </div>
-              ) : (
-                <div className="h-[22px]" />
-              )}
-            </div>
-
-            <div
-              className={scrollable ? "flex-1 overflow-y-auto px-[18px] pb-4" : "flex-shrink-0 px-[18px]"}
-              onScroll={scrollable ? (e) => setScrolled(e.currentTarget.scrollTop > 0) : undefined}
-            >
-              {children}
-            </div>
-
-            {footer && (
-              <div className={`flex-shrink-0 pl-[18px] pr-[22px] pt-4 pb-[18px] ${scrollable ? "border-t-[2.5px] border-ink" : ""}`}>
-                {footer}
-              </div>
-            )}
+        {sheetContent}
       </motion.div>
+      )}
     </>,
     document.body
   );

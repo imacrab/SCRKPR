@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { createPortal } from "react-dom";
 import { db } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Check, Trash2, Star } from "lucide-react";
@@ -273,26 +272,6 @@ export default function Players({ onBack, onModalChange }) {
 
   return (
     <div className="bg-background flex flex-col overflow-hidden lg:px-6" style={{ height: "100dvh", paddingTop: wide ? WIDE_PAGE_TOP : PAGE_TOP, paddingBottom: wide ? "max(env(safe-area-inset-bottom), 28px)" : "env(safe-area-inset-bottom)" }}>
-      {/* Edit-mode frame — portaled to <body> so the page's overflow-hidden
-          can't clip its rounded corners at the screen edges. */}
-      {createPortal(
-        <AnimatePresence>
-          {selectMode && (
-            <motion.div
-              key="edit-frame"
-              aria-hidden="true"
-              className="fixed inset-0 z-30 pointer-events-none rounded-[55px]"
-              style={{ border: "5px solid rgb(var(--fg))" }}
-              initial={{ opacity: 0, scale: 1.015 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.015 }}
-              transition={{ duration: 0.22, ease: "easeOut" }}
-            />
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
-
       <div className="px-5 flex items-center gap-2 h-12 lg:h-16 flex-shrink-0">
         {selectMode ? (
           <>

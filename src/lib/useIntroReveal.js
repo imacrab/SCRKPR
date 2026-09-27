@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { hasOnboarded } from "./onboarding";
-import { SPRING_SNAPPY } from "./motion";
+import { SPRING_ENTER } from "./motion";
 
 export const ONBOARDING_DONE_EVENT = "scrkpr:onboarding-done";
 
@@ -21,7 +21,7 @@ export function useIntroReveal() {
     return {
       initial: { opacity: 0, y: 28, scale: 0.97 },
       animate: phase === "play" ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 28, scale: 0.97 },
-      transition: { ...SPRING_SNAPPY, delay: baseDelay + index * step },
+      transition: { ...SPRING_ENTER, delay: baseDelay + index * step },
     };
   };
 

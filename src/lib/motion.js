@@ -12,6 +12,7 @@ export const DUR_PAGE = 0.4;    // page transitions
 // Springs
 export const SPRING_SHEET = { type: "spring", stiffness: 400, damping: 35 };            // bottom sheets / modals
 export const SPRING_SNAPPY = { type: "spring", stiffness: 500, damping: 25 };           // in-layout UI (chevrons, columns)
+export const SPRING_ENTER = { type: "spring", stiffness: 500, damping: 45 };            // entrances — critically damped so content never overshoots into a clipping edge
 export const SPRING_POP = { type: "spring", stiffness: 800, damping: 8, mass: 0.5 };    // score pop / bouncy emphasis
 export const SPRING_POP_SNAPPY = { type: "spring", stiffness: 650, damping: 16, mass: 0.5 }; // quick confirming pop (little overshoot, settles fast)
 

@@ -5,7 +5,7 @@ import { isLowMode, getModeMeta } from "@/lib/gameModes";
 import { WinnerCard, SectionLabel, PageTitle, PAGE_TOP } from "./neo";
 import ScoreHistoryPanel from "./ScoreHistoryPanel";
 import HistoryGameStats from "./HistoryGameStats";
-import { TRANSITION_PANEL, SPRING_SNAPPY } from "@/lib/motion";
+import { TRANSITION_PANEL, SPRING_ENTER } from "@/lib/motion";
 
 const safeFormat = (value, fmt) => {
   const d = new Date(value);
@@ -69,7 +69,7 @@ export default function HistoryGameDetail({ game, onBack }) {
         <motion.div
           initial={{ opacity: 0, y: 16, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ ...SPRING_SNAPPY, delay: 0.05 }}
+          transition={{ ...SPRING_ENTER, delay: 0.05 }}
         >
           <WinnerCard
             label="Game"

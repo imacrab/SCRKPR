@@ -3,7 +3,7 @@ import { X, Play } from "lucide-react";
 import { format } from "date-fns";
 import { getModeMeta } from "@/lib/gameModes";
 import { ColorChip } from "./neo";
-import { SPRING_SNAPPY } from "@/lib/motion";
+import { SPRING_ENTER } from "@/lib/motion";
 
 const safeFormat = (value, fmt) => {
   const d = new Date(value);
@@ -29,7 +29,7 @@ export default function SavedGamesList({ savedGames, onResume, onDelete }) {
           <motion.div
             key={game.id}
             initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0, transition: { ...SPRING_SNAPPY, delay: enterDelay } }}
+            animate={{ opacity: 1, y: 0, transition: { ...SPRING_ENTER, delay: enterDelay } }}
             exit={{ opacity: 0, height: 0 }}
             className="mb-4 mr-[5px] bg-surface border-3 border-ink rounded-2xl shadow-neo-md overflow-hidden"
           >

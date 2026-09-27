@@ -1,7 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Spade, Users, History, Settings } from "lucide-react";
 import { motion } from "framer-motion";
-import { TRANSITION_PAGE, TRANSITION_PANEL } from "@/lib/motion";
+import { useRef } from "react";
+import { TRANSITION_PANEL, TRANSITION_SLIDE_OUT } from "@/lib/motion";
 import { useIntroReveal } from "@/lib/useIntroReveal";
 
 const TABS = [
@@ -19,6 +20,8 @@ export default function BottomNavigationBar({ hidden = false }) {
   // slide back up (and fade in) when returning to any other route.
   const { phase: introPhase } = useIntroReveal();
   const isHidden = hidden || pathname === "/game" || introPhase === "hidden";
+  const introRevealedRef = useRef(false);
+  const playIntroDelay = introPhase === "play" && !introRevealedRef.current;
   const activeIndex = Math.max(0, TABS.findIndex((tab) => tab.path === pathname));
 
   return (
@@ -29,7 +32,10 @@ export default function BottomNavigationBar({ hidden = false }) {
         y: isHidden ? 140 : 0,
         opacity: isHidden ? 0 : 1,
       }}
-      transition={introPhase === "play" ? { ...TRANSITION_PAGE, delay: 0.75 } : TRANSITION_PAGE}
+      transition={isHidden ? TRANSITION_SLIDE_OUT : playIntroDelay ? { ...TRANSITION_PANEL, delay: 0.75 } : TRANSITION_PANEL}
+      onAnimationComplete={() => {
+        if (introPhase === "play") introRevealedRef.current = true;
+      }}
       style={{
         paddingBottom: "env(safe-area-inset-bottom)",
         pointerEvents: isHidden ? "none" : "auto",

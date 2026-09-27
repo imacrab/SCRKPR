@@ -61,7 +61,7 @@ export default function PlayerEditPanel({ player, usedColors, usedEmojis, onSave
         )}
         <div className="flex-1" />
         <Button variant="outline" onClick={onDiscard} className="px-6">
-          Discard
+          Cancel
         </Button>
         <Button onClick={handleSubmit} disabled={!draft.name.trim()} className="px-7 mr-1">
           {isEditing ? "Save" : "Add player"}

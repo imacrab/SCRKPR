@@ -11,6 +11,7 @@ import { toNeoColor } from "@/lib/colors";
 import { SPRING_SHEET } from "@/lib/motion";
 import { primeIOSKeyboard } from "@/lib/iosKeyboardPrimer";
 import { useWideLayout } from "@/lib/useWideLayout";
+import { showToast } from "@/lib/neoToast";
 
 export default function Players({ onBack, onModalChange }) {
   const [players, setPlayers] = useState([]);
@@ -172,6 +173,7 @@ export default function Players({ onBack, onModalChange }) {
       await db.players.update(id, { name, color, emoji, cardStyle });
       saved = { ...players.find((p) => p.id === id), name, color, emoji, cardStyle };
       setPlayers((prev) => prev.map((p) => (p.id === id ? saved : p)));
+      showToast("Player updated");
     } else {
       saved = await db.players.create({ name, color, emoji, cardStyle });
       setPlayers((prev) => [saved, ...prev]);

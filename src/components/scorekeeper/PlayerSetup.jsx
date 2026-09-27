@@ -619,16 +619,20 @@ export default function PlayerSetup({ onStart, onModalChange }) {
           <>
               {!hasPlayers &&
             <motion.div {...reveal(2)} className="flex flex-col">
-                  <div aria-hidden="true" className="space-y-2.5 mr-1 opacity-40">
-                    {[120, 90].map((w) => (
-                      <div key={w} className="h-[60px] flex items-center gap-3 px-2.5 border-3 border-dashed border-dash rounded-xl">
-                        <span className="w-10 h-10 border-3 border-dashed border-dash rounded-[9px]" />
-                        <span className="h-3 rounded-md bg-hairline" style={{ width: w }} />
-                      </div>
-                    ))}
+                  <div className="relative">
+                    <div aria-hidden="true" className="space-y-2.5 mr-1 opacity-20">
+                      {[120, 90].map((w) => (
+                        <div key={w} className="h-[60px] flex items-center gap-3 px-2.5 border-3 border-dashed border-dash rounded-xl">
+                          <span className="w-10 h-10 border-3 border-dashed border-dash rounded-[9px]" />
+                          <span className="h-3 rounded-md bg-hairline" style={{ width: w }} />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                      <h2 className="font-display text-[26px] leading-[1.1] uppercase">Let's add some players</h2>
+                      <p className="mt-2.5 text-base font-medium text-subtle">You need at least two to start.</p>
+                    </div>
                   </div>
-                  <h2 className="font-display mt-[30px] text-[26px] leading-[1.1] uppercase text-center">Let's add some players</h2>
-                  <p className="mt-2.5 text-base font-medium text-center text-subtle">You need at least two to start.</p>
                   <button
                     onPointerDown={primeIOSKeyboard}
                     onClick={() => setShowAddPlayerWithNav(true)}

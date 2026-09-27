@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Play } from "lucide-react";
 import { format } from "date-fns";
 import { getModeMeta } from "@/lib/gameModes";
-import FluentEmoji from "./FluentEmoji";
+import { ColorChip } from "./neo";
 import { SPRING_SNAPPY } from "@/lib/motion";
 
 const safeFormat = (value, fmt) => {
@@ -31,53 +31,39 @@ export default function SavedGamesList({ savedGames, onResume, onDelete }) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0, transition: { ...SPRING_SNAPPY, delay: enterDelay } }}
             exit={{ opacity: 0, height: 0 }}
-            className="mb-3 rounded-2xl border border-border bg-card overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)]"
+            className="mb-4 mr-[5px] bg-surface border-3 border-ink rounded-2xl shadow-neo-md overflow-hidden"
           >
-            {/* Header — name + meta, with delete */}
-            <div className="px-4 py-3 flex items-start justify-between gap-3 border-b border-border">
-              <div className="flex flex-col gap-1 min-w-0">
-                <p className="text-base text-foreground [font-family:'Geist',_sans-serif] font-semibold truncate">
-                  {game.name}
-                </p>
-                <p className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
-                  <span>{safeFormat(game.saved_at, "MMM d · h:mm a")}</span>
-                  <span>·</span>
-                  <span className="inline-flex items-center gap-1">
-                    <FluentEmoji emoji={meta.emoji} size={14} />
-                    {meta.label}
-                  </span>
-                  <span>·</span>
-                  <span>{rounds} {rounds === 1 ? "round" : "rounds"}</span>
+            <div className="px-3.5 pt-3.5 pb-3 flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-lg font-extrabold truncate">{game.name}</p>
+                <p className="font-mono mt-0.5 text-[11px] font-bold tracking-[0.08em] uppercase text-subtle">
+                  {safeFormat(game.saved_at, "MMM d · h:mm a")} · {meta.label} · {rounds} {rounds === 1 ? "round" : "rounds"}
                 </p>
               </div>
               <button
                 onClick={(e) => { e.stopPropagation(); onDelete(game.id); }}
                 aria-label="Delete saved game"
-                className="flex-shrink-0 w-8 h-8 -mr-1 -mt-1 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                className="neo-press flex-shrink-0 w-9 h-9 flex items-center justify-center bg-surface border-2.5 border-ink rounded-[10px] shadow-neo-sm"
               >
-                <X size={16} strokeWidth={2} />
+                <X size={18} strokeWidth={3} />
               </button>
             </div>
 
-            {/* Standings */}
-            <div className="px-4 py-3 space-y-1">
+            <div className="px-3.5 pb-3.5 flex flex-col gap-1.5">
               {players.map((p) => (
-                <div key={p.id ?? p.name} className="flex items-center gap-3 py-1.5">
-                  {p.emoji
-                    ? <span className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden" style={{ backgroundColor: p.color }}><FluentEmoji emoji={p.emoji} size={16} /></span>
-                    : <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 mx-[7px]" style={{ backgroundColor: p.color }} />}
-                  <span className="text-sm text-foreground flex-1 truncate">{p.name}</span>
-                  <span className="text-sm font-semibold" style={{ color: p.color }}>{p.total}</span>
+                <div key={p.id ?? p.name} className="h-9 flex items-center gap-2.5 px-2.5 bg-paper border-2 border-ink rounded-[10px]">
+                  <ColorChip color={p.color} />
+                  <span className="flex-1 truncate text-[15px] font-bold">{p.name}</span>
+                  <span className="font-display text-base">{p.total}</span>
                 </div>
               ))}
             </div>
 
-            {/* Resume */}
             <button
               onClick={() => onResume(game)}
-              className="w-full h-11 flex items-center justify-center gap-2 border-t border-border text-sm font-semibold text-foreground hover:bg-accent transition-colors"
+              className="w-full h-12 flex items-center justify-center gap-2 bg-sun text-ink border-t-3 border-ink text-base font-extrabold active:bg-[#F5C62A]"
             >
-              <Play size={16} strokeWidth={2.5} />
+              <Play size={18} strokeWidth={3} fill="currentColor" />
               Resume game
             </button>
           </motion.div>

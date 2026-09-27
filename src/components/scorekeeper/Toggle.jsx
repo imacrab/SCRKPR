@@ -1,8 +1,5 @@
 import { motion } from "framer-motion";
 
-/**
- * Simple iOS-style toggle switch. Uncontrolled visuals — parent owns state.
- */
 export default function Toggle({ checked, onChange, ariaLabel }) {
   return (
     <button
@@ -11,16 +8,18 @@ export default function Toggle({ checked, onChange, ariaLabel }) {
       aria-checked={checked}
       aria-label={ariaLabel}
       onClick={() => onChange(!checked)}
-      className="relative w-[52px] h-[32px] rounded-full flex-shrink-0 transition-colors"
-      style={{
-        backgroundColor: checked ? "#2DC5F8" : "rgba(255,255,255,0.12)",
-      }}
+      className="flex-shrink-0 w-[60px] h-11 flex items-center justify-center"
     >
-      <motion.span
-        className="absolute top-[3px] left-[3px] w-[26px] h-[26px] rounded-full bg-white shadow-md"
-        animate={{ x: checked ? 20 : 0 }}
-        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-      />
+      <span
+        className="relative w-14 h-8 rounded-full border-3 border-ink transition-colors"
+        style={{ backgroundColor: checked ? "#1FD66F" : "#E6E0D2" }}
+      >
+        <motion.span
+          className="absolute top-[2px] left-[2px] w-[22px] h-[22px] rounded-full bg-surface border-3 border-ink"
+          animate={{ x: checked ? 24 : 0 }}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        />
+      </span>
     </button>
   );
 }

@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import NumberPad from "./NumberPad";
 import { Button } from "@/components/ui/button";
 import BottomSheetModal from "./BottomSheetModal";
+import { PlayerTile, HeaderLink } from "./neo";
+import { toNeoColor } from "@/lib/colors";
 import { SPRING_SNAPPY } from "@/lib/motion";
 
 export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit, onClose }) {
@@ -51,30 +53,32 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
 
   if (!displayPlayer) return null;
 
+  const scores = displayPlayer.scores || [];
+  const total = scores.reduce((sum, n) => sum + n, 0);
+  const entered = value === "" || value === "-" ? 0 : parseFloat(value) || 0;
+  const newTotal = isEditing ? total - (scores[displayEditingIndex] ?? 0) + entered : total + entered;
+  const shown = value === "" ? "0" : value.startsWith("-") ? `−${value.slice(1)}` : `+${value}`;
+
   return (
     <BottomSheetModal
       isOpen={isOpen}
       onClose={onClose}
-      eyebrow={isEditing ? "Edit Score" : "Add Score"}
+      leading={<PlayerTile emoji={displayPlayer.emoji} color={toNeoColor(displayPlayer.color)} size={46} radius={11} />}
+      eyebrow={isEditing ? `Edit round ${displayEditingIndex + 1}` : "Add Score"}
       title={displayPlayer.name}
+      trailing={<HeaderLink onClick={() => handleChange("")}>Clear</HeaderLink>}
       footer={
-        <div className="flex gap-3">
-          <Button onClick={onClose} variant="outline" className="flex-1 h-11">
+        <div className="grid grid-cols-2 gap-3.5">
+          <Button onClick={onClose} variant="outline">
             Cancel
           </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!isValid}
-            className="flex-1 h-11 bg-white hover:bg-white/90 font-semibold"
-            style={{ color: "#262729" }}
-          >
-            {isEditing ? "Update" : "Add Score"}
+          <Button onClick={handleSubmit} disabled={!isValid}>
+            {isEditing ? "Update" : value === "" || value === "-" ? "Add score" : `Add ${value.replace("-", "−")}`}
           </Button>
         </div>
       }
     >
-      {/* Display */}
-      <div className="text-center mb-4">
+      <div className="mr-1 h-20 flex items-center justify-between px-[18px] bg-surface border-3 border-ink rounded-[14px] shadow-neo overflow-hidden">
         <AnimatePresence mode="popLayout">
           <motion.span
             key={digitKey}
@@ -82,17 +86,19 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 14, scale: 0.8 }}
             transition={SPRING_SNAPPY}
-            className="text-5xl font-bold inline-block"
-            style={{ color: value === "" ? "rgba(150,150,150,0.3)" : "#FFFFFF" }}
+            className="font-display text-5xl leading-none inline-block"
+            style={{ color: value === "" ? "rgb(var(--dash))" : "rgb(var(--fg))" }}
           >
-            {value === "" ? "0" : value}
+            {shown}
           </motion.span>
         </AnimatePresence>
-        <div className="mt-3 h-px bg-border mx-6" />
+        <div className="font-mono text-right text-xs font-bold leading-normal">
+          <div className="text-subtle">NEW TOTAL</div>
+          <div className="text-base">{total} → {newTotal}</div>
+        </div>
       </div>
 
-      {/* Number pad */}
-      <div className="pb-2">
+      <div className="pt-4">
         <NumberPad value={value} onChange={handleChange} />
       </div>
     </BottomSheetModal>

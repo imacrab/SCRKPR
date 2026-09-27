@@ -1,3 +1,4 @@
+import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BottomSheetModal from "./BottomSheetModal";
 
@@ -6,24 +7,22 @@ export default function ResetConfirmModal({ isOpen, onConfirm, onClose }) {
     <BottomSheetModal
       isOpen={isOpen}
       onClose={onClose}
+      icon={<RotateCcw size={30} strokeWidth={2.75} />}
       eyebrow="Confirm"
       title="Reset all scores?"
-      description="This will clear every player's score for the current game. Players remain."
+      description="This clears every player's score for the current game. Players stay put."
       footer={
-        <div className="flex gap-3">
-          <Button onClick={onClose} variant="outline" className="flex-1 h-11">
+        <div className="grid grid-cols-2 gap-3.5">
+          <Button onClick={onClose} variant="outline">
             Cancel
           </Button>
-          <Button
-            onClick={() => { onConfirm(); onClose(); }}
-            className="flex-1 h-11 bg-accent-red hover:bg-accent-red/90 text-white font-semibold"
-          >
+          <Button onClick={() => { onConfirm(); onClose(); }} variant="destructive">
             Reset
           </Button>
         </div>
       }
     >
-      <div className="pb-2" />
+      <div className="pb-1" />
     </BottomSheetModal>
   );
 }

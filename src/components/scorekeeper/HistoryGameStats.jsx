@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { StatTile } from "./neo";
 import { isLowMode } from "@/lib/gameModes";
 
 // Per-game stats block for the History detail view. Mirrors EndGameModal's
@@ -99,17 +100,16 @@ export default function HistoryGameStats({ game }) {
       ].filter(Boolean);
 
   return (
-    <div className="space-y-2">
+    <div className="grid grid-cols-2 gap-2.5 mr-1">
       {rows.map((row, i) => (
         <motion.div
           key={row.label}
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 * i }}
-          className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30"
+          className={i === rows.length - 1 && rows.length % 2 === 1 ? "col-span-2" : ""}
         >
-          <span className="text-xs text-muted-foreground">{row.label}</span>
-          <span className="text-sm font-semibold text-foreground">{row.value}</span>
+          <StatTile label={row.label} value={row.value} />
         </motion.div>
       ))}
     </div>

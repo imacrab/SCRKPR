@@ -10,6 +10,16 @@ module.exports = {
   			sm: 'calc(var(--radius) - 4px)',
   			sheet: '44px'
   		},
+  		borderWidth: {
+  			'2.5': '2.5px',
+  			'3': '3px'
+  		},
+  		boxShadow: {
+  			'neo-sm': '3px 3px 0 rgb(var(--ink))',
+  			neo: '4px 4px 0 rgb(var(--ink))',
+  			'neo-md': '5px 5px 0 rgb(var(--ink))',
+  			'neo-lg': '6px 6px 0 rgb(var(--ink))'
+  		},
   		minHeight: {
   			touch: '44px'
   		},
@@ -50,12 +60,25 @@ module.exports = {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
-        'accent-blue': '#2DC5F8',
-        'accent-red': '#FF3A3A',
+  			ink: 'rgb(var(--ink) / <alpha-value>)',
+  			fg: 'rgb(var(--fg) / <alpha-value>)',
+  			paper: 'rgb(var(--paper) / <alpha-value>)',
+  			surface: 'rgb(var(--surface) / <alpha-value>)',
+  			subtle: 'rgb(var(--subtle) / <alpha-value>)',
+  			putty: 'rgb(var(--putty) / <alpha-value>)',
+  			hairline: 'rgb(var(--hairline) / <alpha-value>)',
+  			faint: 'rgb(var(--faint) / <alpha-value>)',
+  			dash: 'rgb(var(--dash) / <alpha-value>)',
+  			sun: '#FFD23F',
+  			danger: '#FF4B3E',
+  			success: '#1FD66F',
+  			'accent-blue': '#1FBFFF',
+  			'accent-red': '#FF4B3E',
   		},
   		fontFamily: {
-  			display: ['Syne', 'sans-serif'],
-  			sans: ['Geist', 'sans-serif'],
+  			display: ['Archivo', 'sans-serif'],
+  			sans: ['Archivo', 'sans-serif'],
+  			mono: ['JetBrains Mono', 'monospace'],
   		},
   		keyframes: {
   			'accordion-down': {

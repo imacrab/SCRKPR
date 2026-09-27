@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { BarChart3 } from "lucide-react";
 import { isLowMode } from "@/lib/gameModes";
 import FluentEmoji from "./FluentEmoji";
+import { PlayerTile } from "./neo";
+import { toNeoColor } from "@/lib/colors";
 import { TRANSITION_PANEL } from "@/lib/motion";
 
 export default function HistoryStats({ games }) {
@@ -40,65 +42,45 @@ export default function HistoryStats({ games }) {
   if (totalGames === 0) return null;
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden">
-      <div className="px-4 py-3 flex items-center gap-2 border-b border-border">
-        <BarChart3 size={16} strokeWidth={2} className="text-muted-foreground" />
-        <span className="text-sm font-medium text-foreground">All-time Stats</span>
-        <span className="text-xs text-muted-foreground">
-          · {totalGames} game{totalGames !== 1 ? "s" : ""}
+    <div className="mr-1.5 bg-surface border-3 border-ink rounded-2xl shadow-neo-lg overflow-hidden">
+      <div className="px-4 h-14 flex items-center gap-2 bg-paper border-b-3 border-ink">
+        <BarChart3 size={18} strokeWidth={2.75} />
+        <span className="text-base font-extrabold">All-time stats</span>
+        <span className="font-mono ml-auto text-[11px] font-bold tracking-[0.08em] uppercase text-subtle">
+          {totalGames} game{totalGames !== 1 ? "s" : ""}
         </span>
       </div>
 
-      <div className="px-4 pb-3 pt-1">
-        {/* Header row */}
-        <div className="grid grid-cols-12 gap-2 py-2 text-[10px] uppercase tracking-wider text-muted-foreground">
-          <div className="col-span-5">Player</div>
-          <div className="col-span-2 text-right">Games</div>
-          <div className="col-span-2 text-right">Wins</div>
-          <div className="col-span-3 text-right">Avg Score</div>
-        </div>
+      <div className="font-mono grid grid-cols-12 gap-2 px-4 pt-3 pb-1.5 text-[10px] font-bold tracking-[0.1em] uppercase text-subtle">
+        <div className="col-span-5">Player</div>
+        <div className="col-span-2 text-right">Games</div>
+        <div className="col-span-2 text-right">Wins</div>
+        <div className="col-span-3 text-right">Avg</div>
+      </div>
 
-        <div className="space-y-1">
-          {perPlayer.map((p, i) => (
-            <motion.div
-              key={p.name}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ ...TRANSITION_PANEL, delay: i * 0.05 }}
-              className="grid grid-cols-12 gap-2 items-center py-1.5 min-h-[36px]"
-            >
-              <div className="col-span-5 flex items-center gap-2 min-w-0">
-                {p.emoji ? (
-                  <span
-                    className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden"
-                    style={{ backgroundColor: p.color }}
-                  >
-                    <FluentEmoji emoji={p.emoji} size={16} />
-                  </span>
-                ) : (
-                  <div
-                    className="w-2.5 h-2.5 rounded-full flex-shrink-0 mx-[7px]"
-                    style={{ backgroundColor: p.color }}
-                  />
-                )}
-                <span className="text-sm text-foreground truncate">{p.name}</span>
-                {i === 0 && p.wins > 0 && <FluentEmoji emoji="👑" size={14} />}
-              </div>
-              <div className="col-span-2 text-right text-sm text-muted-foreground tabular-nums">
-                {p.games}
-              </div>
-              <div
-                className="col-span-2 text-right text-sm font-semibold tabular-nums"
-                style={{ color: p.color }}
-              >
+      <div className="pb-1">
+        {perPlayer.map((p, i) => (
+          <motion.div
+            key={p.name}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ ...TRANSITION_PANEL, delay: i * 0.05 }}
+            className={`grid grid-cols-12 gap-2 items-center px-4 h-[52px] ${i < perPlayer.length - 1 ? "border-b-2 border-hairline" : ""}`}
+          >
+            <div className="col-span-5 flex items-center gap-2 min-w-0">
+              <PlayerTile emoji={p.emoji} color={toNeoColor(p.color)} size={30} radius={8} border={2.5} />
+              <span className="text-[15px] font-bold truncate">{p.name}</span>
+              {i === 0 && p.wins > 0 && <FluentEmoji emoji="👑" size={14} />}
+            </div>
+            <div className="col-span-2 text-right text-base font-bold tabular-nums text-subtle">{p.games}</div>
+            <div className="col-span-2 flex justify-end">
+              <span className="font-display min-w-[30px] h-7 px-1 flex items-center justify-center text-base border-2 border-ink rounded-md" style={{ background: i === 0 && p.wins > 0 ? "#FFD23F" : "rgb(var(--surface))", color: i === 0 && p.wins > 0 ? "rgb(var(--ink))" : undefined }}>
                 {p.wins}
-              </div>
-              <div className="col-span-3 text-right text-sm text-foreground tabular-nums">
-                {p.avg.toFixed(1)}
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              </span>
+            </div>
+            <div className="col-span-3 text-right text-base font-bold tabular-nums">{p.avg.toFixed(1)}</div>
+          </motion.div>
+        ))}
       </div>
     </div>
   );

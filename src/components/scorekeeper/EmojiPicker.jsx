@@ -392,29 +392,29 @@ export default function EmojiPicker({ selected, onChange }) {
   return (
     <div className="flex flex-col">
       {/* Search */}
-      <div className="relative px-3 pt-1 pb-2">
+      <div className="relative pb-2 mr-1">
         <Search
-          size={16}
-          strokeWidth={2}
-          className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+          size={18}
+          strokeWidth={2.5}
+          className="absolute left-3.5 top-[22px] -translate-y-1/2 pointer-events-none"
         />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search emojis"
-          className="w-full h-10 pl-9 pr-3 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+          className="w-full h-11 pl-10 pr-3 rounded-xl bg-surface border-3 border-ink font-bold text-fg placeholder:text-faint placeholder:font-semibold focus:outline-none focus:shadow-neo-sm"
           style={{ fontSize: "16px" }}
         />
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-7 gap-2 p-3 justify-items-center">
+      <div className="grid grid-cols-6 gap-2 pt-1 pb-3 pr-1">
         <button
           type="button"
           onPointerDown={(e) => { e.preventDefault(); onChange(""); }}
-          className="w-10 h-10 rounded-full flex items-center justify-center bg-secondary text-muted-foreground text-xs font-medium transition-transform active:scale-90"
-          style={{ outline: !selected ? "2px solid white" : "none", outlineOffset: "2px" }}
+          className="font-mono aspect-square flex items-center justify-center border-2.5 border-ink rounded-[10px] text-[10px] font-bold uppercase transition-[transform,box-shadow] duration-100"
+          style={{ background: !selected ? "#FFD23F" : "rgb(var(--surface))", color: !selected ? "rgb(var(--ink))" : undefined, boxShadow: !selected ? "3px 3px 0 rgb(var(--ink))" : "none", transform: !selected ? "translate(-2px, -2px)" : "none" }}
           aria-label="No emoji"
         >
           None
@@ -424,8 +424,8 @@ export default function EmojiPicker({ selected, onChange }) {
             key={`${emoji}-${index}`}
             type="button"
             onPointerDown={(e) => { e.preventDefault(); onChange(emoji); }}
-            className="w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-90"
-            style={{ outline: selected === emoji ? "2px solid white" : "none", outlineOffset: "2px" }}
+            className="aspect-square flex items-center justify-center border-2.5 border-ink rounded-[10px] transition-[transform,box-shadow] duration-100"
+            style={{ background: selected === emoji ? "#FFD23F" : "rgb(var(--surface))", boxShadow: selected === emoji ? "3px 3px 0 rgb(var(--ink))" : "none", transform: selected === emoji ? "translate(-2px, -2px)" : "none" }}
           >
             <motion.span
               animate={selected === emoji ? { scale: [1, 1.35, 1], rotate: [0, -10, 10, 0] } : { scale: 1, rotate: 0 }}
@@ -438,7 +438,7 @@ export default function EmojiPicker({ selected, onChange }) {
         ))}
 
         {filtered.length === 0 && (
-          <div className="col-span-7 py-6 text-center text-sm text-muted-foreground">
+          <div className="col-span-6 py-6 text-center text-sm font-semibold text-subtle">
             No emojis match "{query}"
           </div>
         )}

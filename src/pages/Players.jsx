@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Check, Trash2, Star } from "lucide-react";
 import PlayerEditModal from "@/components/scorekeeper/PlayerEditModal";
 import DeletePlayerConfirmModal from "@/components/scorekeeper/DeletePlayerConfirmModal";
-import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
+import { PlayerTile, SectionLabel, PageTitle, HeaderLink, PAGE_TOP } from "@/components/scorekeeper/neo";
+import { toNeoColor } from "@/lib/colors";
 import { SPRING_SHEET } from "@/lib/motion";
 import { primeIOSKeyboard } from "@/lib/iosKeyboardPrimer";
 
@@ -16,7 +17,6 @@ export default function Players({ onBack, onModalChange }) {
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(() => new Set());
   const [showBulkConfirm, setShowBulkConfirm] = useState(false);
-  const [canScroll, setCanScroll] = useState(false);
   const [poppedId, setPoppedId] = useState(null); // star that just bounced
   const scrollRef = useRef(null);
   // Fully manual entrance + FLIP for the player list — NO framer on the rows or
@@ -107,17 +107,6 @@ export default function Players({ onBack, onModalChange }) {
     await Promise.allSettled(ids.map((id) => db.players.delete(id)));
   };
 
-  useEffect(() => {
-    const checkScroll = () => {
-      if (scrollRef.current) {
-        setCanScroll(scrollRef.current.scrollHeight > scrollRef.current.clientHeight);
-      }
-    };
-    checkScroll();
-    window.addEventListener("resize", checkScroll);
-    return () => window.removeEventListener("resize", checkScroll);
-  }, [players, loading]);
-
   // Runs after every render. A row appearing for the first time rises + fades
   // in (staggered on first load, quick pop later); a row whose position changed
   // — a favorite re-sorting, or a section header appearing/disappearing pushing
@@ -197,7 +186,7 @@ export default function Players({ onBack, onModalChange }) {
   const renderRow = (p, idx) => {
     const isSelected = selectedIds.has(p.id);
     return (
-      <div key={p.id} data-row-id={p.id} data-idx={idx} className="mb-2">
+      <div key={p.id} data-row-id={p.id} data-idx={idx} className="pb-3">
         <button
           onClick={() => {
             if (longPressFiredRef.current) { longPressFiredRef.current = false; return; }
@@ -205,92 +194,53 @@ export default function Players({ onBack, onModalChange }) {
           }}
           onPointerDown={(e) => { if (!selectMode) primeIOSKeyboard(); startLongPress(e, p); }}
           onContextMenu={(e) => e.preventDefault()}
-          className="relative w-full rounded-2xl overflow-hidden flex items-center text-left active:scale-[0.99]"
-          style={{
-            // Raised card on the app background; a red ring signals a row that's
-            // picked in select (bulk-delete) mode. Depth from the shadow, no border.
-            minHeight: 78,
-            backgroundColor: "hsl(var(--card))",
-            boxShadow: isSelected
-              ? "inset 0 0 0 2.5px #FF3A3A, 0 4px 20px rgba(0,0,0,0.1)"
-              : "0 4px 20px rgba(0,0,0,0.1)",
-            transition: "box-shadow 200ms ease-out, transform 120ms ease-out",
-          }}
+          className="neo-press w-[calc(100%-4px)] h-[68px] flex items-center gap-3.5 pl-2.5 pr-2 text-left bg-surface border-3 border-ink rounded-[14px] shadow-neo"
+          style={{ backgroundColor: isSelected ? "rgba(255, 75, 62, 0.22)" : "rgb(var(--surface))" }}
         >
-          {/* Oversized player emoji bleeding off the left edge (clipped by the
-              card's overflow-hidden) — matches the New Game setup cards. */}
-          {p.emoji ? (
-            <div
-              className="absolute pointer-events-none select-none"
-              style={{
-                left: -22,
-                top: "50%",
-                transform: "translateY(-50%) rotate(-6deg)",
-                filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.35))",
-              }}
-              aria-hidden="true"
+          <PlayerTile emoji={p.emoji} color={toNeoColor(p.color)} size={46} radius={10} />
+          <span className="flex-1 min-w-0 text-[21px] font-extrabold truncate">{p.name}</span>
+          {!selectMode && (
+            <span
+              role="button"
+              tabIndex={0}
+              aria-label={p.favorite ? "Remove from favorites" : "Add to favorites"}
+              onClick={(e) => { e.stopPropagation(); toggleFavorite(p.id); }}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="flex-shrink-0 w-11 h-11 flex items-center justify-center"
             >
-              <FluentEmoji emoji={p.emoji} size={100} />
-            </div>
-          ) : (
-            <div
-              className="absolute top-1/2 -translate-y-1/2 rounded-full border-2 border-white/20"
-              style={{ left: 20, width: 52, height: 52, backgroundColor: p.color }}
-            />
-          )}
-
-          {/* Content — offset right to clear the emoji */}
-          <div className="relative z-10 flex flex-1 items-center min-w-0" style={{ marginLeft: 94, marginRight: 16 }}>
-            <span className="flex-1 text-foreground text-2xl [font-family:'Geist',_sans-serif] font-bold truncate">{p.name}</span>
-            {!selectMode && (
-              <span
-                role="button"
-                tabIndex={0}
-                aria-label={p.favorite ? "Remove from favorites" : "Add to favorites"}
-                onClick={(e) => { e.stopPropagation(); toggleFavorite(p.id); }}
-                onPointerDown={(e) => e.stopPropagation()}
-                className="flex-shrink-0 w-11 h-11 flex items-center justify-center"
-              >
-                <motion.span
-                  animate={poppedId === p.id ? { scale: [1, p.favorite ? 1.4 : 1.18, 1] } : { scale: 1 }}
-                  transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
-                  style={{ display: "inline-flex" }}
-                >
-                  <Star
-                    size={20}
-                    strokeWidth={2}
-                    style={{
-                      fill: p.favorite ? "#FFC93C" : "transparent",
-                      color: p.favorite ? "#FFC93C" : "hsl(var(--muted-foreground))",
-                    }}
-                  />
-                </motion.span>
-              </span>
-            )}
-            {selectMode && (
               <motion.span
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={SPRING_SHEET}
-                className={`w-7 h-7 ml-1 rounded-full flex-shrink-0 flex items-center justify-center border-2 transition-colors ${
-                  isSelected ? "bg-accent-red border-accent-red text-white" : "border-border text-transparent"
-                }`}
+                animate={poppedId === p.id ? { scale: [1, p.favorite ? 1.4 : 1.18, 1] } : { scale: 1 }}
+                transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
+                style={{ display: "inline-flex" }}
               >
-                <Check size={16} strokeWidth={3} />
+                <Star size={26} strokeWidth={2.25} fill={p.favorite ? "#FFD23F" : "transparent"} />
               </motion.span>
-            )}
-          </div>
+            </span>
+          )}
+          {selectMode && (
+            <motion.span
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={SPRING_SHEET}
+              className="w-11 h-11 flex-shrink-0 flex items-center justify-center"
+            >
+              <span
+                className="w-[30px] h-[30px] flex items-center justify-center border-3 border-ink rounded-lg transition-colors"
+                style={{ backgroundColor: isSelected ? "#FF4B3E" : "rgb(var(--surface))", color: "rgb(var(--ink))" }}
+              >
+                {isSelected && <Check size={18} strokeWidth={3.5} />}
+              </span>
+            </motion.span>
+          )}
         </button>
       </div>
     );
   };
 
   return (
-    <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
-      {/* Edit-mode frame — a 4px brand border around the whole screen that
-          fades in while selecting, signalling a distinct "edit mode". Portaled
-          to <body> so the outer overflow-hidden container can't clip its
-          rounded corners into squares at the screen edges. */}
+    <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: PAGE_TOP, paddingBottom: "env(safe-area-inset-bottom)" }}>
+      {/* Edit-mode frame — portaled to <body> so the page's overflow-hidden
+          can't clip its rounded corners at the screen edges. */}
       {createPortal(
         <AnimatePresence>
           {selectMode && (
@@ -298,7 +248,7 @@ export default function Players({ onBack, onModalChange }) {
               key="edit-frame"
               aria-hidden="true"
               className="fixed inset-0 z-30 pointer-events-none rounded-[55px]"
-              style={{ border: "4px solid #2DC5F8", boxShadow: "inset 0 0 26px -8px rgba(45,197,248,0.6)" }}
+              style={{ border: "5px solid rgb(var(--fg))" }}
               initial={{ opacity: 0, scale: 1.015 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.015 }}
@@ -309,83 +259,86 @@ export default function Players({ onBack, onModalChange }) {
         document.body
       )}
 
-      <div className="pt-10 pb-2 px-5 flex items-baseline flex-shrink-0 relative" style={{ backgroundColor: "hsl(var(--background) / 0.8)", backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)" }}>
-        <div className="flex-1 flex items-baseline">
-          {players.length > 0 && (
-            <button
-              onClick={() => (selectMode ? exitSelectMode() : setSelectMode(true))}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
-            >
-              {selectMode ? "Cancel" : "Select"}
-            </button>
-          )}
-        </div>
-        <h1 className="font-sans font-medium text-lg text-foreground text-center">Players</h1>
-        <div className="flex-1 flex items-baseline justify-end">
-          {!selectMode && (
+      <div className="px-5 flex items-center gap-2 h-12 flex-shrink-0">
+        {selectMode ? (
+          <>
+            <HeaderLink onClick={exitSelectMode}>Cancel</HeaderLink>
+            <PageTitle className="flex-1 text-center text-2xl">{selectedIds.size} selected</PageTitle>
+            <HeaderLink onClick={toggleSelectAll}>{allSelected ? "None" : "All"}</HeaderLink>
+          </>
+        ) : (
+          <>
+            <PageTitle className="flex-1 text-[32px]">Players</PageTitle>
+            {players.length > 0 && <HeaderLink className="px-2.5" onClick={() => setSelectMode(true)}>Select</HeaderLink>}
             <button
               onPointerDown={primeIOSKeyboard}
               onClick={() => setEditing({})}
-              className="text-sm font-medium text-foreground hover:text-foreground transition-colors px-2 py-1 flex items-center gap-1"
-              style={{ transform: "translateY(3px)" }}
+              aria-label="Add player"
+              className="neo-press w-[46px] h-[46px] mr-1 flex items-center justify-center bg-sun text-ink border-3 border-ink rounded-xl shadow-neo"
             >
-              <Plus size={20} strokeWidth={2} />
+              <Plus size={22} strokeWidth={3} />
             </button>
-          )}
-          {selectMode && players.length > 0 && (
-            <button
-              onClick={toggleSelectAll}
-              className="text-sm font-medium text-accent-blue hover:opacity-80 transition-opacity px-2 py-1"
-            >
-              {allSelected ? "Deselect all" : "Select all"}
-            </button>
-          )}
-        </div>
+          </>
+        )}
       </div>
 
       <div className="flex-1 relative overflow-hidden">
-        {canScroll && <div className="absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />}
-        {canScroll && <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />}
-
         <div
           ref={scrollRef}
-          className="h-full overflow-y-auto px-5 py-4"
-          style={{ paddingBottom: "calc(56px + 16px + 16px + env(safe-area-inset-bottom))" }}
+          className="h-full overflow-y-auto px-5 pt-2"
+          style={{ paddingBottom: "calc(69px + 24px + env(safe-area-inset-bottom))" }}
         >
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="w-6 h-6 border-2 border-border border-t-foreground rounded-full animate-spin" />
+              <div className="w-6 h-6 border-3 border-ink/20 border-t-ink rounded-full animate-spin" />
             </div>
           ) : players.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center" style={{ gap: 20 }}>
-              <FluentEmoji emoji="☝️" size={140} style={{ display: "block" }} />
-              <div className="flex flex-col items-center" style={{ gap: 8 }}>
-                <p className="text-white text-2xl [font-family:'Geist',_sans-serif] font-medium">Add some players</p>
-                <p className="text-white/60 text-base [font-family:'Geist',_sans-serif]">Tap the + above to get started</p>
+            <div className="relative flex flex-col items-center text-center">
+              <svg width="96" height="96" viewBox="0 0 120 120" fill="none" stroke="#111" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="absolute right-6 -top-1">
+                <path d="M18 110 C 30 60, 60 34, 104 16" />
+                <path d="M84 12 L 106 15 L 98 36" />
+              </svg>
+              <div className="relative w-[320px] h-[230px] mt-24">
+                {[
+                  { left: 40, top: 0, w: 240, rot: -6, bar: 110 },
+                  { left: 22, top: 78, w: 260, rot: 3, bar: 140 },
+                ].map(({ left, top, w, rot, bar }) => (
+                  <div key={top} className="absolute h-16 flex items-center gap-3 px-3 bg-surface border-3 border-ink rounded-[14px] shadow-neo" style={{ left, top, width: w, transform: `rotate(${rot}deg)` }}>
+                    <span className="w-10 h-10 border-3 border-dashed border-ink rounded-[10px]" />
+                    <span className="h-3 rounded-md bg-hairline" style={{ width: bar }} />
+                  </div>
+                ))}
+                <div className="absolute h-16 flex items-center gap-3 px-3 bg-sun text-ink border-3 border-ink rounded-[14px] shadow-neo" style={{ left: 48, top: 156, width: 240, transform: "rotate(-2deg)" }}>
+                  <span className="font-display w-10 h-10 flex items-center justify-center bg-surface border-3 border-ink rounded-[10px] text-[22px]">?</span>
+                  <span className="h-3 w-[90px] rounded-md bg-ink" />
+                </div>
               </div>
+              <h2 className="font-display mt-10 text-[28px] leading-[1.1] uppercase">Add some players</h2>
+              <p className="mt-3 text-[17px] font-medium text-subtle">Tap the + above to get started.</p>
+              <button
+                onPointerDown={primeIOSKeyboard}
+                onClick={() => setEditing({})}
+                className="neo-press mt-7 h-14 px-7 flex items-center gap-2.5 bg-surface border-3 border-ink rounded-xl shadow-neo-md text-[17px] font-extrabold"
+              >
+                <Plus size={20} strokeWidth={3} />
+                Add first player
+              </button>
             </div>
           ) : (
             (() => {
               // Recency order within each group (players is created_date-desc).
               const favs = players.filter((p) => p.favorite);
               const others = players.filter((p) => !p.favorite);
-              // Headers only when there's an actual split (both groups present).
               const hasSplit = favs.length > 0 && others.length > 0;
-              // Plain header divs — they mount/unmount instantly. The rows'
-              // manual FLIP glides everything below when a header appears or
-              // disappears, so there's no snap and nothing for framer to fight.
-              const header = (key, label) => (
-                <div
-                  key={key}
-                  className="px-1 pt-1 pb-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest"
-                >
-                  {label}
-                </div>
+              // Plain header divs — the rows' manual FLIP glides everything below
+              // when a header appears or disappears.
+              const header = (key, label, first) => (
+                <SectionLabel key={key} className={`${first ? "mt-2" : "mt-3.5"} mb-2.5`}>{label}</SectionLabel>
               );
               const items = [];
-              if (hasSplit) items.push(header("hdr-fav", "Favorites"));
+              if (hasSplit) items.push(header("hdr-fav", "Favorites", true));
               favs.forEach((p, i) => items.push(renderRow(p, i)));
-              if (hasSplit) items.push(header("hdr-all", "All Players"));
+              if (hasSplit) items.push(header("hdr-all", "All Players", false));
               others.forEach((p, i) => items.push(renderRow(p, favs.length + i)));
               return items;
             })()
@@ -393,7 +346,6 @@ export default function Players({ onBack, onModalChange }) {
         </div>
       </div>
 
-      {/* Floating bulk-delete pill — slides up when something is selected */}
       <AnimatePresence>
         {selectMode && selectedIds.size > 0 && (
           <motion.div
@@ -402,13 +354,13 @@ export default function Players({ onBack, onModalChange }) {
             exit={{ y: 80, opacity: 0 }}
             transition={SPRING_SHEET}
             className="fixed inset-x-0 z-40 flex justify-center pointer-events-none"
-            style={{ bottom: "calc(24px + env(safe-area-inset-bottom))" }}
+            style={{ bottom: "calc(28px + env(safe-area-inset-bottom))" }}
           >
             <button
               onClick={() => setShowBulkConfirm(true)}
-              className="pointer-events-auto flex items-center gap-2 px-5 h-11 rounded-full bg-accent-red hover:bg-accent-red/90 text-white text-sm font-semibold shadow-2xl active:scale-95 transition-transform"
+              className="neo-press pointer-events-auto h-14 px-6 flex items-center gap-2.5 bg-danger text-ink border-3 border-ink rounded-xl shadow-neo-md text-[17px] font-extrabold"
             >
-              <Trash2 size={16} strokeWidth={2.5} />
+              <Trash2 size={20} strokeWidth={2.5} />
               Delete {selectedIds.size} {selectedIds.size === 1 ? "player" : "players"}
             </button>
           </motion.div>

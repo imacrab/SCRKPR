@@ -1,80 +1,74 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  /* Light mode defaults */
   :root {
-    --background: 220 4% 15.5%;
-    --foreground: 220 13% 9%;
+    /* RGB triplets so Tailwind opacity modifiers work (e.g. border-ink/20). */
+    --ink: 17 17 17;
+    --fg: 17 17 17;
+    --paper: 244 239 227;
+    --surface: 255 255 255;
+    --subtle: 58 54 47;
+    --putty: 230 224 210;
+    --hairline: 217 210 195;
+    --faint: 138 132 120;
+    --dash: 184 176 160;
+
+    --background: 43 41% 92.5%;
+    --foreground: 0 0% 6.7%;
     --card: 0 0% 100%;
-    --card-foreground: 220 13% 9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 13% 9%;
-    --primary: 199 94% 40%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 220 13% 92%;
-    --secondary-foreground: 220 13% 20%;
-    --muted: 220 0% 100% / 75%;
-    --muted-foreground: 0 0% 100% / 50%;
-    --accent: 220 13% 88%;
-    --accent-foreground: 220 13% 9%;
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 13% 85%;
-    --input: 220 13% 85%;
-    --ring: 199 94% 40%;
+    --card-foreground: 0 0% 6.7%;
+    --popover: 43 41% 92.5%;
+    --popover-foreground: 0 0% 6.7%;
+    --primary: 45 100% 62.4%;
+    --primary-foreground: 0 0% 6.7%;
+    --secondary: 0 0% 100%;
+    --secondary-foreground: 0 0% 6.7%;
+    --muted: 43 25% 86%;
+    --muted-foreground: 39 10% 21%;
+    --accent: 43 25% 86%;
+    --accent-foreground: 0 0% 6.7%;
+    --destructive: 4 100% 62%;
+    --destructive-foreground: 0 0% 6.7%;
+    --border: 0 0% 6.7%;
+    --input: 0 0% 6.7%;
+    --ring: 0 0% 6.7%;
     --radius: 0.75rem;
+    color-scheme: light;
   }
 
-  /* Dark mode - class-based */
+  /* Dark mode keeps the hard ink edges, but every "black" carries a faint
+     blue-gray tint instead of being pure black. */
   .dark {
-    --background: 220 4% 15.5%;
-    --foreground: 0 0% 93%;
-    --card: 214 7% 20.5%;
-    --card-foreground: 0 0% 93%;
-    --popover: 220 13% 12%;
-    --popover-foreground: 0 0% 93%;
-    --primary: 199 94% 57%;
-    --primary-foreground: 220 13% 9%;
-    --secondary: 220 13% 16%;
-    --secondary-foreground: 0 0% 80%;
-    --muted: 220 13% 16%;
-    --muted-foreground: 0 0% 50%;
-    --accent: 220 13% 18%;
-    --accent-foreground: 0 0% 93%;
-    --destructive: 0 100% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 13% 18%;
-    --input: 220 13% 18%;
-    --ring: 199 94% 57%;
-  }
+    --ink: 12 14 19;
+    --fg: 238 235 228;
+    --paper: 32 36 44;
+    --surface: 45 50 61;
+    --subtle: 162 168 181;
+    --putty: 61 67 80;
+    --hairline: 56 62 74;
+    --faint: 124 131 146;
+    --dash: 88 95 110;
 
-  /* Fallback for system preference if no explicit theme set */
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme]) {
-      --background: 220 4% 15.5%;
-      --foreground: 0 0% 93%;
-      --card: 214 7% 20.5%;
-      --card-foreground: 0 0% 93%;
-      --popover: 220 13% 12%;
-      --popover-foreground: 0 0% 93%;
-      --primary: 199 94% 57%;
-      --primary-foreground: 220 13% 9%;
-      --secondary: 220 13% 16%;
-      --secondary-foreground: 0 0% 80%;
-      --muted: 220 13% 16%;
-      --muted-foreground: 0 0% 50%;
-      --accent: 220 13% 18%;
-      --accent-foreground: 0 0% 93%;
-      --destructive: 0 100% 60%;
-      --destructive-foreground: 0 0% 98%;
-      --border: 220 13% 18%;
-      --input: 220 13% 18%;
-      --ring: 199 94% 57%;
-    }
+    --background: 220 16% 15%;
+    --foreground: 43 22% 91%;
+    --card: 220 15% 21%;
+    --card-foreground: 43 22% 91%;
+    --popover: 220 16% 15%;
+    --popover-foreground: 43 22% 91%;
+    --secondary: 220 15% 21%;
+    --secondary-foreground: 43 22% 91%;
+    --muted: 222 13% 28%;
+    --muted-foreground: 222 10% 67%;
+    --accent: 222 13% 28%;
+    --accent-foreground: 43 22% 91%;
+    --border: 225 22% 6%;
+    --input: 225 22% 6%;
+    --ring: 43 22% 91%;
+    color-scheme: dark;
   }
 }
 
@@ -87,7 +81,6 @@
     -webkit-user-select: none;
   }
 
-  /* Allow text selection in inputs */
   input, textarea, [contenteditable] {
     user-select: text;
     -webkit-user-select: text;
@@ -98,80 +91,26 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Geist', sans-serif;
+    @apply bg-paper text-fg;
+    font-family: 'Archivo', sans-serif;
     overscroll-behavior: none;
   }
 }
 
 @layer utilities {
   .font-display {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Archivo', sans-serif;
+    font-stretch: 125%;
+    font-weight: 900;
+    letter-spacing: -0.01em;
   }
 
-  /* Subtle animated gradient background (lovable.dev style) */
-  .animated-gradient-bg {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      radial-gradient(at 20% 20%, hsl(199 94% 57% / 0.18) 0px, transparent 50%),
-      radial-gradient(at 80% 0%, hsl(280 80% 60% / 0.15) 0px, transparent 50%),
-      radial-gradient(at 0% 80%, hsl(330 80% 60% / 0.15) 0px, transparent 50%),
-      radial-gradient(at 80% 80%, hsl(220 80% 60% / 0.18) 0px, transparent 50%),
-      radial-gradient(at 50% 50%, hsl(160 70% 55% / 0.12) 0px, transparent 50%);
-    background-size: 200% 200%;
-    animation: gradient-shift 22s ease-in-out infinite;
-    filter: blur(40px);
+  /* Neo-brutalist press: the element drops onto its hard shadow. */
+  .neo-press {
+    transition: transform 90ms ease-out, box-shadow 90ms ease-out;
   }
-
-  @keyframes gradient-shift {
-    0%, 100% { background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 50% 50%; }
-    25%      { background-position: 30% 20%, 70% 30%, 20% 70%, 80% 70%, 60% 40%; }
-    50%      { background-position: 60% 50%, 40% 60%, 50% 40%, 50% 60%, 40% 60%; }
-    75%      { background-position: 20% 70%, 80% 70%, 30% 30%, 70% 30%, 60% 50%; }
-  }
-
-  .stretch-tab-pill--moving {
-    animation: stretch-tab-pill 300ms cubic-bezier(0.4, 0, 0.2, 1) both;
-  }
-
-  @keyframes stretch-tab-pill {
-    0% {
-      transform: translateX(var(--from-x)) scaleX(1);
-    }
-
-    55% {
-      transform: translateX(var(--mid-x)) scaleX(2);
-    }
-
-    100% {
-      transform: translateX(var(--to-x)) scaleX(1);
-    }
-  }
-
-  .accent-blue {
-    color: #2DC5F8;
-  }
-
-  .accent-red {
-    color: #FF3A3A;
-  }
-
-  .bg-accent-blue {
-    background-color: #2DC5F8;
-  }
-
-  .bg-accent-red {
-    background-color: #FF3A3A;
-  }
-
-  .border-accent-blue {
-    border-color: #2DC5F8;
-  }
-
-  .border-accent-red {
-    border-color: #FF3A3A;
+  .neo-press:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 rgb(var(--ink));
   }
 }

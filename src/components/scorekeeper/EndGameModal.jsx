@@ -129,7 +129,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
             transition={{ delay: 0.7, duration: 0.8, ease: "easeInOut" }}
             className="flex"
           >
-            <NeoIcon name={isTie ? "handshake" : winner?.emoji || "trophy"} knockout="#FFFFFF" size={40} />
+            <NeoIcon name={isTie ? "handshake" : winner?.emoji || "trophy"} size={40} />
           </motion.span>
         </PlayerTile>
       </motion.div>

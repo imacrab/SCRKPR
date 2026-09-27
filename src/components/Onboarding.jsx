@@ -173,7 +173,7 @@ function MiniScoreboard() {
         animate={{ opacity: 1, y: [30, 0, 6, 0] }}
         transition={{ delay: 0.8, duration: 0.9 }}
       >
-        <NeoIcon name="pointer" knockout="#FFFFFF" strokeWidth={2.5} size={56} className="text-ink" />
+        <NeoIcon name="pointer" size={56} className="text-ink" />
       </motion.span>
     </div>
   );

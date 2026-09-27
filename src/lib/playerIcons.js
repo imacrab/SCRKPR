@@ -11,8 +11,7 @@ import {
   Tractor, TreeDeciduous, TreePalm, TreePine, Trophy, Truck, Umbrella, VenetianMask, Worm, Zap,
 } from "lucide-react";
 
-// Stored in the player's `emoji` field. Only icons that still read clearly when
-// filled belong here — pure line icons vanish under the knockout stroke.
+// Stored in the player's `emoji` field.
 export const PLAYER_ICON_LIBRARY = [
   // Characters
   ["smile", Smile, "smile happy face joy grin"],

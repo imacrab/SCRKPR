@@ -95,7 +95,7 @@ export function StatusTags({ showLeader, isWorst, className = "absolute -top-[15
             className={`${className} z-20 pointer-events-none`}
             aria-hidden="true"
           >
-            <Tag bg="#FF4B3E" rotate={3}><NeoIcon name="frown" knockout="#FF4B3E" size={14} />Worst round</Tag>
+            <Tag bg="#FF4B3E" rotate={3}><NeoIcon name="frown" size={14} />Worst round</Tag>
           </motion.div>
         )}
       </AnimatePresence>
@@ -129,7 +129,7 @@ export function RoundTile({ icon, scoredThisRound, size = 48, radius = 11 }) {
             exit={{ y: travel, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
             transition={SPRING_POP_SNAPPY}
           >
-            <NeoIcon name={icon} knockout="#FFFFFF" size={Math.round(size * 0.6)} />
+            <NeoIcon name={icon} size={Math.round(size * 0.6)} />
           </motion.span>
         ) : null}
       </AnimatePresence>
@@ -147,7 +147,7 @@ export function StreakTag({ streak }) {
           transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
           className="flex"
         >
-          <NeoIcon name="flame" knockout="#FFFFFF" size={13} />
+          <NeoIcon name="flame" size={13} />
         </motion.span>
         {streak}
       </Tag>

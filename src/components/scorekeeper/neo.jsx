@@ -21,7 +21,7 @@ export function SectionLabel({ children, className = "", as: Tag = "div", ...pro
   );
 }
 
-export function PlayerTile({ icon, color = "rgb(var(--surface))", knockout = color, size = 48, radius, border = 3, rotate = 0, className = "", children }) {
+export function PlayerTile({ icon, color = "rgb(var(--surface))", size = 48, radius, border = 3, rotate = 0, className = "", children }) {
   const themed = color.startsWith("rgb(var(");
   return (
     <span
@@ -35,7 +35,7 @@ export function PlayerTile({ icon, color = "rgb(var(--surface))", knockout = col
         transform: rotate ? `rotate(${rotate}deg)` : undefined,
       }}
     >
-      {children ?? <NeoIcon name={icon} knockout={knockout} size={Math.round((size - border * 2) * 0.66)} />}
+      {children ?? <NeoIcon name={icon} size={Math.round((size - border * 2) * 0.66)} />}
     </span>
   );
 }
@@ -167,7 +167,7 @@ export function WinnerCard({ label, date, sorted, isTie, modeLabel, className = 
         <div className="relative flex-shrink-0">
           <PlayerTile icon={isTie ? "handshake" : winner.emoji || "trophy"} color="#FFFFFF" size={62} radius={14} />
           <span className="absolute -right-2.5 -bottom-2 w-[30px] h-[30px] flex items-center justify-center bg-sun text-ink border-2.5 border-ink rounded-full">
-            <NeoIcon name="trophy" knockout="#FFD23F" size={16} />
+            <NeoIcon name="trophy" size={16} />
           </span>
         </div>
         <div className="min-w-0">

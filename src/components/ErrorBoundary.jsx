@@ -41,7 +41,7 @@ export default class ErrorBoundary extends React.Component {
       >
         <LogoSticker size="lg" className="mb-12" />
         <PlayerTile color="#FF4FA0" size={96} radius={22} rotate={-6} className="shadow-neo-md">
-          <NeoIcon name="dices" knockout="#FF4FA0" size={58} />
+          <NeoIcon name="dices" size={58} />
         </PlayerTile>
         <h1 className="font-display mt-8 text-[26px] leading-[1.1] uppercase">We had a little hiccup</h1>
         <p className="mt-3 mb-8 text-base font-medium leading-relaxed text-subtle max-w-[18rem]">

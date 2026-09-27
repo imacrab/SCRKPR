@@ -32,7 +32,7 @@ export default function PlayerEditPanel({ player, usedColors, usedEmojis, onSave
   return (
     <section aria-label={isEditing ? "Edit player" : "New player"} className={`h-full flex flex-col p-7 ${WIDE_PANEL}`}>
       <div className="flex items-center gap-4 flex-shrink-0">
-        <PlayerTile icon={draft.emoji} color={tileBackground} knockout={draft.color} size={72} radius={16} rotate={-4} className="shadow-neo" />
+        <PlayerTile icon={draft.emoji} color={tileBackground} size={72} radius={16} rotate={-4} className="shadow-neo" />
         <div className="min-w-0">
           <SectionLabel className="text-[11px]">{isEditing ? "Edit player" : "New player"}</SectionLabel>
           <h2 className={`font-display mt-1 text-[34px] leading-[1.05] uppercase truncate ${draft.name.trim() ? "" : "opacity-40"}`}>
@@ -85,7 +85,7 @@ export function PlayerEditPanelEmpty({ onAdd }) {
   return (
     <div className={`h-full flex flex-col items-center justify-center text-center p-8 ${WIDE_PANEL}`}>
       <PlayerTile color="#FFD23F" size={104} radius={22} rotate={-6} className="shadow-neo-md">
-        <NeoIcon name="pointer" knockout="#FFD23F" size={62} className="-rotate-90" />
+        <NeoIcon name="pointer" size={62} className="-rotate-90" />
       </PlayerTile>
       <h2 className="font-display mt-8 text-[28px] leading-[1.1] uppercase">Pick a player</h2>
       <p className="mt-2.5 text-base font-medium text-subtle max-w-[300px]">Tap anyone on the left to change their name, color, or icon.</p>

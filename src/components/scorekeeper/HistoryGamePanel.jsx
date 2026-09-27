@@ -55,7 +55,7 @@ export default function HistoryGamePanel({ game, onDelete, onRematch }) {
           <div className="relative flex-shrink-0">
             <PlayerTile icon={isTie ? "handshake" : winner.emoji || "trophy"} color={isTie ? "rgb(var(--surface))" : toNeoColor(winner.color)} size={84} radius={18} className="shadow-neo" />
             <span className="absolute -right-3 -bottom-2.5 w-9 h-9 flex items-center justify-center bg-sun text-ink border-2.5 border-ink rounded-full">
-              <NeoIcon name="trophy" knockout="#FFD23F" size={20} />
+              <NeoIcon name="trophy" size={20} />
             </span>
           </div>
           <div className="min-w-0">

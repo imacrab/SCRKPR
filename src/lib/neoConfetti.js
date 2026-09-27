@@ -53,7 +53,7 @@ function iconPiece(icon, color) {
     boxShadow: "3px 3px 0 rgb(var(--ink))",
     color: "rgb(var(--ink))",
   });
-  el.innerHTML = renderToStaticMarkup(createElement(NeoIcon, { name: icon, knockout: color, size: "72%" }));
+  el.innerHTML = renderToStaticMarkup(createElement(NeoIcon, { name: icon, size: "72%" }));
   return el;
 }
 

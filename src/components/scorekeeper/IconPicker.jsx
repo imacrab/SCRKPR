@@ -11,7 +11,7 @@ function matchesQuery(keywords, q) {
   return tokens.every((t) => haystack.includes(t));
 }
 
-export default function IconPicker({ selected, onChange }) {
+export default function IconPicker({ selected, onChange, stickyClassName = "top-0" }) {
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
@@ -21,24 +21,24 @@ export default function IconPicker({ selected, onChange }) {
 
   return (
     <div className="flex flex-col">
-      {/* Search */}
-      <div className="relative pb-2 mr-1">
-        <Search
-          size={18}
-          strokeWidth={2.5}
-          className="absolute left-3.5 top-[22px] -translate-y-1/2 pointer-events-none"
-        />
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search icons"
-          className="w-full h-11 pl-10 pr-3 rounded-xl bg-surface border-3 border-ink font-bold text-fg placeholder:text-faint placeholder:font-semibold focus:outline-none focus:shadow-neo-sm"
-          style={{ fontSize: "16px" }}
-        />
+      <div className={`sticky z-[5] bg-paper pb-2 pr-1 ${stickyClassName}`}>
+        <div className="relative">
+          <Search
+            size={18}
+            strokeWidth={2.5}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+          />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search icons"
+            className="w-full h-11 pl-10 pr-3 rounded-xl bg-surface border-3 border-ink font-bold text-fg placeholder:text-faint placeholder:font-semibold focus:outline-none focus:shadow-neo-sm"
+            style={{ fontSize: "16px" }}
+          />
+        </div>
       </div>
 
-      {/* Grid */}
       <div className="grid grid-cols-6 gap-2 pt-1 pb-3 pr-1">
         <button
           type="button"
@@ -66,7 +66,7 @@ export default function IconPicker({ selected, onChange }) {
                 transition={{ duration: 0.45, ease: "easeInOut" }}
                 className="flex"
               >
-                <NeoIcon name={id} knockout={active ? "#FFD23F" : "rgb(var(--surface))"} size={30} />
+                <NeoIcon name={id} size={30} />
               </motion.span>
             </button>
           );

@@ -140,7 +140,11 @@ export function PlayerEditFields({ draft, onChange, inputRef, onSubmit, onEscape
             </div>
           </>
         ) : (
-          <IconPicker selected={emoji} onChange={(next) => onChange({ emoji: next })} />
+          <IconPicker
+            selected={emoji}
+            onChange={(next) => onChange({ emoji: next })}
+            stickyClassName={wide ? "top-0 -mt-5 pt-5" : "top-[22px] -mt-3.5 pt-3.5"}
+          />
         )}
       </div>
     </div>

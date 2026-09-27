@@ -100,7 +100,7 @@ export default function SlideToEndGame({ onComplete }) {
             animate={{ scale: [1, 1.35, 1], rotate: [0, -8, 8, 0] }}
             transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
           >
-            <NeoIcon name="flag" knockout="#FFFFFF" size={22} className="text-ink" />
+            <NeoIcon name="flag" size={22} className="text-ink" />
           </motion.span>
         </motion.div>
       </div>

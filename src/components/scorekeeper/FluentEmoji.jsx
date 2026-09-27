@@ -1,5 +1,6 @@
-// Renders a Microsoft Fluent Emoji (3D) image from the lobehub CDN.
-// Falls back to the native unicode emoji if the image fails to load.
+// Renders a Microsoft Fluent Emoji (3D) image bundled in public/emoji/
+// (see scripts/vendor-emoji.mjs). Falls back to the native unicode emoji if
+// the image is missing.
 
 import { useState, useEffect } from "react";
 
@@ -16,7 +17,7 @@ function emojiToCodepoint(emoji) {
   return codepoints.join("-");
 }
 
-const ASSET_BASE = "https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets";
+const ASSET_BASE = `${import.meta.env.BASE_URL}emoji`;
 
 export function getFluentEmojiUrl(emoji) {
   const cp = emojiToCodepoint(emoji);

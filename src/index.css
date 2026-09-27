@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@500;700&display=swap');
+@import '@fontsource-variable/archivo/wdth.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
 
 @tailwind base;
 @tailwind components;
@@ -92,14 +94,14 @@
 
   body {
     @apply bg-paper text-fg;
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo Variable', sans-serif;
     overscroll-behavior: none;
   }
 }
 
 @layer utilities {
   .font-display {
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo Variable', sans-serif;
     font-stretch: 125%;
     font-weight: 900;
     letter-spacing: -0.01em;

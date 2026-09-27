@@ -76,8 +76,8 @@ module.exports = {
   			'accent-red': '#FF4B3E',
   		},
   		fontFamily: {
-  			display: ['Archivo', 'sans-serif'],
-  			sans: ['Archivo', 'sans-serif'],
+  			display: ['Archivo Variable', 'sans-serif'],
+  			sans: ['Archivo Variable', 'sans-serif'],
   			mono: ['JetBrains Mono', 'monospace'],
   		},
   		keyframes: {

@@ -20,13 +20,134 @@ function pickRandomUnused(options, used = []) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-export default function PlayerEditModal({ isOpen, player, usedColors = [], usedEmojis = [], onSave, onDelete, onClose }) {
-  const [name, setName] = useState("");
-  const [color, setColor] = useState(PLAYER_COLORS[0]);
-  const [emoji, setEmoji] = useState("");
-  const [cardStyle, setCardStyle] = useState("solid"); // "solid" | "gradient"
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+export function initialPlayerDraft(player, usedColors = [], usedEmojis = []) {
+  if (player?.id) {
+    return {
+      name: player.name || "",
+      color: toNeoColor(player.color),
+      emoji: player.emoji || "",
+      cardStyle: player.cardStyle === "gradient" ? "gradient" : "solid",
+    };
+  }
+  return {
+    name: "",
+    color: pickRandomUnused(PLAYER_COLORS, usedColors.map(toNeoColor)),
+    emoji: pickRandomUnused(AUTOFILL_EMOJIS, usedEmojis),
+    cardStyle: "solid",
+  };
+}
+
+export function PlayerEditFields({ draft, onChange, inputRef, onSubmit, onEscape, wide = false }) {
   const [styleTab, setStyleTab] = useState("color"); // "color" | "emoji"
+  const { name, color, emoji, cardStyle } = draft;
+
+  const nameInput = (
+    <Input
+      id="player-name"
+      ref={inputRef}
+      type="text"
+      value={name}
+      onChange={(e) => onChange({ name: e.target.value.slice(0, 20) })}
+      onKeyDown={(e) => { if (e.key === "Enter") onSubmit(); if (e.key === "Escape") onEscape?.(); }}
+      placeholder="Player name"
+      maxLength={20}
+      className={wide ? "flex-1 min-w-0" : "mt-1.5 w-[calc(100%-4px)] flex-shrink-0"}
+    />
+  );
+  const styleTabs = (
+    <SegmentedControl className={wide ? "w-[220px] flex-shrink-0 mr-1" : "mt-4 mr-1 flex-shrink-0"} height={wide ? 52 : 44} options={STYLE_TABS} value={styleTab} onChange={setStyleTab} />
+  );
+
+  return (
+    // Fixed-height layout: the tab panel fills the remaining space so the
+    // sheet doesn't jump when switching between Color and Emoji.
+    <div className="flex flex-col h-full min-h-0">
+      {!wide && (
+        <div
+          className="mr-1 h-16 flex-shrink-0 flex items-center gap-3 px-3 border-3 border-ink rounded-[14px] shadow-neo"
+          style={{ background: cardStyle === "gradient" ? twoToneBackground(color) : color }}
+        >
+          <PlayerTile emoji={emoji} color="#FFFFFF" size={42} radius={10} />
+          <span className={`flex-1 min-w-0 truncate text-xl font-extrabold ${name.trim() ? "" : "opacity-50"}`}>{name.trim() || "Player name"}</span>
+          <span className="font-mono text-[10px] font-bold tracking-[0.12em]">PREVIEW</span>
+        </div>
+      )}
+
+      <SectionLabel as="label" htmlFor="player-name" className={`${wide ? "" : "mt-4"} text-[11px] flex-shrink-0`}>Name</SectionLabel>
+      {wide ? (
+        <div className="mt-2 flex items-center gap-4 flex-shrink-0">
+          {nameInput}
+          {styleTabs}
+        </div>
+      ) : (
+        <>
+          {nameInput}
+          {styleTabs}
+        </>
+      )}
+
+      <div className={`flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-2 ${wide ? "pt-5" : "pt-3.5"}`}>
+        {styleTab === "color" ? (
+          <>
+            <div className="grid grid-cols-2 gap-3 mr-1">
+              {[
+                { id: "solid", label: "Solid" },
+                { id: "gradient", label: "Two-tone" },
+              ].map(({ id, label }) => {
+                const active = cardStyle === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    aria-pressed={active}
+                    onPointerDown={(e) => { e.preventDefault(); onChange({ cardStyle: id }); }}
+                    className="h-14 flex items-end px-3 pb-2 border-3 border-ink rounded-xl text-[15px] font-extrabold transition-shadow"
+                    style={{
+                      background: id === "solid" ? color : twoToneBackground(color, 50),
+                      boxShadow: active ? "3px 3px 0 rgb(var(--ink))" : "none",
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <SectionLabel className="mt-4 text-[11px]">Color</SectionLabel>
+            <div className={`mt-2 mr-1 grid gap-2.5 ${wide ? "grid-cols-8" : "grid-cols-5"}`}>
+              {NEO_COLORS.map(({ name: swatchName, hex }) => {
+                const active = color === hex;
+                return (
+                  <button
+                    key={hex}
+                    type="button"
+                    aria-label={swatchName}
+                    aria-pressed={active}
+                    onPointerDown={(e) => { e.preventDefault(); onChange({ color: hex }); }}
+                    className="aspect-square flex items-center justify-center border-3 border-ink rounded-xl transition-[transform,box-shadow] duration-100"
+                    style={{
+                      background: hex,
+                      boxShadow: active ? "3px 3px 0 rgb(var(--ink))" : "none",
+                      transform: active ? "translate(-2px, -2px)" : "none",
+                    }}
+                  >
+                    {active && <Check size={20} strokeWidth={3.5} />}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          <EmojiPicker selected={emoji} onChange={(next) => onChange({ emoji: next })} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function PlayerEditModal({ isOpen, player, usedColors = [], usedEmojis = [], onSave, onDelete, onClose }) {
+  const [draft, setDraft] = useState(() => initialPlayerDraft(player, usedColors, usedEmojis));
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const inputRef = useRef(null);
   const isEditing = !!player?.id;
 
@@ -47,25 +168,15 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
 
   useEffect(() => {
     if (!isOpen) return;
-    if (player?.id) {
-      setName(player.name || "");
-      setColor(toNeoColor(player.color));
-      setEmoji(player.emoji || "");
-      setCardStyle(player.cardStyle === "gradient" ? "gradient" : "solid");
-    } else {
-      setName("");
-      setColor(pickRandomUnused(PLAYER_COLORS, usedColors.map(toNeoColor)));
-      setEmoji(pickRandomUnused(AUTOFILL_EMOJIS, usedEmojis));
-      setCardStyle("solid");
-    }
+    setDraft(initialPlayerDraft(player, usedColors, usedEmojis));
     // Focus is handled by setInputRef synchronously on mount — see comment
     // above. Do not add a setTimeout here or iOS will drop the keyboard.
   }, [isOpen, player, usedColors, usedEmojis]);
 
   const handleSubmit = () => {
-    const trimmed = name.trim();
+    const trimmed = draft.name.trim();
     if (!trimmed) return;
-    onSave({ id: player?.id, name: trimmed, color, emoji, cardStyle });
+    onSave({ ...draft, id: player?.id, name: trimmed });
   };
 
   return (
@@ -89,95 +200,19 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
                 <Trash2 size={22} strokeWidth={2.5} />
               </Button>
             )}
-            <Button onClick={handleSubmit} disabled={!name.trim()} className="flex-1">
+            <Button onClick={handleSubmit} disabled={!draft.name.trim()} className="flex-1">
               {isEditing ? "Save" : "Add player"}
             </Button>
           </div>
         }
       >
-        {/* Fixed-height layout: the tab panel fills the remaining space so the
-            sheet doesn't jump when switching between Color and Emoji. */}
-        <div className="flex flex-col h-full min-h-0">
-          <div
-            className="mr-1 h-16 flex-shrink-0 flex items-center gap-3 px-3 border-3 border-ink rounded-[14px] shadow-neo"
-            style={{ background: cardStyle === "gradient" ? twoToneBackground(color) : color }}
-          >
-            <PlayerTile emoji={emoji} color="#FFFFFF" size={42} radius={10} />
-            <span className={`flex-1 min-w-0 truncate text-xl font-extrabold ${name.trim() ? "" : "opacity-50"}`}>{name.trim() || "Player name"}</span>
-            <span className="font-mono text-[10px] font-bold tracking-[0.12em]">PREVIEW</span>
-          </div>
-
-          <SectionLabel as="label" htmlFor="player-name" className="mt-4 text-[11px] flex-shrink-0">Name</SectionLabel>
-          <Input
-            id="player-name"
-            ref={setInputRef}
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value.slice(0, 20))}
-            onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); if (e.key === "Escape") onClose(); }}
-            placeholder="Player name"
-            maxLength={20}
-            className="mt-1.5 w-[calc(100%-4px)] flex-shrink-0"
-          />
-
-          <SegmentedControl className="mt-4 mr-1 flex-shrink-0" options={STYLE_TABS} value={styleTab} onChange={setStyleTab} />
-
-          <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pt-3.5 pb-2">
-            {styleTab === "color" ? (
-              <>
-                <div className="grid grid-cols-2 gap-3 mr-1">
-                  {[
-                    { id: "solid", label: "Solid" },
-                    { id: "gradient", label: "Two-tone" },
-                  ].map(({ id, label }) => {
-                    const active = cardStyle === id;
-                    return (
-                      <button
-                        key={id}
-                        type="button"
-                        aria-pressed={active}
-                        onPointerDown={(e) => { e.preventDefault(); setCardStyle(id); }}
-                        className="h-14 flex items-end px-3 pb-2 border-3 border-ink rounded-xl text-[15px] font-extrabold transition-shadow"
-                        style={{
-                          background: id === "solid" ? color : twoToneBackground(color, 50),
-                          boxShadow: active ? "3px 3px 0 rgb(var(--ink))" : "none",
-                        }}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <SectionLabel className="mt-4 text-[11px]">Color</SectionLabel>
-                <div className="mt-2 mr-1 grid grid-cols-5 gap-2.5">
-                  {NEO_COLORS.map(({ name: swatchName, hex }) => {
-                    const active = color === hex;
-                    return (
-                      <button
-                        key={hex}
-                        type="button"
-                        aria-label={swatchName}
-                        aria-pressed={active}
-                        onPointerDown={(e) => { e.preventDefault(); setColor(hex); }}
-                        className="aspect-square flex items-center justify-center border-3 border-ink rounded-xl transition-[transform,box-shadow] duration-100"
-                        style={{
-                          background: hex,
-                          boxShadow: active ? "3px 3px 0 rgb(var(--ink))" : "none",
-                          transform: active ? "translate(-2px, -2px)" : "none",
-                        }}
-                      >
-                        {active && <Check size={20} strokeWidth={3.5} />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
-            ) : (
-              <EmojiPicker selected={emoji} onChange={setEmoji} />
-            )}
-          </div>
-        </div>
+        <PlayerEditFields
+          draft={draft}
+          onChange={(patch) => setDraft((d) => ({ ...d, ...patch }))}
+          inputRef={setInputRef}
+          onSubmit={handleSubmit}
+          onEscape={onClose}
+        />
       </BottomSheetModal>
 
       <DeletePlayerConfirmModal

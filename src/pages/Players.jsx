@@ -4,11 +4,13 @@ import { db } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Check, Trash2, Star } from "lucide-react";
 import PlayerEditModal from "@/components/scorekeeper/PlayerEditModal";
+import PlayerEditPanel, { PlayerEditPanelEmpty } from "@/components/scorekeeper/PlayerEditPanel";
 import DeletePlayerConfirmModal from "@/components/scorekeeper/DeletePlayerConfirmModal";
-import { PlayerTile, SectionLabel, PageTitle, HeaderLink, PAGE_TOP } from "@/components/scorekeeper/neo";
+import { PlayerTile, SectionLabel, PageTitle, HeaderLink, PAGE_TOP, WIDE_PAGE_TOP } from "@/components/scorekeeper/neo";
 import { toNeoColor } from "@/lib/colors";
 import { SPRING_SHEET } from "@/lib/motion";
 import { primeIOSKeyboard } from "@/lib/iosKeyboardPrimer";
+import { useWideLayout } from "@/lib/useWideLayout";
 
 export default function Players({ onBack, onModalChange }) {
   const [players, setPlayers] = useState([]);
@@ -18,6 +20,8 @@ export default function Players({ onBack, onModalChange }) {
   const [selectedIds, setSelectedIds] = useState(() => new Set());
   const [showBulkConfirm, setShowBulkConfirm] = useState(false);
   const [poppedId, setPoppedId] = useState(null); // star that just bounced
+  const [discardCount, setDiscardCount] = useState(0); // remounts the inline editor to drop edits
+  const wide = useWideLayout();
   const scrollRef = useRef(null);
   // Fully manual entrance + FLIP for the player list — NO framer on the rows or
   // section headers. Framer re-writes transform/layout on render and fought the
@@ -163,14 +167,17 @@ export default function Players({ onBack, onModalChange }) {
   };
 
   const handleSave = async ({ id, name, color, emoji, cardStyle }) => {
+    let saved;
     if (id) {
       await db.players.update(id, { name, color, emoji, cardStyle });
-      setPlayers((prev) => prev.map((p) => (p.id === id ? { ...p, name, color, emoji, cardStyle } : p)));
+      saved = { ...players.find((p) => p.id === id), name, color, emoji, cardStyle };
+      setPlayers((prev) => prev.map((p) => (p.id === id ? saved : p)));
     } else {
-      const created = await db.players.create({ name, color, emoji, cardStyle });
-      setPlayers((prev) => [created, ...prev]);
+      saved = await db.players.create({ name, color, emoji, cardStyle });
+      setPlayers((prev) => [saved, ...prev]);
     }
-    setEditing(null);
+    // The inline tablet editor stays on the player it just saved.
+    setEditing(wide ? saved : null);
   };
 
   const handleDelete = async (id) => {
@@ -185,6 +192,7 @@ export default function Players({ onBack, onModalChange }) {
   // never affects layout, so it can't fight the FLIP.
   const renderRow = (p, idx) => {
     const isSelected = selectedIds.has(p.id);
+    const isEditingRow = wide && !selectMode && editing?.id === p.id;
     return (
       <div key={p.id} data-row-id={p.id} data-idx={idx} className="pb-3">
         <button
@@ -195,7 +203,10 @@ export default function Players({ onBack, onModalChange }) {
           onPointerDown={(e) => { if (!selectMode) primeIOSKeyboard(); startLongPress(e, p); }}
           onContextMenu={(e) => e.preventDefault()}
           className="neo-press w-[calc(100%-4px)] h-[68px] flex items-center gap-3.5 pl-2.5 pr-2 text-left bg-surface border-3 border-ink rounded-[14px] shadow-neo"
-          style={{ backgroundColor: isSelected ? "rgba(255, 75, 62, 0.22)" : "rgb(var(--surface))" }}
+          style={{
+            backgroundColor: isSelected ? "rgba(255, 75, 62, 0.22)" : isEditingRow ? toNeoColor(p.color) : "rgb(var(--surface))",
+            color: isEditingRow ? "rgb(var(--ink))" : undefined,
+          }}
         >
           <PlayerTile emoji={p.emoji} color={toNeoColor(p.color)} size={46} radius={10} />
           <span className="flex-1 min-w-0 text-[21px] font-extrabold truncate">{p.name}</span>
@@ -238,7 +249,7 @@ export default function Players({ onBack, onModalChange }) {
   };
 
   return (
-    <div className="bg-background flex flex-col overflow-hidden" style={{ height: "100dvh", paddingTop: PAGE_TOP, paddingBottom: "env(safe-area-inset-bottom)" }}>
+    <div className="bg-background flex flex-col overflow-hidden lg:px-6" style={{ height: "100dvh", paddingTop: wide ? WIDE_PAGE_TOP : PAGE_TOP, paddingBottom: wide ? "max(env(safe-area-inset-bottom), 28px)" : "env(safe-area-inset-bottom)" }}>
       {/* Edit-mode frame — portaled to <body> so the page's overflow-hidden
           can't clip its rounded corners at the screen edges. */}
       {createPortal(
@@ -259,7 +270,7 @@ export default function Players({ onBack, onModalChange }) {
         document.body
       )}
 
-      <div className="px-5 flex items-center gap-2 h-12 flex-shrink-0">
+      <div className="px-5 flex items-center gap-2 h-12 lg:h-16 flex-shrink-0">
         {selectMode ? (
           <>
             <HeaderLink onClick={exitSelectMode}>Cancel</HeaderLink>
@@ -274,19 +285,21 @@ export default function Players({ onBack, onModalChange }) {
               onPointerDown={primeIOSKeyboard}
               onClick={() => setEditing({})}
               aria-label="Add player"
-              className="neo-press w-[46px] h-[46px] mr-1 flex items-center justify-center bg-sun text-ink border-3 border-ink rounded-xl shadow-neo"
+              className="neo-press w-[46px] h-[46px] lg:w-auto lg:h-[52px] lg:px-5 lg:gap-2 lg:ml-4 mr-1 flex items-center justify-center bg-sun text-ink border-3 border-ink rounded-xl shadow-neo lg:text-[17px] font-extrabold"
             >
               <Plus size={22} strokeWidth={3} />
+              {wide && "Add player"}
             </button>
           </>
         )}
       </div>
 
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 min-h-0 flex lg:gap-6 lg:mt-5">
+      <div className="flex-1 lg:flex-none lg:w-[340px] landscape:lg:w-[400px] relative overflow-hidden">
         <div
           ref={scrollRef}
           className="h-full overflow-y-auto px-5 pt-2"
-          style={{ paddingBottom: "calc(69px + 24px + env(safe-area-inset-bottom))" }}
+          style={{ paddingBottom: wide ? 24 : "calc(69px + 24px + env(safe-area-inset-bottom))" }}
         >
           {loading ? (
             <div className="flex items-center justify-center py-20">
@@ -346,6 +359,25 @@ export default function Players({ onBack, onModalChange }) {
         </div>
       </div>
 
+      {wide && (
+        <div className="flex-1 min-w-0 pt-2 pr-5 pb-2">
+          {editing ? (
+            <PlayerEditPanel
+              key={`${editing.id ?? "new"}-${discardCount}`}
+              player={editing}
+              usedColors={players.map((p) => p.color)}
+              usedEmojis={players.map((p) => p.emoji).filter(Boolean)}
+              onSave={handleSave}
+              onDelete={handleDelete}
+              onDiscard={() => (editing.id ? setDiscardCount((n) => n + 1) : setEditing(null))}
+            />
+          ) : (
+            <PlayerEditPanelEmpty onAdd={() => setEditing({})} />
+          )}
+        </div>
+      )}
+      </div>
+
       <AnimatePresence>
         {selectMode && selectedIds.size > 0 && (
           <motion.div
@@ -368,7 +400,7 @@ export default function Players({ onBack, onModalChange }) {
       </AnimatePresence>
 
       <PlayerEditModal
-        isOpen={!!editing}
+        isOpen={!!editing && !wide}
         player={editing}
         usedColors={players.map((p) => p.color)}
         usedEmojis={players.map((p) => p.emoji).filter(Boolean)}

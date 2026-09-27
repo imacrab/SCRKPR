@@ -7,7 +7,8 @@ import { resetOnboarding } from "@/lib/onboarding";
 import { base44 } from "@/api/base44Client";
 import BottomSheetModal from "@/components/scorekeeper/BottomSheetModal";
 import Toggle from "@/components/scorekeeper/Toggle";
-import { PlayerTile, SectionLabel, PageTitle, SegmentedControl, PAGE_TOP } from "@/components/scorekeeper/neo";
+import { PlayerTile, SectionLabel, PageTitle, SegmentedControl, PAGE_TOP, WIDE_PAGE_TOP } from "@/components/scorekeeper/neo";
+import { useWideLayout } from "@/lib/useWideLayout";
 
 const THEME_OPTIONS = [
   { id: "system", label: "Auto", icon: <Monitor size={18} strokeWidth={2.5} /> },
@@ -24,6 +25,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
   const [clearing, setClearing] = useState(false);
   const { toggles, setMode } = useGameModeToggles();
   const [themePref, setThemePref] = useThemePreference();
+  const wide = useWideLayout();
 
   // Local-first: players + game history live on this device. "Clear" wipes the
   // local store. Sign Out is only meaningful once cloud sync (and therefore an
@@ -57,62 +59,64 @@ export default function AccountSettings({ onBack, onModalChange }) {
 
   return (
     <div
-      className="bg-background flex flex-col overflow-hidden"
-      style={{ height: "100dvh", paddingTop: PAGE_TOP, paddingBottom: "env(safe-area-inset-bottom)" }}
+      className="bg-background flex flex-col overflow-hidden lg:px-6"
+      style={{ height: "100dvh", paddingTop: wide ? WIDE_PAGE_TOP : PAGE_TOP, paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="px-5 h-12 flex items-center flex-shrink-0">
+      <div className="px-5 h-12 lg:h-16 flex items-center flex-shrink-0">
         <PageTitle>Settings</PageTitle>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 pt-5" style={{ paddingBottom: "calc(69px + 24px + env(safe-area-inset-bottom))" }}>
-        <SectionLabel className="mb-2.5">Appearance</SectionLabel>
-        <SegmentedControl className="mr-[5px] shadow-neo-md" height={48} options={THEME_OPTIONS} value={themePref} onChange={setThemePref} />
+      <div className="flex-1 overflow-y-auto px-5 pt-5 lg:pt-8" style={{ paddingBottom: wide ? 40 : "calc(69px + 24px + env(safe-area-inset-bottom))" }}>
+        <div className="lg:max-w-[680px]">
+          <SectionLabel className="mb-2.5">Appearance</SectionLabel>
+          <SegmentedControl className="mr-[5px] shadow-neo-md" height={48} options={THEME_OPTIONS} value={themePref} onChange={setThemePref} />
 
-        <SectionLabel className="mt-[26px] mb-2.5">Game Modes</SectionLabel>
-        <div className={cardClass}>
-          {OPTIONAL_MODES.map((mode) => (
-            <div key={mode.id} className="h-14 flex items-center gap-3 pl-3 pr-2.5">
-              <PlayerTile emoji={mode.emoji} color={MODE_COLORS[mode.id]} size={34} radius={9} border={2.5} />
-              <p className="flex-1 text-[17px] font-bold">{mode.label}</p>
-              <Toggle
-                checked={toggles[mode.id] !== false}
-                onChange={(next) => setMode(mode.id, next)}
-                ariaLabel={`Toggle ${mode.label}`}
-              />
-            </div>
-          ))}
-        </div>
+          <SectionLabel className="mt-[26px] mb-2.5">Game Modes</SectionLabel>
+          <div className={cardClass}>
+            {OPTIONAL_MODES.map((mode) => (
+              <div key={mode.id} className="h-14 flex items-center gap-3 pl-3 pr-2.5">
+                <PlayerTile emoji={mode.emoji} color={MODE_COLORS[mode.id]} size={34} radius={9} border={2.5} />
+                <p className="flex-1 text-[17px] font-bold">{mode.label}</p>
+                <Toggle
+                  checked={toggles[mode.id] !== false}
+                  onChange={(next) => setMode(mode.id, next)}
+                  ariaLabel={`Toggle ${mode.label}`}
+                />
+              </div>
+            ))}
+          </div>
 
-        <SectionLabel className="mt-[26px] mb-2.5">System</SectionLabel>
-        <div className={cardClass}>
-          {systemRow("#1FD66F", <Smartphone size={18} strokeWidth={2.5} />, "Saved on this device", "Players and games stay here. No account needed.")}
-          {systemRow(
-            "#FFD23F",
-            <Sparkles size={18} strokeWidth={2.5} />,
-            "Replay welcome",
-            "See the intro tour again.",
-            <Button size="sm" variant="outline" className="mr-[3px]" onClick={() => { resetOnboarding(); window.location.href = "/"; }}>
-              Replay
-            </Button>
-          )}
-          {SYNC_ENABLED && systemRow(
-            "rgb(var(--surface))",
-            <LogOut size={18} strokeWidth={2.5} />,
-            "Sign out",
-            "End your session and return to login.",
-            <Button size="sm" variant="outline" className="mr-[3px]" onClick={() => base44.auth.logout("/")}>
-              Sign out
-            </Button>
-          )}
-          {systemRow(
-            "#FF4B3E",
-            <Trash2 size={18} strokeWidth={2.5} />,
-            "Clear all data",
-            "Remove every player and game from this device.",
-            <Button size="sm" variant="destructive" className="mr-[3px]" onClick={() => setShowConfirm(true)}>
-              Clear
-            </Button>
-          )}
+          <SectionLabel className="mt-[26px] mb-2.5">System</SectionLabel>
+          <div className={cardClass}>
+            {systemRow("#1FD66F", <Smartphone size={18} strokeWidth={2.5} />, "Saved on this device", "Players and games stay here. No account needed.")}
+            {systemRow(
+              "#FFD23F",
+              <Sparkles size={18} strokeWidth={2.5} />,
+              "Replay welcome",
+              "See the intro tour again.",
+              <Button size="sm" variant="outline" className="mr-[3px]" onClick={() => { resetOnboarding(); window.location.href = "/"; }}>
+                Replay
+              </Button>
+            )}
+            {SYNC_ENABLED && systemRow(
+              "rgb(var(--surface))",
+              <LogOut size={18} strokeWidth={2.5} />,
+              "Sign out",
+              "End your session and return to login.",
+              <Button size="sm" variant="outline" className="mr-[3px]" onClick={() => base44.auth.logout("/")}>
+                Sign out
+              </Button>
+            )}
+            {systemRow(
+              "#FF4B3E",
+              <Trash2 size={18} strokeWidth={2.5} />,
+              "Clear all data",
+              "Remove every player and game from this device.",
+              <Button size="sm" variant="destructive" className="mr-[3px]" onClick={() => setShowConfirm(true)}>
+                Clear
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 

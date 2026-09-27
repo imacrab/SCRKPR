@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { RotateCcw, Flag, Bookmark } from "lucide-react";
-import { LogoSticker, SectionLabel, SegmentedControl, PAGE_TOP } from "./neo";
+import { LogoSticker, SectionLabel, SegmentedControl, PAGE_TOP, WIDE_PAGE_TOP } from "./neo";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { db } from "@/lib/store";
 import PlayerColumn from "./PlayerColumn";
+import ScoreCard from "./ScoreCard";
 import ScoreInputModal from "./ScoreInputModal";
 import PlayerEditModal from "./PlayerEditModal";
 import EndGameModal from "./EndGameModal";
@@ -12,6 +13,14 @@ import ScoreHistoryPanel from "./ScoreHistoryPanel";
 import PauseGameModal from "./PauseGameModal";
 import { isLowMode, isCircleMode, getModeMeta } from "@/lib/gameModes";
 import { SPRING_SHEET, TRANSITION_PANEL } from "@/lib/motion";
+import { useWideLayout } from "@/lib/useWideLayout";
+
+// Columns for the tablet card grid; the rounds panel takes a slice of the
+// width, so boards without it can fit one more column.
+function boardColumns(count, hasSidePanel) {
+  if (hasSidePanel) return count <= 4 ? 2 : count <= 9 ? 3 : 4;
+  return count <= 2 ? 2 : count <= 6 ? 3 : 4;
+}
 
 const iconButtonClass = "neo-press w-11 h-11 flex items-center justify-center bg-surface border-3 border-ink rounded-[11px] shadow-neo-sm";
 
@@ -32,6 +41,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
   const [endingGame, setEndingGame] = useState(false);
   const [showPauseModal, setShowPauseModal] = useState(false);
   const [view, setView] = useState("board"); // "board" | "rounds"
+  const wide = useWideLayout();
   const scrollContainerRef = useRef(null);
   const scoreCloseTimerRef = useRef(null);
   const endGameTimerRef = useRef(null);
@@ -241,20 +251,24 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
     }, 420);
   };
 
+  // If the player has already logged this round, ADD to that round's entry
+  // (so +2 then +4 tallies as +6); otherwise log a fresh one.
+  const applyScore = (player, value) => {
+    const p = players.find((x) => x.id === player.id) || player;
+    if (!circleMode && p.scores.length > currentRound) {
+      onEditScore(p.id, currentRound, p.scores[currentRound] + value);
+    } else {
+      onAddScore(p.id, value);
+    }
+  };
+
   const handleSubmit = (value) => {
     if (!activePlayer) return;
     if (editingScore !== null) {
       // Correcting a specific past entry (tapped the "(+X)") — replace it.
       onEditScore(editingScore.playerId, editingScore.scoreIndex, value);
     } else {
-      // Tapping the player: if they've already logged this round, ADD to that
-      // round's entry (so +2 then +4 tallies as +6); otherwise log a fresh one.
-      const p = players.find((x) => x.id === activePlayer.id) || activePlayer;
-      if (!circleMode && p.scores.length > currentRound) {
-        onEditScore(activePlayer.id, currentRound, p.scores[currentRound] + value);
-      } else {
-        onAddScore(activePlayer.id, value);
-      }
+      applyScore(activePlayer, value);
     }
     closeScoreModal();
   };
@@ -288,8 +302,148 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
 
 
 
+  const modals = (
+    <>
+        <ScoreInputModal
+          player={activePlayer}
+          editingIndex={editingScore?.scoreIndex ?? null}
+          isOpen={scoreModalOpen}
+          onSubmit={handleSubmit}
+          onClose={handleClose} />
+      
+
+        <PlayerEditModal
+          player={editingPlayer}
+          isOpen={!!editingPlayer}
+          usedColors={players.map((p) => p.color)}
+          usedEmojis={players.map((p) => p.emoji).filter(Boolean)}
+          onSave={handleSavePlayer}
+          onClose={() => setEditingPlayer(null)} />
+      
+
+        <ResetConfirmModal
+          isOpen={showResetConfirm}
+          onConfirm={onReset}
+          onClose={() => setShowResetConfirm(false)} />
+      
+
+        <EndGameModal
+          isOpen={showEndGame}
+          players={players}
+          winMode={winMode}
+          gameStartTime={gameStartTime}
+          onConfirm={handleConfirmEndGame}
+          isConfirming={endingGame}
+          onCancel={() => {
+            if (endingGame) return;
+            setShowEndGame(false);
+          }} />
+
+
+        <PauseGameModal
+          isOpen={showPauseModal}
+          defaultName={defaultPauseName}
+          onSave={(name) => onPauseGame?.(name)}
+          onClose={() => setShowPauseModal(false)} />
+    </>
+  );
+
+  const cardProps = (player) => ({
+    player,
+    isLeader: player.id === leaderId,
+    isWorst: player.id === worstId,
+    isHighlighted: player.id === lastAddedPlayerId,
+    streak: streakMap[player.name] || 0,
+    winsNeeded,
+    behind: lowWins ? totalOf(player) - bestTotal : bestTotal - totalOf(player),
+    scoredThisRound: !circleMode && player.scores.length > currentRound,
+    onAddScore: () => handleOpenScore(player),
+    onEditScore: (i) => handleEditScore(player, i),
+    onEditPlayer: () => setEditingPlayer(player),
+  });
+
+  if (wide) {
+    const columns = boardColumns(sortedPlayers.length, showTabs);
+    const rows = Math.max(1, Math.ceil(sortedPlayers.length / columns));
+    const statusLabel = circleMode ? `Best of ${bestOf} · ${rulesLabel}` : `Round ${roundNumber} · ${rulesLabel}`;
+
+    return (
+      <div className="w-full flex flex-col overflow-hidden bg-background px-10" style={{ height: "100dvh", paddingTop: WIDE_PAGE_TOP, paddingBottom: "max(env(safe-area-inset-bottom), 28px)" }}>
+        <div className="flex items-center gap-4 h-16 flex-shrink-0">
+          <button onClick={() => setShowEndGame(true)} aria-label="End game">
+            <LogoSticker size="lg" />
+          </button>
+          <span className="font-mono flex-1 min-w-0 ml-2 text-[13px] font-bold tracking-[0.1em] uppercase truncate">
+            {statusLabel}
+          </span>
+          <button onClick={() => setShowPauseModal(true)} className={`${iconButtonClass} !w-[52px] !h-[52px]`} aria-label="Save game">
+            <Bookmark size={22} strokeWidth={2.5} />
+          </button>
+          <button onClick={() => setShowResetConfirm(true)} className={`${iconButtonClass} !w-[52px] !h-[52px]`} aria-label="Reset scores">
+            <RotateCcw size={22} strokeWidth={2.5} />
+          </button>
+          <button
+            onClick={() => setShowEndGame(true)}
+            className="neo-press font-display ml-2 mr-1.5 h-[60px] px-7 flex items-center gap-2.5 bg-sun text-ink border-3 border-ink rounded-[14px] shadow-neo-lg text-xl uppercase">
+            <Flag size={22} strokeWidth={2.75} />
+            End game
+          </button>
+        </div>
+
+        <div className="flex-1 min-h-0 flex gap-8 mt-6">
+          <div className="flex-1 min-w-0 overflow-y-auto pt-4" style={{ WebkitOverflowScrolling: "touch" }}>
+            <div
+              className="grid gap-x-3 gap-y-4 h-full"
+              style={{
+                gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                gridTemplateRows: `repeat(${rows}, minmax(250px, 1fr))`,
+              }}>
+              <LayoutGroup>
+                {sortedPlayers.map((player, idx) =>
+                <motion.div
+                  key={player.id}
+                  layout
+                  initial={{ opacity: 0, y: 48, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{
+                    layout: SPRING_SHEET,
+                    y: { ...SPRING_SHEET, delay: idx * 0.07 },
+                    scale: { ...SPRING_SHEET, delay: idx * 0.07 },
+                    opacity: { duration: 0.25, delay: idx * 0.07 },
+                  }}
+                  className="min-h-0 pr-[9px] pb-[9px]">
+                    <ScoreCard {...cardProps(player)} onQuickScore={(step) => applyScore(player, step)} />
+                  </motion.div>
+                )}
+              </LayoutGroup>
+            </div>
+          </div>
+
+          {showTabs && (
+            <section
+              aria-label="Rounds"
+              className="w-[360px] landscape:w-[420px] flex-shrink-0 mt-4 mb-[7px] mr-[7px] flex flex-col bg-surface border-3 border-ink rounded-[20px] shadow-neo-lg overflow-hidden">
+              <div className="h-14 flex-shrink-0 flex items-center justify-between px-5 border-b-3 border-ink">
+                <SectionLabel className="!text-fg">Rounds</SectionLabel>
+                <span className="font-mono flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] uppercase text-subtle">
+                  <span className="w-4 h-3.5 bg-sun border-2 border-ink rounded" />
+                  {lowWins ? "Round low" : "Round best"}
+                </span>
+              </div>
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                <ScoreHistoryPanel players={sortedPlayers} winMode={winMode} bare />
+              </div>
+            </section>
+          )}
+        </div>
+
+        {modals}
+      </div>
+    );
+  }
+
   return (
-    <div className="w-screen flex flex-col overflow-hidden bg-background" style={{ height: "100dvh", paddingTop: PAGE_TOP, paddingBottom: "env(safe-area-inset-bottom)" }}>
+    <div className="w-full flex flex-col overflow-hidden bg-background" style={{ height: "100dvh", paddingTop: PAGE_TOP, paddingBottom: "env(safe-area-inset-bottom)" }}>
       <div className="flex items-center gap-2.5 h-[46px] px-5 flex-shrink-0">
         <button onClick={() => setShowEndGame(true)} aria-label="End game">
           <LogoSticker />
@@ -355,18 +509,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
                       opacity: { duration: 0.25, delay: idx * 0.07 },
                     }}
                     className="w-full flex-shrink-0">
-                      <PlayerColumn
-                      player={player}
-                      isLeader={player.id === leaderId}
-                      isWorst={player.id === worstId}
-                      isHighlighted={player.id === lastAddedPlayerId}
-                      streak={streakMap[player.name] || 0}
-                      winsNeeded={winsNeeded}
-                      behind={lowWins ? totalOf(player) - bestTotal : bestTotal - totalOf(player)}
-                      scoredThisRound={!circleMode && player.scores.length > currentRound}
-                      onAddScore={() => handleOpenScore(player)}
-                      onEditScore={(i) => handleEditScore(player, i)}
-                      onEditPlayer={() => setEditingPlayer(player)} />
+                      <PlayerColumn {...cardProps(player)} />
                     </motion.div>
                   )}
                 </LayoutGroup>
@@ -385,48 +528,7 @@ export default function ScoreBoard({ players, winMode, bestOf, targetScore, last
         </button>
       </div>
 
-      <ScoreInputModal
-        player={activePlayer}
-        editingIndex={editingScore?.scoreIndex ?? null}
-        isOpen={scoreModalOpen}
-        onSubmit={handleSubmit}
-        onClose={handleClose} />
-      
-
-      <PlayerEditModal
-        player={editingPlayer}
-        isOpen={!!editingPlayer}
-        usedColors={players.map((p) => p.color)}
-        usedEmojis={players.map((p) => p.emoji).filter(Boolean)}
-        onSave={handleSavePlayer}
-        onClose={() => setEditingPlayer(null)} />
-      
-
-      <ResetConfirmModal
-        isOpen={showResetConfirm}
-        onConfirm={onReset}
-        onClose={() => setShowResetConfirm(false)} />
-      
-
-      <EndGameModal
-        isOpen={showEndGame}
-        players={players}
-        winMode={winMode}
-        gameStartTime={gameStartTime}
-        onConfirm={handleConfirmEndGame}
-        isConfirming={endingGame}
-        onCancel={() => {
-          if (endingGame) return;
-          setShowEndGame(false);
-        }} />
-
-
-      <PauseGameModal
-        isOpen={showPauseModal}
-        defaultName={defaultPauseName}
-        onSave={(name) => onPauseGame?.(name)}
-        onClose={() => setShowPauseModal(false)} />
-
+      {modals}
     </div>);
 
 }

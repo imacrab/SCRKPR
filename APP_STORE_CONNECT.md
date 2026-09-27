@@ -66,7 +66,7 @@ First release. Keep score for any game — on your device, no account needed.
 
 Provide for **iPhone 6.9"** — `1320 × 2868` (or 6.7" `1290 × 2796`). 1–10 images; 3–5 is a good set. Suggested shots: the FTUE welcome, the live scoreboard with the crown, the Players list with favorites, the End Game hero, the History page.
 
-> **iPad:** Capacitor builds universal (iPhone+iPad) by default, which would require **iPad screenshots too**. For a simpler v1, set the target to **iPhone only** in Xcode (target → General → Supported Destinations, remove iPad). Otherwise prepare iPad 13" `2064 × 2752` screenshots as well.
+> **iPad:** The target is universal (iPhone + iPad) and the web app has a dedicated tablet layout, so App Store Connect requires **iPad 13" screenshots** too — `2064 × 2752` (portrait) or `2752 × 2064` (landscape; the scoreboard reads best this way).
 
 ## 8. App Privacy ("nutrition label")
 

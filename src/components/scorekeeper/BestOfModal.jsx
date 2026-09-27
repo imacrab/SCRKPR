@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BottomSheetModal from "./BottomSheetModal";
-import FluentEmoji from "./FluentEmoji";
 import { PlayerTile } from "./neo";
 
 const stepperClass = "neo-press w-14 h-14 flex items-center justify-center bg-surface border-3 border-ink rounded-xl shadow-neo disabled:opacity-40 disabled:shadow-none";
@@ -28,7 +27,7 @@ export default function BestOfModal({ isOpen, onConfirm, onClose }) {
     <BottomSheetModal
       isOpen={isOpen}
       onClose={onClose}
-      leading={<PlayerTile color="#FFD23F" size={46} radius={11}><FluentEmoji emoji="🏆" size={30} /></PlayerTile>}
+      leading={<PlayerTile icon="trophy" color="#FFD23F" size={46} radius={11} />}
       eyebrow="Best Of"
       title="How many games?"
       footer={

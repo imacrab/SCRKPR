@@ -9,7 +9,7 @@
 - **Run it:** `npm install` → `npm run dev` (works fully offline, no `.env`). `npm run lint` and `npm run build` both pass. Full app is feature-complete and green.
 - **Where we are:** UI/UX is essentially done through §16. App icon **resolved** (coral circles, §14). Currently on branch **`fix-clean-house`** (cut from `main`, which has everything merged).
 - **What's next (the actual blockers):** ship to the **iOS App Store** — all Mac-side: (1) finish the Xcode/submission runbook in `CAPACITOR_iOS.md` (set the `.icon`, sign w/ team `8RJXUWMLNF`, iPhone-only, upload) + paste `APP_STORE_CONNECT.md`; (2) **real-iPhone device test** (drag/FLIP/safe-area only verified headlessly); (3) `npm audit fix`; (4) phase-2: drop `@base44/sdk` from the bundle. See **Open items**.
-- **Conventions that bite if ignored:** one modal only — `BottomSheetModal` (§16); animation values from `@/lib/motion`, colors from `@/lib/colors` (no inline hex/springs); emojis via `FluentEmoji`; logo is `@/assets/scrkpr-logo.svg`. The player-list reorder in `PlayerSetup` is a minefield — read its architecture note before touching. Preview/dev animations can look frozen in a backgrounded browser tab (rAF pauses) — an environmental artifact, not a bug.
+- **Conventions that bite if ignored:** one modal only — `BottomSheetModal` (§16); animation values from `@/lib/motion`, colors from `@/lib/colors` (no inline hex/springs); icons via `NeoIcon` (filled Lucide, registry in `@/lib/playerIcons`; players' `emoji` field now stores an icon id, legacy emoji map via `LEGACY_EMOJI`); logo is `@/assets/scrkpr-logo.svg`. The player-list reorder in `PlayerSetup` is a minefield — read its architecture note before touching. Preview/dev animations can look frozen in a backgrounded browser tab (rAF pauses) — an environmental artifact, not a bug.
 - **Read next:** "Current state" snapshot below for the fuller picture, then §16 → §14 for the most recent work; **Open items** for the punch list.
 
 ## What this project is
@@ -188,7 +188,7 @@ A product pass on the core interactions (grilled w/ Adrian). Three changes:
 - Import animation values from `@/lib/motion` and colors from `@/lib/colors` — no inline springs/durations/hex.
 - Modals use `BottomSheetModal` (which portals to `document.body`); player editing uses `PlayerEditModal` everywhere.
 - Pages signal modal-open via `onModalChange` so `ScoreKeeper` hides nav + gradient.
-- Emojis render through `FluentEmoji` (Microsoft Fluent 3D via CDN, unicode `<span>` fallback).
+- Icons render through `NeoIcon`: Lucide filled with `currentColor` and stroked in the background color (`knockout`) so detail lines read as cut-outs. Replaced the Fluent 3D emoji CDN.
 - The SCRKPR logo is local (`@/assets/scrkpr-logo.svg`, white `SCRKPR!` wordmark) — never re-add the media.base44.com URL.
 - **Error handling:** `src/components/ErrorBoundary.jsx` wraps the app (in `App.jsx`, *outside* the transformed page `motion.div` so its fixed fallback is viewport-relative). Any page crash shows a calm "We had a little hiccup / your games are still saved" screen with a "Back to Home" button that hard-reloads `/`. Prefer to also fail-soft at the source (e.g. `safeFormat` in `History.jsx` guards bad dates) so the boundary stays a last resort. Game data persists in localStorage + Base44, so a reload is safe.
 

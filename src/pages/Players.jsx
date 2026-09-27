@@ -208,7 +208,7 @@ export default function Players({ onBack, onModalChange }) {
             color: isEditingRow ? "rgb(var(--ink))" : undefined,
           }}
         >
-          <PlayerTile emoji={p.emoji} color={toNeoColor(p.color)} size={46} radius={10} />
+          <PlayerTile icon={p.emoji} color={toNeoColor(p.color)} size={46} radius={10} />
           <span className="flex-1 min-w-0 text-[21px] font-extrabold truncate">{p.name}</span>
           {!selectMode && (
             <span

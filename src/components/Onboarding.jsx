@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import { ArrowRight, Plus } from "lucide-react";
-import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
+import NeoIcon from "@/components/scorekeeper/NeoIcon";
 import { LogoSticker, PlayerTile, Tag, CrownGlyph, PAGE_TOP } from "@/components/scorekeeper/neo";
 import { SPRING_SHEET, SPRING_SNAPPY, SPRING_POP, DUR_MEDIUM } from "@/lib/motion";
 import { setOnboarded } from "@/lib/onboarding";
@@ -38,10 +38,10 @@ function usePlay() {
 // A choreographed cascade: the hero card counts up first, the satellites pop in
 // while it's still climbing, and the crown lands last.
 const STACK = [
-  { emoji: "🐙", color: "#9B6BFF", score: 24, left: 82, top: 146, rotate: -3, delay: 0.3, countDur: 1.0, hero: true },
-  { emoji: "🐵", color: "#FF8A1F", score: 19, left: 190, top: 20, rotate: 7, delay: 0.62, countDur: 0.9 },
-  { emoji: "🦊", color: "#1FBFFF", score: 12, left: 0, top: 30, rotate: -8, delay: 0.9, countDur: 0.8 },
-  { emoji: "🐸", color: "#1FD66F", score: 8, left: 38, top: 256, rotate: 4, delay: 1.15, countDur: 0.7 },
+  { icon: "shell", color: "#9B6BFF", score: 24, left: 82, top: 146, rotate: -3, delay: 0.3, countDur: 1.0, hero: true },
+  { icon: "squirrel", color: "#FF8A1F", score: 19, left: 190, top: 20, rotate: 7, delay: 0.62, countDur: 0.9 },
+  { icon: "dog", color: "#1FBFFF", score: 12, left: 0, top: 30, rotate: -8, delay: 0.9, countDur: 0.8 },
+  { icon: "fish", color: "#1FD66F", score: 8, left: 38, top: 256, rotate: 4, delay: 1.15, countDur: 0.7 },
 ];
 const CROWN_DELAY = 2.1;
 
@@ -51,7 +51,7 @@ function ScoreStack() {
     <div className="relative w-[330px] h-[330px] mx-auto">
       {STACK.map((c) => (
         <motion.div
-          key={c.emoji}
+          key={c.icon}
           className="absolute"
           style={{ left: c.left, top: c.top, zIndex: c.hero ? 2 : 1 }}
           initial={false}
@@ -71,7 +71,7 @@ function ScoreStack() {
                 <CrownGlyph width={42} height={32} />
               </motion.span>
             )}
-            <PlayerTile emoji={c.emoji} color={c.color} size={c.hero ? 52 : 44} radius={c.hero ? 12 : 10} />
+            <PlayerTile icon={c.icon} color={c.color} size={c.hero ? 52 : 44} radius={c.hero ? 12 : 10} />
             <CountUp to={c.score} className={c.hero ? "text-[40px]" : "text-[30px]"} delay={c.delay + 0.1} duration={c.countDur} play={play} />
           </div>
         </motion.div>
@@ -90,9 +90,9 @@ function ScoreStack() {
 
 function PlayerChips() {
   const tiles = [
-    { color: "#FF4FA0", emoji: "🦄", size: 104, rotate: -9, y: 10 },
-    { color: "#1FBFFF", emoji: "🦀", size: 118, rotate: 3, y: 0 },
-    { color: "#1FD66F", emoji: "🐸", size: 104, rotate: 8, y: 14 },
+    { color: "#FF4FA0", icon: "sparkles", size: 104, rotate: -9, y: 10 },
+    { color: "#1FBFFF", icon: "cat", size: 118, rotate: 3, y: 0 },
+    { color: "#1FD66F", icon: "rocket", size: 104, rotate: 8, y: 14 },
   ];
   const swatches = ["#FF4FA0", "#1FBFFF", "#9B6BFF", "#FF8A1F", "#1FD66F", "#FFFFFF"];
   return (
@@ -100,15 +100,13 @@ function PlayerChips() {
       <div className="flex items-center justify-center h-[150px]">
         {tiles.map((t, i) => (
           <motion.div
-            key={t.emoji}
+            key={t.icon}
             initial={{ scale: 0, y: 24 }}
             animate={{ scale: 1, y: t.y }}
             transition={{ ...SPRING_POP, delay: 0.12 + i * 0.1 }}
             className={i === 1 ? "relative z-10 -mx-2" : ""}
           >
-            <PlayerTile color={t.color} size={t.size} radius={t.size > 110 ? 24 : 22} rotate={t.rotate} className={t.size > 110 ? "shadow-neo-lg" : "shadow-neo-md"}>
-              <FluentEmoji emoji={t.emoji} size={Math.round(t.size * 0.74)} />
-            </PlayerTile>
+            <PlayerTile icon={t.icon} color={t.color} size={t.size} radius={t.size > 110 ? 24 : 22} rotate={t.rotate} className={t.size > 110 ? "shadow-neo-lg" : "shadow-neo-md"} />
           </motion.div>
         ))}
       </div>
@@ -130,14 +128,14 @@ function PlayerChips() {
 
 function MiniScoreboard() {
   const rows = [
-    { color: "#FF4FA0", emoji: "🦄", name: "Maya", score: 24, leader: true },
-    { color: "#FF8A1F", emoji: "🦊", name: "Priya", score: 18 },
+    { color: "#FF4FA0", icon: "sparkles", name: "Maya", score: 24, leader: true },
+    { color: "#FF8A1F", icon: "dog", name: "Priya", score: 18 },
   ];
   return (
     <div className="relative w-full max-w-[320px] mx-auto flex flex-col gap-[18px]">
       {rows.map((r, i) => (
         <motion.div
-          key={r.emoji}
+          key={r.icon}
           initial={{ opacity: 0, x: -24 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ ...SPRING_SNAPPY, delay: 0.15 + i * 0.12 }}
@@ -154,7 +152,7 @@ function MiniScoreboard() {
               <Tag><CrownGlyph />Leader</Tag>
             </motion.span>
           )}
-          <PlayerTile emoji={r.emoji} color="#FFFFFF" size={44} radius={10} />
+          <PlayerTile icon={r.icon} color="#FFFFFF" size={44} radius={10} />
           <span className="flex-1 text-left text-xl font-extrabold">{r.name}</span>
           <motion.span
             initial={{ scale: 0.4, opacity: 0 }}
@@ -175,7 +173,7 @@ function MiniScoreboard() {
         animate={{ opacity: 1, y: [30, 0, 6, 0] }}
         transition={{ delay: 0.8, duration: 0.9 }}
       >
-        <FluentEmoji emoji="👆" size={56} />
+        <NeoIcon name="pointer" knockout="#FFFFFF" strokeWidth={2.5} size={56} className="text-ink" />
       </motion.span>
     </div>
   );
@@ -229,7 +227,7 @@ const SLIDES = [
     bg: "#FFD23F",
     align: "center",
     title: "Set up the culprits",
-    body: "Give everyone a color and an emoji to match their confidence.",
+    body: "Give everyone a color and an icon to match their confidence.",
   },
   {
     key: "score",

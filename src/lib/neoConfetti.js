@@ -1,5 +1,7 @@
 import { PLAYER_COLORS } from "./colors";
-import { getFluentEmojiUrl } from "@/components/scorekeeper/FluentEmoji";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import NeoIcon from "@/components/scorekeeper/NeoIcon";
 
 const SHAPES = {
   square: '<rect x="3" y="3" width="18" height="18" rx="3"/>',
@@ -36,7 +38,7 @@ function shapePiece(color) {
   return el;
 }
 
-function emojiPiece(emoji, color) {
+function iconPiece(icon, color) {
   const el = document.createElement("div");
   const size = rand(40, 52);
   Object.assign(el.style, {
@@ -49,12 +51,9 @@ function emojiPiece(emoji, color) {
     border: "3px solid rgb(var(--ink))",
     borderRadius: "11px",
     boxShadow: "3px 3px 0 rgb(var(--ink))",
+    color: "rgb(var(--ink))",
   });
-  const img = document.createElement("img");
-  img.src = getFluentEmojiUrl(emoji);
-  img.alt = "";
-  Object.assign(img.style, { width: "78%", height: "78%", objectFit: "contain" });
-  el.appendChild(img);
+  el.innerHTML = renderToStaticMarkup(createElement(NeoIcon, { name: icon, knockout: color, size: "72%" }));
   return el;
 }
 
@@ -90,7 +89,7 @@ function launch(el, { originX, delay }, live) {
   });
 }
 
-export function fireNeoConfetti({ colors = PLAYER_COLORS, emoji, bursts = [{ x: 0.2, delay: 250 }, { x: 0.8, delay: 400 }, { x: 0.5, delay: 600 }], count = 34 } = {}) {
+export function fireNeoConfetti({ colors = PLAYER_COLORS, icon, bursts = [{ x: 0.2, delay: 250 }, { x: 0.8, delay: 400 }, { x: 0.5, delay: 600 }], count = 34 } = {}) {
   const live = [];
   // Cancels pieces still waiting to launch; ones already in the air finish.
   const cancel = () => live.forEach((stop) => stop());
@@ -103,9 +102,9 @@ export function fireNeoConfetti({ colors = PLAYER_COLORS, emoji, bursts = [{ x: 
     }
   });
 
-  if (emoji) {
+  if (icon) {
     for (let i = 0; i < 9; i++) {
-      launch(emojiPiece(emoji, pick(colors)), { originX: rand(0.25, 0.75), delay: 850 + i * 60 }, live);
+      launch(iconPiece(icon, pick(colors)), { originX: rand(0.25, 0.75), delay: 850 + i * 60 }, live);
     }
   }
   return cancel;

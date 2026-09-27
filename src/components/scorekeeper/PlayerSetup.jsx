@@ -14,7 +14,7 @@ import { primeIOSKeyboard } from "@/lib/iosKeyboardPrimer";
 import { useGameModeToggles } from "@/lib/useGameModeToggles";
 import { useIntroReveal } from "@/lib/useIntroReveal";
 import { useWideLayout } from "@/lib/useWideLayout";
-import FluentEmoji from "./FluentEmoji";
+import NeoIcon from "./NeoIcon";
 
 function lineupLabel(players) {
   const names = players.map((p) => p.name);
@@ -349,7 +349,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 : "transform 120ms ease-out, background-color 160ms ease-out, box-shadow 160ms ease-out",
             }}
           >
-            <PlayerTile emoji={player.emoji} color={selected ? "#FFFFFF" : color} size={40} radius={9} />
+            <PlayerTile icon={player.emoji} color={selected ? "#FFFFFF" : color} size={40} radius={9} />
             <span className="flex-1 min-w-0 text-xl font-extrabold truncate">{player.name}</span>
             <button
               type="button"
@@ -475,7 +475,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                           transform: tappedId === player.id ? "translate(2px, 2px)" : "none",
                         }}>
                         <div className="flex items-start justify-between">
-                          <PlayerTile emoji={player.emoji} color={selected ? "#FFFFFF" : color} size={52} radius={12} />
+                          <PlayerTile icon={player.emoji} color={selected ? "#FFFFFF" : color} size={52} radius={12} />
                           <span
                             aria-hidden="true"
                             className="w-8 h-8 flex items-center justify-center border-3 border-ink rounded-lg transition-colors"
@@ -528,7 +528,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
               <button
                 onClick={() => {setShowGameMode(true);onModalChange?.(true);}}
                 className="neo-press w-[calc(100%-3px)] h-16 flex items-center gap-3 pl-2.5 pr-3 bg-surface border-3 border-ink rounded-xl shadow-neo-sm">
-                <PlayerTile emoji={modeMeta.emoji} color="#FFD23F" size={40} radius={10} border={2.5} />
+                <PlayerTile icon={modeMeta.icon} color="#FFD23F" size={40} radius={10} border={2.5} />
                 <span className="flex-1 min-w-0 text-left">
                   <span className="block text-[17px] font-extrabold truncate">{modeMeta.label}</span>
                   <span className="block text-[13px] font-semibold text-subtle">
@@ -544,7 +544,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                   <div className="flex flex-shrink-0">
                     {selectedPlayers.slice(0, 4).map((p, i) => (
                       <span key={p.id} className={i > 0 ? "-ml-3" : ""} style={{ zIndex: 10 - i }}>
-                        <PlayerTile emoji={p.emoji} color={toNeoColor(p.color)} size={46} radius={11} rotate={i % 2 ? 4 : -4} />
+                        <PlayerTile icon={p.emoji} color={toNeoColor(p.color)} size={46} radius={11} rotate={i % 2 ? 4 : -4} />
                       </span>
                     ))}
                   </div>
@@ -552,7 +552,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
                 </div>
               ) : (
                 <div className="min-h-[52px] flex items-center gap-3 text-subtle">
-                  <FluentEmoji emoji="👆" size={28} />
+                  <NeoIcon name="pointer" size={28} />
                   <span className="text-[15px] font-semibold">Tap players to add them.</span>
                 </div>
               )}
@@ -689,7 +689,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         <button
           onClick={() => {setShowGameMode(true);onModalChange?.(true);}}
           className="neo-press w-[calc(100%-4px)] h-12 flex items-center gap-2.5 pl-2 pr-3 bg-surface border-3 border-ink rounded-xl shadow-neo-sm">
-          <PlayerTile emoji={modeMeta.emoji} color="#FFD23F" size={32} radius={8} border={2.5} />
+          <PlayerTile icon={modeMeta.icon} color="#FFD23F" size={32} radius={8} border={2.5} />
           <span className="flex-1 text-left text-base font-extrabold">{modeMeta.label}</span>
           <span className="font-mono text-[11px] font-bold tracking-[0.1em] text-subtle">CHANGE</span>
           <ChevronRight size={20} strokeWidth={3} />

@@ -75,7 +75,7 @@ export default function AccountSettings({ onBack, onModalChange }) {
           <div className={cardClass}>
             {OPTIONAL_MODES.map((mode) => (
               <div key={mode.id} className="h-14 flex items-center gap-3 pl-3 pr-2.5">
-                <PlayerTile emoji={mode.emoji} color={MODE_COLORS[mode.id]} size={34} radius={9} border={2.5} />
+                <PlayerTile icon={mode.icon} color={MODE_COLORS[mode.id]} size={34} radius={9} border={2.5} />
                 <p className="flex-1 text-[17px] font-bold">{mode.label}</p>
                 <Toggle
                   checked={toggles[mode.id] !== false}

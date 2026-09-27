@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Check, Plus } from "lucide-react";
 
-import FluentEmoji from "./FluentEmoji";
+import NeoIcon from "./NeoIcon";
 import { PlayerTile, Tag, CrownGlyph } from "./neo";
 import { toNeoColor, twoToneBackground } from "@/lib/colors";
 import { SPRING_POP, SPRING_POP_SNAPPY, SPRING_SNAPPY, TRANSITION_SLIDE_OUT } from "@/lib/motion";
@@ -95,7 +95,7 @@ export function StatusTags({ showLeader, isWorst, className = "absolute -top-[15
             className={`${className} z-20 pointer-events-none`}
             aria-hidden="true"
           >
-            <Tag bg="#FF4B3E" rotate={3}><FluentEmoji emoji="😭" size={13} />Worst round</Tag>
+            <Tag bg="#FF4B3E" rotate={3}><NeoIcon name="frown" knockout="#FF4B3E" size={14} />Worst round</Tag>
           </motion.div>
         )}
       </AnimatePresence>
@@ -104,7 +104,7 @@ export function StatusTags({ showLeader, isWorst, className = "absolute -top-[15
 }
 
 // The avatar flips to a check once the player has logged the current round.
-export function RoundTile({ emoji, scoredThisRound, size = 48, radius = 11 }) {
+export function RoundTile({ icon, scoredThisRound, size = 48, radius = 11 }) {
   const travel = size;
   return (
     <PlayerTile color={scoredThisRound ? "rgb(var(--ink))" : "#FFFFFF"} size={size} radius={radius} className="relative overflow-hidden">
@@ -120,16 +120,16 @@ export function RoundTile({ emoji, scoredThisRound, size = 48, radius = 11 }) {
           >
             <Check size={Math.round(size * 0.54)} strokeWidth={3.5} color="#FFFFFF" />
           </motion.span>
-        ) : emoji ? (
+        ) : icon ? (
           <motion.span
-            key="emoji"
+            key="icon"
             className="flex"
             initial={{ y: travel, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: travel, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
             transition={SPRING_POP_SNAPPY}
           >
-            <FluentEmoji emoji={emoji} size={Math.round(size * 0.7)} />
+            <NeoIcon name={icon} knockout="#FFFFFF" size={Math.round(size * 0.6)} />
           </motion.span>
         ) : null}
       </AnimatePresence>
@@ -147,7 +147,7 @@ export function StreakTag({ streak }) {
           transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
           className="flex"
         >
-          <FluentEmoji emoji="🔥" size={12} />
+          <NeoIcon name="flame" knockout="#FFFFFF" size={13} />
         </motion.span>
         {streak}
       </Tag>
@@ -217,7 +217,7 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
     >
       <StatusTags showLeader={showLeader} isWorst={isWorst} />
 
-      <RoundTile emoji={player.emoji} scoredThisRound={scoredThisRound} />
+      <RoundTile icon={player.emoji} scoredThisRound={scoredThisRound} />
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 min-w-0">

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { BarChart3 } from "lucide-react";
 import { isLowMode } from "@/lib/gameModes";
-import FluentEmoji from "./FluentEmoji";
+import NeoIcon from "./NeoIcon";
 import { PlayerTile } from "./neo";
 import { toNeoColor } from "@/lib/colors";
 import { TRANSITION_PANEL } from "@/lib/motion";
@@ -68,9 +68,9 @@ export default function HistoryStats({ games }) {
             className={`grid grid-cols-12 gap-2 items-center px-4 h-[52px] ${i < perPlayer.length - 1 ? "border-b-2 border-hairline" : ""}`}
           >
             <div className="col-span-5 flex items-center gap-2 min-w-0">
-              <PlayerTile emoji={p.emoji} color={toNeoColor(p.color)} size={30} radius={8} border={2.5} />
+              <PlayerTile icon={p.emoji} color={toNeoColor(p.color)} size={30} radius={8} border={2.5} />
               <span className="text-[15px] font-bold truncate">{p.name}</span>
-              {i === 0 && p.wins > 0 && <FluentEmoji emoji="👑" size={14} />}
+              {i === 0 && p.wins > 0 && <NeoIcon name="crown" size={16} className="text-sun" />}
             </div>
             <div className="col-span-2 text-right text-base font-bold tabular-nums text-subtle">{p.games}</div>
             <div className="col-span-2 flex justify-end">

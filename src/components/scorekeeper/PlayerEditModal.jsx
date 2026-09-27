@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BottomSheetModal from "./BottomSheetModal";
-import EmojiPicker, { AUTOFILL_EMOJIS } from "./EmojiPicker";
+import IconPicker from "./IconPicker";
+import { AUTOFILL_ICONS, toIconId } from "@/lib/playerIcons";
 import DeletePlayerConfirmModal from "./DeletePlayerConfirmModal";
 import { Check, Trash2 } from "lucide-react";
 import { NEO_COLORS, PLAYER_COLORS, toNeoColor, twoToneBackground } from "@/lib/colors";
@@ -10,7 +11,7 @@ import { PlayerTile, SectionLabel, SegmentedControl } from "./neo";
 
 const STYLE_TABS = [
   { id: "color", label: "Color" },
-  { id: "emoji", label: "Emoji" },
+  { id: "icon", label: "Icon" },
 ];
 
 function pickRandomUnused(options, used = []) {
@@ -25,20 +26,20 @@ export function initialPlayerDraft(player, usedColors = [], usedEmojis = []) {
     return {
       name: player.name || "",
       color: toNeoColor(player.color),
-      emoji: player.emoji || "",
+      emoji: toIconId(player.emoji),
       cardStyle: player.cardStyle === "gradient" ? "gradient" : "solid",
     };
   }
   return {
     name: "",
     color: pickRandomUnused(PLAYER_COLORS, usedColors.map(toNeoColor)),
-    emoji: pickRandomUnused(AUTOFILL_EMOJIS, usedEmojis),
+    emoji: pickRandomUnused(AUTOFILL_ICONS, usedEmojis.map(toIconId)),
     cardStyle: "solid",
   };
 }
 
 export function PlayerEditFields({ draft, onChange, inputRef, onSubmit, onEscape, wide = false }) {
-  const [styleTab, setStyleTab] = useState("color"); // "color" | "emoji"
+  const [styleTab, setStyleTab] = useState("color"); // "color" | "icon"
   const { name, color, emoji, cardStyle } = draft;
 
   const nameInput = (
@@ -60,14 +61,14 @@ export function PlayerEditFields({ draft, onChange, inputRef, onSubmit, onEscape
 
   return (
     // Fixed-height layout: the tab panel fills the remaining space so the
-    // sheet doesn't jump when switching between Color and Emoji.
+    // sheet doesn't jump when switching between Color and Icon.
     <div className="flex flex-col h-full min-h-0">
       {!wide && (
         <div
           className="mr-1 h-16 flex-shrink-0 flex items-center gap-3 px-3 text-ink border-3 border-ink rounded-[14px] shadow-neo"
           style={{ background: cardStyle === "gradient" ? twoToneBackground(color) : color }}
         >
-          <PlayerTile emoji={emoji} color="#FFFFFF" size={42} radius={10} />
+          <PlayerTile icon={emoji} color="#FFFFFF" size={42} radius={10} />
           <span className={`flex-1 min-w-0 truncate text-xl font-extrabold ${name.trim() ? "" : "opacity-50"}`}>{name.trim() || "Player name"}</span>
           <span className="font-mono text-[10px] font-bold tracking-[0.12em]">PREVIEW</span>
         </div>
@@ -138,7 +139,7 @@ export function PlayerEditFields({ draft, onChange, inputRef, onSubmit, onEscape
             </div>
           </>
         ) : (
-          <EmojiPicker selected={emoji} onChange={(next) => onChange({ emoji: next })} />
+          <IconPicker selected={emoji} onChange={(next) => onChange({ emoji: next })} />
         )}
       </div>
     </div>

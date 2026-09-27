@@ -14,7 +14,6 @@ const safeFormat = (value, fmt) => {
   return isNaN(d.getTime()) ? "—" : format(d, fmt);
 };
 import HistoryStats from "@/components/scorekeeper/HistoryStats";
-import FluentEmoji from "@/components/scorekeeper/FluentEmoji";
 import { PlayerTile, SegmentedControl, SectionLabel, PageTitle, HeaderLink, WinnerCard, ColorChip, PAGE_TOP, WIDE_PAGE_TOP } from "@/components/scorekeeper/neo";
 import { toNeoColor } from "@/lib/colors";
 import HistoryGameDetail from "@/components/scorekeeper/HistoryGameDetail";
@@ -147,11 +146,9 @@ export default function History({ onBack, onResumeGame, onRematch, onModalChange
     onRematch?.(game.players, game.win_mode, null, getModeMeta(game.win_mode).targetScore);
   };
 
-  const emptyPanel = (emoji, title, body) => (
+  const emptyPanel = (icon, title, body) => (
     <div className="flex flex-col items-center justify-center text-center px-5" style={{ minHeight: "50vh" }}>
-      <PlayerTile color="rgb(var(--surface))" size={104} radius={22} rotate={-6} className="shadow-neo-md">
-        <FluentEmoji emoji={emoji} size={72} />
-      </PlayerTile>
+      <PlayerTile icon={icon} color="rgb(var(--surface))" size={104} radius={22} rotate={-6} className="shadow-neo-md" />
       <h2 className="font-display mt-8 text-[26px] leading-[1.1] uppercase">{title}</h2>
       <p className="mt-2.5 text-base font-medium text-subtle max-w-[280px]">{body}</p>
     </div>
@@ -287,7 +284,7 @@ export default function History({ onBack, onResumeGame, onRematch, onModalChange
 
             <div className="flex-1 min-h-0 mt-6">
               {tab === "games" ? (
-                games.length === 0 ? emptyPanel("🏆", "No finished games", "Finish a game and it'll show up here.") : (
+                games.length === 0 ? emptyPanel("trophy", "No finished games", "Finish a game and it'll show up here.") : (
                   <div className="h-full flex gap-8">
                     <div
                       ref={scrollRef}
@@ -317,7 +314,7 @@ export default function History({ onBack, onResumeGame, onRematch, onModalChange
                                 color: active ? "rgb(var(--ink))" : "rgb(var(--fg))",
                                 boxShadow: active ? "6px 6px 0 rgb(var(--ink))" : "3px 3px 0 rgb(var(--ink))",
                               }}>
-                              <PlayerTile emoji={isTie ? "🤝" : winner.emoji || "🏆"} color={active ? "#FFFFFF" : isTie ? "rgb(var(--surface))" : toNeoColor(winner.color)} size={48} radius={11} />
+                              <PlayerTile icon={isTie ? "🤝" : winner.emoji || "🏆"} color={active ? "#FFFFFF" : isTie ? "rgb(var(--surface))" : toNeoColor(winner.color)} size={48} radius={11} />
                               <div className="flex-1 min-w-0">
                                 <div className="text-lg font-extrabold truncate">{isTie ? "It's a tie" : `${winner.name} won`}</div>
                                 <div className="font-mono mt-0.5 text-[11px] font-bold tracking-[0.08em] uppercase opacity-80 truncate">
@@ -352,14 +349,14 @@ export default function History({ onBack, onResumeGame, onRematch, onModalChange
                         onDelete={(id) => setSavedToDelete(savedGames.find((g) => g.id === id) || null)}
                       />
                     </div>
-                  ) : emptyPanel("🔖", "No saved games", "Tap the bookmark during a game to save it here.")}
+                  ) : emptyPanel("bookmark", "No saved games", "Tap the bookmark during a game to save it here.")}
                 </div>
               ) : (
                 <div className="h-full overflow-y-auto pb-4">
                   <div className="max-w-[760px]">
                     {games.length > 0
                       ? <HistoryStats games={games} />
-                      : emptyPanel("📊", "No stats yet", "Finish a game to see your stats here.")}
+                      : emptyPanel("chart-column-big", "No stats yet", "Finish a game to see your stats here.")}
                   </div>
                 </div>
               )}
@@ -420,7 +417,7 @@ export default function History({ onBack, onResumeGame, onRematch, onModalChange
               >
                 {games.length > 0
                   ? <HistoryStats games={games} />
-                  : emptyPanel("📊", "No stats yet", "Finish a game to see your stats here.")}
+                  : emptyPanel("chart-column-big", "No stats yet", "Finish a game to see your stats here.")}
               </motion.div>
             ) : tab === "saved" ? (
               <motion.div
@@ -436,7 +433,7 @@ export default function History({ onBack, onResumeGame, onRematch, onModalChange
                     onResume={onResumeGame}
                     onDelete={(id) => setSavedToDelete(savedGames.find((g) => g.id === id) || null)}
                   />
-                ) : emptyPanel("🔖", "No saved games", "Tap the bookmark during a game to save it here.")}
+                ) : emptyPanel("bookmark", "No saved games", "Tap the bookmark during a game to save it here.")}
               </motion.div>
             ) : (
             <motion.div
@@ -446,7 +443,7 @@ export default function History({ onBack, onResumeGame, onRematch, onModalChange
               exit={{ opacity: 0, x: -24 }}
               transition={TRANSITION_PANEL}
             >
-            {games.length === 0 && emptyPanel("🏆", "No finished games", "Finish a game and it'll show up here.")}
+            {games.length === 0 && emptyPanel("trophy", "No finished games", "Finish a game and it'll show up here.")}
             <AnimatePresence>
             {games.map((game, gameIdx) => {
                 const isLowWin = isLowMode(game.win_mode);
@@ -490,7 +487,7 @@ export default function History({ onBack, onResumeGame, onRematch, onModalChange
                     whileTap={{ scale: 0.985 }}
                     className="mb-3.5 mr-[5px] p-3.5 bg-surface border-3 border-ink rounded-2xl shadow-neo-md cursor-pointer">
                     <div className="flex items-center gap-3">
-                      <PlayerTile emoji={isTie ? "🤝" : winner.emoji || "🏆"} color={isTie ? "rgb(var(--surface))" : toNeoColor(winner.color)} size={44} radius={10} />
+                      <PlayerTile icon={isTie ? "🤝" : winner.emoji || "🏆"} color={isTie ? "rgb(var(--surface))" : toNeoColor(winner.color)} size={44} radius={10} />
                       <div className="flex-1 min-w-0">
                         <div className="text-lg font-extrabold truncate">{isTie ? "It's a tie" : `${winner.name} won`}</div>
                         <div className="font-mono mt-0.5 text-[11px] font-bold tracking-[0.08em] uppercase text-subtle">

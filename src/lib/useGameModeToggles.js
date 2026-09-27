@@ -9,11 +9,11 @@ const STORAGE_KEY = "scrkpr_game_mode_toggles";
 // Modes users can turn off. "high" / "low" / "bestof" are considered core and
 // always visible — only optional/experimental modes live here.
 export const OPTIONAL_MODES = [
-  { id: "swish", label: "Swish", emoji: "⚡", description: "Race to 500 — lowest total wins." },
-  { id: "ginrummy", label: "Gin Rummy", emoji: "🎴", description: "Race to 100 — lowest total wins." },
-  { id: "hotdice", label: "Hot Dice", emoji: "🎲", description: "Race to 10,000 — highest total wins." },
-  { id: "phase10", label: "Phase 10", emoji: "🃏", description: "Complete all 10 phases — lowest total wins." },
-  { id: "skipbo", label: "Skip-Bo", emoji: "🔢", description: "Race to 500 — highest total wins." },
+  { id: "swish", label: "Swish", icon: "zap", description: "Race to 500 — lowest total wins." },
+  { id: "ginrummy", label: "Gin Rummy", icon: "spade", description: "Race to 100 — lowest total wins." },
+  { id: "hotdice", label: "Hot Dice", icon: "dices", description: "Race to 10,000 — highest total wins." },
+  { id: "phase10", label: "Phase 10", icon: "layers", description: "Complete all 10 phases — lowest total wins." },
+  { id: "skipbo", label: "Skip-Bo", icon: "square-stack", description: "Race to 500 — highest total wins." },
 ];
 
 // Optional modes ship OFF by default — users opt in from Settings → Game Modes.

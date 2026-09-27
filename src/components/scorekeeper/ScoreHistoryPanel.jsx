@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import FluentEmoji from "./FluentEmoji";
+import NeoIcon from "./NeoIcon";
 import { PlayerTile } from "./neo";
 import { isLowMode } from "@/lib/gameModes";
 import { toNeoColor } from "@/lib/colors";
@@ -20,7 +20,7 @@ export default function ScoreHistoryPanel({ players, winMode, bare = false }) {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center pb-6">
         <PlayerTile color="rgb(var(--surface))" size={104} radius={22} rotate={-6} className="shadow-neo-md">
-          <FluentEmoji emoji="🤷‍♀️" size={72} />
+          <NeoIcon name="ghost" size={62} />
         </PlayerTile>
         <h2 className="font-display mt-8 text-[26px] leading-[1.1] uppercase">No rounds yet</h2>
         <p className="mt-2.5 text-base font-medium text-subtle max-w-[280px]">Every round's scores will stack up here.</p>
@@ -38,7 +38,7 @@ export default function ScoreHistoryPanel({ players, winMode, bare = false }) {
             <div className="font-mono pl-3.5 text-[11px] font-bold tracking-[0.1em]">RND</div>
             {players.map((p) => (
               <div key={p.id} className="flex justify-center" title={p.name}>
-                <PlayerTile emoji={p.emoji} color={toNeoColor(p.color)} size={34} radius={9} border={2.5} />
+                <PlayerTile icon={p.emoji} color={toNeoColor(p.color)} size={34} radius={9} border={2.5} />
               </div>
             ))}
           </div>

@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { SPRING_POP, SPRING_SNAPPY } from "@/lib/motion";
-import FluentEmoji from "./FluentEmoji";
+import NeoIcon from "./NeoIcon";
 
 const KNOB = 48; // knob diameter (px) — also the track height
 const PAD = 4; // track inner padding = the gradient stroke width
@@ -100,7 +100,7 @@ export default function SlideToEndGame({ onComplete }) {
             animate={{ scale: [1, 1.35, 1], rotate: [0, -8, 8, 0] }}
             transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
           >
-            <FluentEmoji emoji="🏁" size={22} />
+            <NeoIcon name="flag" knockout="#FFFFFF" size={22} className="text-ink" />
           </motion.span>
         </motion.div>
       </div>

@@ -37,7 +37,7 @@ export default function ScoreCard({ player, isLeader = false, isWorst = false, i
       <StatusTags showLeader={showLeader} isWorst={isWorst} className="absolute -top-[15px] right-5" />
 
       <div className="flex items-center gap-3.5 min-w-0">
-        <RoundTile emoji={player.emoji} scoredThisRound={scoredThisRound} size={64} radius={14} />
+        <RoundTile icon={player.emoji} scoredThisRound={scoredThisRound} size={64} radius={14} />
         <div className="min-w-0">
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-[26px] font-extrabold truncate leading-tight" title={player.name}>{player.name}</span>

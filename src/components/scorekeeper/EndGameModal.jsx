@@ -4,7 +4,7 @@ import { Check } from "lucide-react";
 import { fireNeoConfetti } from "@/lib/neoConfetti";
 import { Button } from "@/components/ui/button";
 import { isLowMode, getModeMeta } from "@/lib/gameModes";
-import FluentEmoji from "./FluentEmoji";
+import NeoIcon from "./NeoIcon";
 import BottomSheetModal from "./BottomSheetModal";
 import { toNeoColor } from "@/lib/colors";
 import { PlayerTile, Tag, CrownGlyph, StandingRow, StatTile, SectionLabel } from "./neo";
@@ -21,7 +21,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
       .map((p) => ({ ...p, total: p.scores.reduce((s, n) => s + n, 0) }))
       .sort((a, b) => (lowWin ? a.total - b.total : b.total - a.total));
     const isTied = ranked.length > 1 && ranked[0].total === ranked[1].total;
-    return fireNeoConfetti({ emoji: !isTied ? ranked[0]?.emoji : null });
+    return fireNeoConfetti({ icon: !isTied ? ranked[0]?.emoji : null });
   }, [isOpen, players, winMode]);
 
   const hasPlayers = isOpen && players.length > 0;
@@ -129,7 +129,7 @@ export default function EndGameModal({ isOpen, players, winMode, gameStartTime, 
             transition={{ delay: 0.7, duration: 0.8, ease: "easeInOut" }}
             className="flex"
           >
-            <FluentEmoji emoji={isTie ? "🤝" : winner?.emoji || "🏆"} size={44} />
+            <NeoIcon name={isTie ? "handshake" : winner?.emoji || "trophy"} knockout="#FFFFFF" size={40} />
           </motion.span>
         </PlayerTile>
       </motion.div>

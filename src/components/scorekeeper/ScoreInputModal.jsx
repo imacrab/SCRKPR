@@ -63,7 +63,7 @@ export default function ScoreInputModal({ player, editingIndex, isOpen, onSubmit
     <BottomSheetModal
       isOpen={isOpen}
       onClose={onClose}
-      leading={<PlayerTile emoji={displayPlayer.emoji} color={toNeoColor(displayPlayer.color)} size={46} radius={11} />}
+      leading={<PlayerTile icon={displayPlayer.emoji} color={toNeoColor(displayPlayer.color)} size={46} radius={11} />}
       eyebrow={isEditing ? `Edit round ${displayEditingIndex + 1}` : "Add Score"}
       title={displayPlayer.name}
       trailing={<HeaderLink onClick={() => handleChange("")}>Clear</HeaderLink>}

@@ -1,4 +1,4 @@
-import FluentEmoji from "./FluentEmoji";
+import NeoIcon from "./NeoIcon";
 import { RANK_COLORS, toNeoColor } from "@/lib/colors";
 
 export function LogoSticker({ size = "sm", bg = "#FFD23F", className = "", style }) {
@@ -21,10 +21,11 @@ export function SectionLabel({ children, className = "", as: Tag = "div", ...pro
   );
 }
 
-export function PlayerTile({ emoji, color = "rgb(var(--surface))", size = 48, radius, border = 3, rotate = 0, className = "", children }) {
+export function PlayerTile({ icon, color = "rgb(var(--surface))", knockout = color, size = 48, radius, border = 3, rotate = 0, className = "", children }) {
+  const themed = color.startsWith("rgb(var(");
   return (
     <span
-      className={`flex-shrink-0 flex items-center justify-center text-ink border-ink ${className}`}
+      className={`flex-shrink-0 flex items-center justify-center border-ink ${themed ? "text-fg" : "text-ink"} ${className}`}
       style={{
         width: size,
         height: size,
@@ -34,7 +35,7 @@ export function PlayerTile({ emoji, color = "rgb(var(--surface))", size = 48, ra
         transform: rotate ? `rotate(${rotate}deg)` : undefined,
       }}
     >
-      {children ?? (emoji ? <FluentEmoji emoji={emoji} size={Math.round((size - border * 2) * 0.8)} /> : null)}
+      {children ?? <NeoIcon name={icon} knockout={knockout} size={Math.round((size - border * 2) * 0.66)} />}
     </span>
   );
 }
@@ -164,9 +165,9 @@ export function WinnerCard({ label, date, sorted, isTie, modeLabel, className = 
       </div>
       <div className="mt-3.5 flex items-center gap-3.5">
         <div className="relative flex-shrink-0">
-          <PlayerTile emoji={isTie ? "🤝" : winner.emoji || "🏆"} color="#FFFFFF" size={62} radius={14} />
+          <PlayerTile icon={isTie ? "handshake" : winner.emoji || "trophy"} color="#FFFFFF" size={62} radius={14} />
           <span className="absolute -right-2.5 -bottom-2 w-[30px] h-[30px] flex items-center justify-center bg-sun text-ink border-2.5 border-ink rounded-full">
-            <FluentEmoji emoji="🏆" size={16} />
+            <NeoIcon name="trophy" knockout="#FFD23F" size={16} />
           </span>
         </div>
         <div className="min-w-0">

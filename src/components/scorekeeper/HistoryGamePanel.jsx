@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { isLowMode, isCircleMode, getModeMeta } from "@/lib/gameModes";
 import { toNeoColor } from "@/lib/colors";
 import { SPRING_ENTER } from "@/lib/motion";
-import FluentEmoji from "./FluentEmoji";
+import NeoIcon from "./NeoIcon";
 import ScoreHistoryPanel from "./ScoreHistoryPanel";
 import HistoryGameStats from "./HistoryGameStats";
 import { PlayerTile, SectionLabel, WIDE_PANEL } from "./neo";
@@ -53,9 +53,9 @@ export default function HistoryGamePanel({ game, onDelete, onRematch }) {
 
         <div className="mt-6 flex items-center gap-5">
           <div className="relative flex-shrink-0">
-            <PlayerTile emoji={isTie ? "🤝" : winner.emoji || "🏆"} color={isTie ? "rgb(var(--surface))" : toNeoColor(winner.color)} size={84} radius={18} className="shadow-neo" />
+            <PlayerTile icon={isTie ? "handshake" : winner.emoji || "trophy"} color={isTie ? "rgb(var(--surface))" : toNeoColor(winner.color)} size={84} radius={18} className="shadow-neo" />
             <span className="absolute -right-3 -bottom-2.5 w-9 h-9 flex items-center justify-center bg-sun text-ink border-2.5 border-ink rounded-full">
-              <FluentEmoji emoji="🏆" size={20} />
+              <NeoIcon name="trophy" knockout="#FFD23F" size={20} />
             </span>
           </div>
           <div className="min-w-0">

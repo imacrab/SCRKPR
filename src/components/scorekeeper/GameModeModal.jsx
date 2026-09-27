@@ -11,14 +11,14 @@ import { useGameModeToggles } from "@/lib/useGameModeToggles";
 // (first to 500 ends it, lowest total wins). Best Of asks for a round count next.
 // `optional: true` means the mode can be hidden via Settings → Game Modes.
 const MODES = [
-  { value: "swish", label: "Swish", emoji: "⚡", optional: true },
-  { value: "ginrummy", label: "Gin Rummy", emoji: "🎴", optional: true },
-  { value: "hotdice", label: "Hot Dice", emoji: "🎲", optional: true },
-  { value: "phase10", label: "Phase 10", emoji: "🃏", optional: true },
-  { value: "skipbo", label: "Skip-Bo", emoji: "🔢", optional: true },
-  { value: "low", label: "Low Score", emoji: "📉" },
-  { value: "high", label: "High Score", emoji: "📈" },
-  { value: "bestof", label: "Best Of", emoji: "🏆" },
+  { value: "swish", label: "Swish", icon: "zap", optional: true },
+  { value: "ginrummy", label: "Gin Rummy", icon: "spade", optional: true },
+  { value: "hotdice", label: "Hot Dice", icon: "dices", optional: true },
+  { value: "phase10", label: "Phase 10", icon: "layers", optional: true },
+  { value: "skipbo", label: "Skip-Bo", icon: "square-stack", optional: true },
+  { value: "low", label: "Low Score", icon: "arrow-big-down" },
+  { value: "high", label: "High Score", icon: "arrow-big-up" },
+  { value: "bestof", label: "Best Of", icon: "trophy" },
 ];
 
 export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, onClose }) {
@@ -88,7 +88,7 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
       }
     >
       <div className="flex flex-col gap-2.5 pb-1 pr-1">
-        {visibleModes.map(({ value, label, emoji }) => {
+        {visibleModes.map(({ value, label, icon }) => {
           const active = mode === value;
           return (
             <button
@@ -101,7 +101,7 @@ export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, 
                 boxShadow: active ? "4px 4px 0 rgb(var(--ink))" : "none",
               }}
             >
-              <PlayerTile emoji={emoji} color={active ? "#FFFFFF" : "rgb(var(--paper))"} size={38} radius={9} border={2.5} />
+              <PlayerTile icon={icon} color={active ? "#FFFFFF" : "rgb(var(--paper))"} size={38} radius={9} border={2.5} />
               <span className={`flex-1 text-[17px] font-extrabold ${active ? "text-ink" : ""}`}>{label}</span>
               {active && (
                 <span className="w-7 h-7 flex items-center justify-center bg-ink rounded-lg">

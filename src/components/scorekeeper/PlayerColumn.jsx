@@ -40,7 +40,7 @@ function AnimatedTotal({ value }) {
 
   return (
     // Not clipped: digits slide past this box and are clipped by the card.
-    <span className="font-display leading-none block text-[34px] relative" style={{ opacity: isResetting ? 0.7 : 1, height: "1em", minWidth: "1ch" }}>
+    <span className={`font-display leading-none block relative ${String(displayValue).length >= 5 ? "text-[28px]" : "text-[34px]"}`} style={{ opacity: isResetting ? 0.7 : 1, height: "1em", minWidth: "1ch" }}>
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
           key={animKey}
@@ -208,7 +208,7 @@ export default function PlayerColumn({ player, isLeader = false, isWorst = false
         )}
       </div>
 
-      <div className="w-[60px] flex-shrink-0 flex justify-center">
+      <div className="min-w-[60px] flex-shrink-0 flex justify-center">
         <AnimatedTotal value={total} />
       </div>
 

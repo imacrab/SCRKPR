@@ -16,8 +16,9 @@ export const OPTIONAL_MODES = [
   { id: "skipbo", label: "Skip-Bo", icon: "square-stack", description: "Race to 500 — highest total wins." },
 ];
 
-// Optional modes ship OFF by default — users opt in from Settings → Game Modes.
-const DEFAULTS = OPTIONAL_MODES.reduce((acc, m) => ({ ...acc, [m.id]: false }), {});
+// Optional modes ship OFF by default (except Swish) — users opt in from Settings → Game Modes.
+const ENABLED_BY_DEFAULT = new Set(["swish"]);
+const DEFAULTS = OPTIONAL_MODES.reduce((acc, m) => ({ ...acc, [m.id]: ENABLED_BY_DEFAULT.has(m.id) }), {});
 
 function readToggles() {
   try {

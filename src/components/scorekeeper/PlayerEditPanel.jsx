@@ -86,7 +86,7 @@ export function PlayerEditPanelEmpty({ onAdd }) {
   return (
     <div className={`h-full flex flex-col items-center justify-center text-center p-8 ${WIDE_PANEL}`}>
       <PlayerTile color="#FFD23F" size={104} radius={22} rotate={-6} className="shadow-neo-md">
-        <NeoIcon name="pointer" size={62} className="rotate-180" />
+        <NeoIcon name="pointer" size={62} className="-rotate-90" />
       </PlayerTile>
       <h2 className="font-display mt-8 text-[28px] leading-[1.1] uppercase">Pick a player</h2>
       <p className="mt-2.5 text-base font-medium text-subtle max-w-[300px]">Tap anyone on the left to change their name, color, or icon.</p>

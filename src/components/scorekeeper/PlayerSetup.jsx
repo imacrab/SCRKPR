@@ -608,7 +608,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
         <div
           ref={scrollRef}
           onScroll={(e) => setScrolledFromTop(e.currentTarget.scrollTop > 4)}
-          className={`h-full overflow-y-auto px-5 pb-3 ${scrolledFromTop ? "border-t-[2.5px] border-ink" : ""}`}
+          className={`h-full overflow-y-auto px-5 pb-3 ${hasPlayers ? "" : "flex flex-col"} ${scrolledFromTop ? "border-t-[2.5px] border-ink" : ""}`}
           style={{ paddingTop: scrolledFromTop ? 8 : 0 }}>
 
           {allPlayers === null ?
@@ -618,7 +618,7 @@ export default function PlayerSetup({ onStart, onModalChange }) {
 
           <>
               {!hasPlayers &&
-            <motion.div {...reveal(2)} className="flex flex-col">
+            <motion.div {...reveal(2)} className="flex-1 flex flex-col justify-center">
                   <h2 className="font-display text-[26px] leading-[1.1] uppercase text-center">Let's add some players</h2>
                   <p className="mt-2.5 text-base font-medium text-center text-subtle">You need at least two to start.</p>
                   <button

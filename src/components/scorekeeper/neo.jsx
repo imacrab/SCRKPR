@@ -35,7 +35,7 @@ export function PlayerTile({ icon, color = "rgb(var(--surface))", size = 48, rad
         transform: rotate ? `rotate(${rotate}deg)` : undefined,
       }}
     >
-      {children ?? <NeoIcon name={icon} size={Math.round((size - border * 2) * 0.66)} />}
+      {children ?? <NeoIcon name={icon} size={Math.round((size - border * 2) * 0.66)} strokeWidth={3} />}
     </span>
   );
 }

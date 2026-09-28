@@ -129,7 +129,7 @@ export function RoundTile({ icon, scoredThisRound, size = 48, radius = 11 }) {
             exit={{ y: travel, opacity: 0, transition: TRANSITION_SLIDE_OUT }}
             transition={SPRING_POP_SNAPPY}
           >
-            <NeoIcon name={icon} size={Math.round(size * 0.6)} />
+            <NeoIcon name={icon} size={Math.round(size * 0.6)} strokeWidth={3} />
           </motion.span>
         ) : null}
       </AnimatePresence>

@@ -18,7 +18,7 @@ export default function SideNavigation() {
       aria-label="Main"
       className="flex-shrink-0 h-full flex flex-col w-[104px] landscape:w-[264px] px-4 landscape:px-5 bg-surface border-r-3 border-ink"
       style={{
-        paddingTop: "max(calc(env(safe-area-inset-top) + 20px), 36px)",
+        paddingTop: "max(calc(env(safe-area-inset-top) + 20px), var(--wide-page-top-floor))",
         paddingBottom: "max(calc(env(safe-area-inset-bottom) + 12px), 28px)",
       }}
     >

@@ -6,6 +6,8 @@
 
 @layer base {
   :root {
+    --page-top-floor: 44px;
+    --wide-page-top-floor: 36px;
     /* RGB triplets so Tailwind opacity modifiers work (e.g. border-ink/20). */
     --ink: 17 17 17;
     --fg: 17 17 17;
@@ -38,6 +40,15 @@
     --ring: 0 0% 6.7%;
     --radius: 0.75rem;
     color-scheme: light;
+  }
+
+  /* Home-screen installs use a solid status bar, so the page already starts
+     below it and needs no extra clearance. */
+  @media (display-mode: standalone) {
+    :root {
+      --page-top-floor: 0px;
+      --wide-page-top-floor: 0px;
+    }
   }
 
   /* Dark mode keeps the hard ink edges, but every "black" carries a faint

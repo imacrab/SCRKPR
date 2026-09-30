@@ -130,8 +130,8 @@ export function StatTile({ label, value }) {
   );
 }
 
-export const PAGE_TOP = "max(calc(env(safe-area-inset-top) + 8px), 44px)";
-export const WIDE_PAGE_TOP = "max(calc(env(safe-area-inset-top) + 16px), 36px)";
+export const PAGE_TOP = "max(calc(env(safe-area-inset-top) + 8px), var(--page-top-floor))";
+export const WIDE_PAGE_TOP = "max(calc(env(safe-area-inset-top) + 16px), var(--wide-page-top-floor))";
 
 export const WIDE_PANEL = "bg-surface text-fg border-3 border-ink rounded-[20px] shadow-neo-lg";
 

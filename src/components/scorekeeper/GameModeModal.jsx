@@ -16,9 +16,9 @@ const MODES = [
   { value: "hotdice", label: "Hot Dice", icon: "dices", optional: true },
   { value: "phase10", label: "Phase 10", icon: "layers", optional: true },
   { value: "skipbo", label: "Skip-Bo", icon: "square-stack", optional: true },
+  { value: "bestof", label: "Best Of", icon: "trophy" },
   { value: "low", label: "Low Score", icon: "arrow-big-down" },
   { value: "high", label: "High Score", icon: "arrow-big-up" },
-  { value: "bestof", label: "Best Of", icon: "trophy" },
 ];
 
 export default function GameModeModal({ isOpen, winMode, targetScore, onSelect, onClose }) {

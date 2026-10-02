@@ -168,8 +168,12 @@ export default function PlayerEditModal({ isOpen, player, usedColors = [], usedE
   const setInputRef = useCallback((el) => {
     inputRef.current = el;
     if (el && isOpen) {
-      el.focus();
-      try { el.select(); } catch {}
+      // The sheet mounts off-screen and springs in; a plain focus() makes iOS
+      // scroll the whole page to reveal the input, dragging the app with it.
+      el.focus({ preventScroll: true });
+      if (el.value) {
+        try { el.select(); } catch {}
+      }
     }
   }, [isOpen]);
 

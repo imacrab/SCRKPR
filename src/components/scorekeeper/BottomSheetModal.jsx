@@ -192,7 +192,7 @@ export default function BottomSheetModal({
         initial={{ opacity: 0 }}
         animate={{ opacity: isOpen ? 1 : 0 }}
         transition={TRANSITION_FADE}
-        className="fixed inset-0 bg-[rgba(17,17,17,0.62)]"
+        className="fixed inset-0 bg-[rgba(17,17,17,0.62)] backdrop-blur-[24px]"
         style={{ zIndex: backdropZ, pointerEvents: isOpen ? "auto" : "none" }}
         onClick={onClose}
       />
